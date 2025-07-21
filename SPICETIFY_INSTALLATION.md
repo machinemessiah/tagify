@@ -5,7 +5,7 @@
 1. **Open PowerShell**
 
    - Press `Windows key + R`
-   - Type `powershell` - press Enter
+   - Type "powershell" - press Enter
 
 2. Run this command:
 
