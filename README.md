@@ -8,32 +8,33 @@ Tagify is a powerful [Spicetify](https://github.com/spicetify/cli) custom app th
 
 ## Motivation
 
-As a DJ and obsessive music organizer, I spent _years_ searching for a good music tagging system - with no luck. So I built what I wished existed.
+As a DJ and obsessive music organizer, I spent _years_ searching for a good music tagging system - with no luck.
+So I built what I wished existed.
 After several months of development and daily use in my own workflow, I'm excited to share Tagify with fellow music lovers who want to take control of their libraries.
 
 ---
 
 ### **Track Tagging**
 
-Rate tracks, set energy levels, and apply custom tags that actually mean something to you
+Rate tracks, set energy levels, and apply custom tags. Turn vague music memories into organized, searchable data.
 
 ![Single Track Tagging](src/assets/TAGGING_TRACK.gif)
 
 ### **Creating & Managing Tags**
 
-Build your own tag system - from simple genres to complex mood categories.
+Build your own tag system that matches how _you_ think about music.
 
 ![Tag Management](src/assets/CREATING_TAGS.gif)
 
 ### **Smart Filtering & Playlist Creation**
 
-Create playlists using your own custom filters.
+Create playlists by filtering by any combination of tags, ratings, energy, and BPM.
 
 ![Filtering and Playlists](src/assets/FILTERS_PLAYLIST.gif)
 
 ### **Mass Tagging Multiple Tracks**
 
-Select and tag multiple tracks at once for efficient organization.
+Select multiple tracks and apply tags in bulk.
 
 ![Mass Track Tagging](src/assets/MULTI_TRACK_TAGGING.gif)
 
