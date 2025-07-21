@@ -4,7 +4,6 @@
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   const APP_NAME = "tagify";
-  const VERSION = "1.0.0";
 
   const STORAGE_KEY = "tagify:tagData";
   const PLAYLIST_CACHE_KEY = "tagify:playlistCache";
