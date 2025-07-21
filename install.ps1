@@ -42,19 +42,30 @@ if (!(Test-Path -Path $customAppsDir)) {
     New-Item -ItemType Directory -Path $customAppsDir -Force | Out-Null
     Write-Success "Created CustomApps directory"
 }
-    
+
 if (!(Test-Path -Path $tempDir)) {
     New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
 }
 
 Write-Info "Fetching latest release information..."
 $apiUrl = "https://api.github.com/repos/$repoOwner/$repoName/releases/latest"
-    
+
 try {
     $releaseInfo = Invoke-RestMethod -Uri $apiUrl -ErrorAction Stop
-    $downloadUrl = $releaseInfo.assets[0].browser_download_url
     $releaseVersion = $releaseInfo.tag_name
-    Write-Success "Found latest release: $releaseVersion"
+
+    # Find the main zip file (exclude source code archives)
+    $mainAsset = $releaseInfo.assets | Where-Object { 
+        $_.name -like "tagify*.zip" -and $_.name -notlike "*source*" 
+    } | Select-Object -First 1
+
+    if ($mainAsset) {
+        $downloadUrl = $mainAsset.browser_download_url
+        Write-Success "Found latest release: $releaseVersion ($($mainAsset.name))"
+    }
+    else {
+        throw "No suitable zip file found in release"
+    }
 }
 catch {
     Write-Warning "Could not fetch release info from GitHub API. Using direct download..."
@@ -83,7 +94,7 @@ if (Test-Path -Path $customAppDir) {
 Write-Info "Extracting files..."
 try {
     Expand-Archive -Path $zipFile -DestinationPath $tempDir -Force
-        
+
     # Find the extracted folder (might be nested)
     $extractedFolders = Get-ChildItem $tempDir -Directory
     if ($extractedFolders.Count -eq 1) {
@@ -92,7 +103,7 @@ try {
     else {
         $sourceDir = $tempDir
     }
-        
+
     Move-Item -Path $sourceDir -Destination $customAppDir -Force
     Write-Success "Files extracted successfully"
 }
@@ -105,7 +116,7 @@ Write-Info "Configuring Spicetify..."
 try {
     & spicetify config custom_apps $appName
     Write-Success "Added Tagify to Spicetify config"
-        
+
     Write-Info "Applying Spicetify changes..."
     & spicetify apply
     Write-Success "Spicetify configuration applied"
@@ -133,4 +144,3 @@ Next steps:
 3. Start organizing your music!
 
 "@ -ForegroundColor Green
-
