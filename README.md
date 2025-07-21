@@ -115,4 +115,4 @@ curl -fsSL "https://raw.githubusercontent.com/alexk218/tagify/main/install.sh" |
   - Auto-downloads high-quality versions of your tagged Spotify tracks, keeping platforms synchronized.
   - Maintain folder organization and playlist hierarchy across platforms.
 
-Have ideas? Feel free to DM me.
+Have ideas or found a bug? Open an [issue](https://github.com/alexk218/tagify/issues)!
