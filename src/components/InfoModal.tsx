@@ -14,8 +14,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
     { id: "overview", title: "Overview", icon: "📖" },
     { id: "getting-started", title: "Getting Started", icon: "🚀" },
     { id: "tagging", title: "Tagging System", icon: "🏷️" },
-    { id: "features", title: "Key Features", icon: "⭐" },
-    { id: "advanced", title: "Advanced Features", icon: "🔧" }, // New section
+    { id: "features", title: "Features", icon: "⭐" },
   ];
 
   return (
@@ -24,7 +23,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <div className={styles.modalHeader}>
             <h2 className={styles.modalTitle}>
-              <span className={styles.titleIcon}>🎵</span>
+              <span className={styles.titleIcon}>🏷️</span>
               Tagify Guide
             </h2>
             <button className={styles.closeButton} onClick={onClose}>
@@ -55,12 +54,14 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
             <div className={styles.content}>
               {activeSection === "overview" && (
                 <div className={styles.section}>
-                  <h3 className={styles.sectionTitle}>Welcome to Tagify! 🎉</h3>
+                  <h3 className={styles.sectionTitle}>Welcome to Tagify!</h3>
                   <p className={styles.text}>
-                    Tagify is a powerful music organization tool that transforms how you manage and
-                    discover your Spotify library. With an advanced tagging system, smart filtering,
-                    and seamless integration with your music workflow, Tagify helps you create the
-                    perfect soundtrack for any moment.
+                    Tagify is a powerful music organization tool that transforms how you manage your
+                    Spotify library.
+                    <br />
+                    Tag your tracks with a star rating, energy rating, and your own custom tags.
+                    <br />
+                    Create playlists by filtering your tagged tracks based on your own custom tags.
                   </p>
 
                   <div className={styles.featureGrid}>
@@ -109,8 +110,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <div className={styles.stepContent}>
                         <h4>Start with a Track</h4>
                         <p>
-                          Play any song in Spotify, or use the context menu "Tag with Tagify" on any
-                          track to begin tagging.
+                          Play any song in Spotify, or use the context menu (right-click) "Tag with
+                          Tagify" on any track to begin tagging.
                         </p>
                       </div>
                     </div>
@@ -140,11 +141,19 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     <div className={styles.step}>
                       <div className={styles.stepNumber}>4</div>
                       <div className={styles.stepContent}>
-                        <h4>Explore & Filter</h4>
+                        <h4>Filter & Create Playlists</h4>
                         <p>
                           Use the Track List to see all your tagged music and experiment with
-                          filters to find specific vibes.
+                          filters to create playlists based on your tags.
                         </p>
+                      </div>
+                    </div>
+
+                    <div className={styles.step}>
+                      <div className={styles.stepNumber}>5</div>
+                      <div className={styles.stepContent}>
+                        <h4>Create Custom Tags</h4>
+                        <p>Press "Manage Tags" to create your own custom tags!</p>
                       </div>
                     </div>
                   </div>
@@ -203,252 +212,152 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   </div>
 
                   <div className={styles.tip}>
-                    <strong>Pro tip:</strong> You can customize the entire tag structure in "Manage
-                    Tags" to fit your personal music organization style!
+                    Customize your entire tag system in "Manage Tags"!
                   </div>
                 </div>
               )}
 
               {activeSection === "features" && (
                 <div className={styles.section}>
-                  <h3 className={styles.sectionTitle}>Key Features</h3>
+                  <h3 className={styles.sectionTitle}>How to Use Tagify</h3>
 
-                  <div className={styles.featuresList}>
-                    <div className={styles.featureDetail}>
-                      <h4>🏷️ Mass Tagging</h4>
+                  <div className={styles.featuresCompact}>
+                    {/* 1. Create/Manage Tags */}
+                    <div className={styles.featureItem}>
+                      <div className={styles.featureHeader}>
+                        <span className={styles.featureIcon}>🏷️</span>
+                        <h4>1. Create & Manage Tags</h4>
+                      </div>
                       <p>
-                        Select multiple tracks from context menus to tag them all at once. Select
-                        multiple tracks (or Ctrl + A for whole playlist), right-click and press "Tag
-                        with Tagify".
+                        Click <strong>"Manage Tags"</strong> to build your custom tagging system.
+                        Create categories (e.g., "Mood"), subcategories (e.g., "Happy"), and
+                        individual tags (e.g., "Upbeat"). This forms the foundation of your music
+                        organization.
                       </p>
                     </div>
 
-                    <div className={styles.featureDetail}>
-                      <h4>🔒 Track Locking</h4>
+                    {/* 2. Apply ratings, energy, and tags */}
+                    <div className={styles.featureItem}>
+                      <div className={styles.featureHeader}>
+                        <span className={styles.featureIcon}>⭐</span>
+                        <h4>2. Rate, Tag & Set Energy</h4>
+                      </div>
                       <p>
-                        Lock to a specific track to prevent it from changing when Spotify switches
-                        songs. Perfect for detailed tagging sessions.
+                        For any track, set <strong>star ratings (1-5)</strong>,{" "}
+                        <strong>energy levels (1-10)</strong>, and apply your custom tags. Use the
+                        tag selector interface to quickly tag tracks by mood, genre, activity, or
+                        any system you create.
                       </p>
                     </div>
 
-                    <div className={styles.featureDetail}>
-                      <h4>🔍 Smart Filtering</h4>
+                    {/* 3. Update BPM */}
+                    <div className={styles.featureItem}>
+                      <div className={styles.featureHeader}>
+                        <span className={styles.featureIcon}>🎵</span>
+                        <h4>3. BPM Management</h4>
+                      </div>
                       <p>
-                        Filter tracks by any combination of tags, ratings, and energy levels. Create
-                        complex queries to find exactly what you're looking for.
+                        Sometimes Spotify doesn't get the BPM right...
+                        <br />
+                        Click any BPM value to edit manually, or use the refresh button (↻) to fetch
+                        updated BPM from Spotify's audio analysis. Perfect for creating
+                        tempo-specific playlists.
                       </p>
                     </div>
 
-                    <div className={styles.featureDetail}>
-                      <h4>📱 Playlist Creation</h4>
+                    {/* 4. Lock tracks */}
+                    <div className={styles.featureItem}>
+                      <div className={styles.featureHeader}>
+                        <span className={styles.featureIcon}>🔒</span>
+                        <h4>4. Track Locking</h4>
+                      </div>
                       <p>
-                        Create Spotify playlists directly from your filtered results. Perfect for
-                        generating mood-based or activity-specific playlists.
+                        Lock to a specific track to prevent automatic switching when Spotify changes
+                        songs. Essential for focused tagging sessions without interruption.
                       </p>
                     </div>
 
-                    <div className={styles.featureDetail}>
-                      <h4>🎵 Tracklist Integration</h4>
+                    {/* 5. Mass tagging */}
+                    <div className={styles.featureItem}>
+                      <div className={styles.featureHeader}>
+                        <span className={styles.featureIcon}>📦</span>
+                        <h4>5. Batch Tagging</h4>
+                      </div>
                       <p>
-                        See tag information directly in your Spotify playlists with the "Tagify"
-                        column that appears automatically.
+                        Select multiple tracks in any Spotify playlist (Ctrl+A for all),
+                        right-click, and choose
+                        <strong>"Tag with Tagify"</strong> to tag them simultaneously.
                       </p>
                     </div>
 
-                    <div className={styles.featureDetail}>
-                      <h4>🎮 Now Playing Integration</h4>
+                    {/* 6. Import/Export */}
+                    <div className={styles.featureItem}>
+                      <div className={styles.featureHeader}>
+                        <span className={styles.featureIcon}>💾</span>
+                        <h4>6. Import & Export Data</h4>
+                      </div>
                       <p>
-                        View tag information for the currently playing track right in the Spotify
-                        playbar.
+                        <strong>Export:</strong> Download your complete tag library as JSON backup.
+                        <br />
+                        <strong>Import:</strong> Click import button and select your backup file to
+                        restore all tags, ratings, and metadata. Perfect for sharing libraries or
+                        device migration.
+                        <br />
+                        Tip: Backup your data before doing any major operation - like deleting
+                        entire tag categories, etc.
                       </p>
                     </div>
-                  </div>
-                </div>
-              )}
 
-              {/* NEW ADVANCED FEATURES SECTION */}
-              {activeSection === "advanced" && (
-                <div className={styles.section}>
-                  <h3 className={styles.sectionTitle}>Advanced Features</h3>
-
-                  <div className={styles.advancedSection}>
-                    <h4 className={styles.advancedSectionTitle}>🎵 BPM Management</h4>
-                    <div className={styles.advancedFeature}>
-                      <div className={styles.advancedFeatureContent}>
-                        <h5>Update Track BPM</h5>
-                        <p>
-                          In the track details view, you can click on any BPM value to edit it
-                          manually, or use the refresh button (↻) to fetch the latest BPM data from
-                          Spotify's audio analysis.
-                        </p>
-                        <div className={styles.featureBenefit}>
-                          <span className={styles.benefitIcon}>🎯</span>
-                          <span>
-                            Filter your entire library by BPM ranges to create perfect workout
-                            playlists, DJ sets, or tempo-matched collections
-                          </span>
-                        </div>
+                    {/* 7. Smart filtering + playlist creation */}
+                    <div className={styles.featureItem}>
+                      <div className={styles.featureHeader}>
+                        <span className={styles.featureIcon}>🔍</span>
+                        <h4>7. Smart Filtering & Playlist Creation</h4>
                       </div>
+                      <p>
+                        Filter by any combination of tags (include/exclude), ratings, energy levels,
+                        and BPM ranges.
+                        <br />
+                        Click tags once for <span className={styles.includeTag}>include</span>,
+                        twice for
+                        <span className={styles.excludeTag}>exclude</span>.
+                        <br />
+                        <strong>Filter Logic:</strong>{" "}
+                        <span className={styles.filterMode}>ALL</span> = tracks must have ALL
+                        selected tags, <span className={styles.filterMode}>ANY</span> = tracks need
+                        at least ONE selected tag.
+                        <br />
+                        Then click <strong>"Create Playlist"</strong>
+                        or <strong>"Play All"</strong> to enjoy your filtered results.
+                      </p>
                     </div>
-                  </div>
 
-                  <div className={styles.advancedSection}>
-                    <h4 className={styles.advancedSectionTitle}>🔧 Custom Tag Management</h4>
-                    <div className={styles.advancedFeature}>
-                      <div className={styles.advancedFeatureContent}>
-                        <h5>Create Your Own Tag Structure</h5>
-                        <p>
-                          Click "Manage Tags" to completely customize your tagging system. Add new
-                          categories, subcategories, and individual tags that match your music
-                          organization style.
-                        </p>
-                        <div className={styles.featureBenefit}>
-                          <span className={styles.benefitIcon}>🎨</span>
-                          <span>
-                            Build a personalized taxonomy that reflects how you actually think about
-                            and organize your music
-                          </span>
-                        </div>
+                    {/* 8. Tracklist/playbar icons */}
+                    <div className={styles.featureItem}>
+                      <div className={styles.featureHeader}>
+                        <span className={styles.featureIcon}>🎯</span>
+                        <h4>8. Visual Tag Indicators</h4>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.advancedSection}>
-                    <h4 className={styles.advancedSectionTitle}>🔍 Advanced Filtering</h4>
-
-                    <div className={styles.advancedFeature}>
-                      <div className={styles.advancedFeatureContent}>
-                        <h5>ALL vs ANY Filtering Logic</h5>
-                        <div className={styles.filterExplanation}>
-                          <div className={styles.filterMode}>
-                            <span className={styles.filterBadge}>ALL</span>
-                            <span>
-                              Tracks must have <strong>every</strong> selected tag to appear in
-                              results
-                            </span>
+                      <div className={styles.indicatorDemo}>
+                        <p>Track status indicators appear in playlists and the playbar:</p>
+                        <div className={styles.indicatorExamples}>
+                          <div className={styles.indicatorExample}>
+                            <span className={styles.orangeBullet}>●</span>
+                            <span>Orange = Missing tags (needs attention)</span>
                           </div>
-                          <div className={styles.filterMode}>
-                            <span className={styles.filterBadge}>ANY</span>
-                            <span>
-                              Tracks need <strong>at least one</strong> of the selected tags to
-                              appear
-                            </span>
+                          <div className={styles.indicatorExample}>
+                            <span className={styles.greenBullet}>●</span>
+                            <span>Green = Fully tagged (complete)</span>
                           </div>
                         </div>
-                        <p className={styles.filterExample}>
-                          Example: Filtering for "Rock" + "Upbeat" with ALL mode shows only tracks
-                          tagged with both. ANY mode shows tracks with either tag.
+                        <p className={styles.indicatorTip}>
+                          <strong>Click</strong> any indicator to tag that track instantly.
+                          <br />
+                          <strong>Hover</strong> to see current tags.
+                          <br />
+                          You can disable both tracklist & playbar indicators in settings.
                         </p>
                       </div>
-                    </div>
-
-                    <div className={styles.advancedFeature}>
-                      <div className={styles.advancedFeatureContent}>
-                        <h5>INCLUDE vs EXCLUDE Filtering</h5>
-                        <div className={styles.filterExplanation}>
-                          <div className={styles.filterMode}>
-                            <span
-                              className={styles.filterBadge}
-                              style={{ backgroundColor: "#1e90ff" }}
-                            >
-                              INCLUDE
-                            </span>
-                            <span>
-                              Show tracks that <strong>have</strong> these tags
-                            </span>
-                          </div>
-                          <div className={styles.filterMode}>
-                            <span
-                              className={styles.filterBadge}
-                              style={{ backgroundColor: "#ff4c4c" }}
-                            >
-                              EXCLUDE
-                            </span>
-                            <span>
-                              Hide tracks that <strong>have</strong> these tags
-                            </span>
-                          </div>
-                        </div>
-                        <p className={styles.filterExample}>
-                          Tip: Click a tag once to include it (blue), click again to exclude it
-                          (red), click a third time to remove the filter entirely.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.advancedSection}>
-                    <h4 className={styles.advancedSectionTitle}>📋 Smart Playlist Creation</h4>
-                    <div className={styles.advancedFeature}>
-                      <div className={styles.advancedFeatureContent}>
-                        <h5>Create Playlists from Filters</h5>
-                        <p>
-                          After setting up your perfect filter combination, use the "Create
-                          Playlist" button to generate a new Spotify playlist containing only the
-                          filtered tracks.
-                        </p>
-                        <div className={styles.featureBenefit}>
-                          <span className={styles.benefitIcon}>🎵</span>
-                          <span>
-                            Instantly create themed playlists like "High Energy Rock for Workouts"
-                            or "Chill Indie for Study Sessions"
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.advancedSection}>
-                    <h4 className={styles.advancedSectionTitle}>⚡ Bulk Tagging Workflows</h4>
-
-                    <div className={styles.advancedFeature}>
-                      <div className={styles.advancedFeatureContent}>
-                        <h5>Single Track Tagging</h5>
-                        <p>
-                          Right-click any track in any Spotify playlist and select "Tag with Tagify"
-                          to quickly add it to your tagged library.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className={styles.advancedFeature}>
-                      <div className={styles.advancedFeatureContent}>
-                        <h5>Mass Tagging Operations</h5>
-                        <div className={styles.massTaggingSteps}>
-                          <div className={styles.massTaggingStep}>
-                            <span className={styles.stepIcon}>1️⃣</span>
-                            <span>Select multiple tracks (Ctrl/Cmd + Click or Shift + Click)</span>
-                          </div>
-                          <div className={styles.massTaggingStep}>
-                            <span className={styles.stepIcon}>2️⃣</span>
-                            <span>Or use Ctrl/Cmd + A to select an entire playlist</span>
-                          </div>
-                          <div className={styles.massTaggingStep}>
-                            <span className={styles.stepIcon}>3️⃣</span>
-                            <span>Right-click and choose "Tag with Tagify"</span>
-                          </div>
-                          <div className={styles.massTaggingStep}>
-                            <span className={styles.stepIcon}>4️⃣</span>
-                            <span>Apply tags to all selected tracks simultaneously</span>
-                          </div>
-                        </div>
-                        <div className={styles.featureBenefit}>
-                          <span className={styles.benefitIcon}>⚡</span>
-                          <span>
-                            Tag entire albums or playlists with genre/mood tags in seconds instead
-                            of track-by-track
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.proTip}>
-                    <div className={styles.proTipIcon}>🚀</div>
-                    <div className={styles.proTipContent}>
-                      <strong>Pro Workflow:</strong> Create a "To Tag" playlist in Spotify, add
-                      songs throughout the week, then use Ctrl+A → "Tag with Tagify" to batch
-                      process them all at once during your weekly music organization session!
                     </div>
                   </div>
                 </div>
@@ -461,7 +370,6 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
               <div className={styles.footerInfo}>
                 <span className={styles.version}>Tagify v{packageJson.version}</span>
                 <span className={styles.divider}>•</span>
-                <span className={styles.love}>Made with ❤️ for music lovers</span>
                 <a
                   href="https://github.com/alexk218/tagify"
                   target="_blank"
