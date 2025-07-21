@@ -2,6 +2,10 @@
 
 Tagify is a powerful [Spicetify](https://github.com/spicetify/cli) custom app that brings advanced music tagging and organization capabilities to Spotify.
 
+[![GitHub release](https://img.shields.io/github/release/alexk218/tagify.svg)](https://github.com/alexk218/tagify/releases)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/alexk218/tagify.svg)](https://github.com/alexk218/tagify/stargazers)
+
 ### Motivation
 
 As a DJ and obsessive music organizer, I spent _years_ searching for a good music tagging system - with no luck. So I built what I wished existed.
@@ -11,13 +15,13 @@ After several months of development and daily use in my own workflow, I'm excite
 
 ### **Track Tagging**
 
-_Tag any track with star rating and energy level, as well as your own custom tags._
+_Rate tracks, set energy levels, and apply custom tags that actually mean something to you_
 
 ![Single Track Tagging](src/assets/TAGGING_TRACK.gif)
 
 ### **Creating & Managing Tags**
 
-_Customize your tag categories to match your taste._
+_Build your own tag system - from simple genres to complex mood categories._
 
 ![Tag Management](src/assets/CREATING_TAGS.gif)
 
