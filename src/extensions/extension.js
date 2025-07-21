@@ -764,6 +764,7 @@
       tagColumn.setAttribute("role", "columnheader");
       tagColumn.setAttribute("aria-colindex", colIndex.toString());
       tagColumn.style.display = "flex";
+      tagColumn.style.flexDirection = "column";
 
       // Add a button with header text
       const headerButton = document.createElement("button");
@@ -823,7 +824,6 @@
       tagColumn.setAttribute("aria-colindex", colIndex.toString());
       tagColumn.style.display = "flex";
       tagColumn.style.alignItems = "center";
-      tagColumn.style.justifyContent = "space-between";
 
       // Make the entire column clickable
       tagColumn.style.cursor = "pointer";
@@ -844,12 +844,13 @@
       container.style.display = "flex";
       container.style.width = "100%";
       container.style.alignItems = "center";
-      container.style.justifyContent = "space-between";
+      container.style.justifyContent = "center";
 
       // Create the tag info element (left side)
       const tagInfo = document.createElement("div");
       tagInfo.style.display = "flex";
       tagInfo.style.alignItems = "center";
+      tagInfo.style.justifyContent = "center";
 
       // Check if track is tagged
       const isTagged = utils.isTrackTagged(trackUri);
@@ -872,6 +873,9 @@
         tagText.style.overflow = "hidden";
         tagText.style.whiteSpace = "nowrap";
         tagText.style.textOverflow = "ellipsis";
+        tagText.style.display = "flex";
+        tagText.style.alignItems = "center";
+        tagText.style.width = "100%";
 
         // Add tooltip with detailed tag list
         if (
@@ -882,7 +886,6 @@
           const tagList = tracklistEnhancer.createTagListTooltip(trackUri);
           tagText.title = tagList;
         }
-        tagInfo.appendChild(tagText);
 
         tagInfo.appendChild(tagText);
       } else {
