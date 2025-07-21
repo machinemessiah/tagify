@@ -7,7 +7,7 @@
 | [TrackDetails](./TrackDetails.tsx)           | Track info display & tagging | [`TrackDetails.tsx`](./TrackDetails.tsx)           | `track`, `trackData`, `categories` |
 | [TagSelector](./TagSelector.tsx)             | Tag selection interface      | [`TagSelector.tsx`](./TagSelector.tsx)             | `categories`, `onToggleTag`        |
 | [TrackList](./TrackList.tsx)                 | Filtered track listing       | [`TrackList.tsx`](./TrackList.tsx)                 | `tracks`, `filters`                |
-| [MultiTrackDetails](./MultiTrackDetails.tsx) | Multi-track operations       | [`MultiTrackDetails.tsx`](./MultiTrackDetails.tsx) | `selectedTracks`                   |
+| [MultiTrackDetails](./MultiTrackDetails.tsx) | Multi-track operations       | [`MultiTrackDetails.tsx`](./MultiTrackDetails.tsx) | `multiTagTracks`                   |
 
 ## TrackDetails Component
 

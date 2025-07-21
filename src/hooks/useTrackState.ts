@@ -5,14 +5,20 @@ import { parseLocalFileUri } from "../utils/LocalFileParser";
 const LOCK_STATE_KEY = "tagify:lockState";
 const LOCKED_TRACK_KEY = "tagify:lockedTrack";
 
-export function useTrackState() {
+interface UseTrackStateProps {
+  setIsMultiTagging: (isMultiTagging: boolean) => void;
+  setMultiTagTracks: (tracks: SpotifyTrack[]) => void;
+  setLockedMultiTrackUri: (uri: string | null) => void;
+}
+
+export function useTrackState({
+  setIsMultiTagging,
+  setMultiTagTracks,
+  setLockedMultiTrackUri,
+}: UseTrackStateProps) {
   const [currentTrack, setCurrentTrack] = useState<SpotifyTrack | null>(null);
   const [lockedTrack, setLockedTrack] = useState<SpotifyTrack | null>(null);
   const [isLocked, setIsLocked] = useState(false);
-  const [isStorageLoaded, setIsStorageLoaded] = useState(false);
-  const [selectedTracks, setSelectedTracks] = useState<SpotifyTrack[]>([]);
-  const [isMultiTagging, setIsMultiTagging] = useState(false);
-  const [lockedMultiTrackUri, setLockedMultiTrackUri] = useState<string | null>(null);
 
   // Derived state - the active track is either locked track or current track
   const activeTrack = isLocked && lockedTrack ? lockedTrack : currentTrack;
@@ -30,8 +36,6 @@ export function useTrackState() {
       }
     } catch (error) {
       console.error("Tagify: Error loading saved lock state:", error);
-    } finally {
-      setIsStorageLoaded(true);
     }
   }, []);
 
@@ -48,11 +52,6 @@ export function useTrackState() {
 
   // Listen for track changes
   useEffect(() => {
-    // Only set up the listener if storage has been loaded
-    if (!isStorageLoaded) {
-      return;
-    }
-
     // Function to update current track based on Spicetify API
     const updateCurrentTrack = () => {
       // Check if we have a valid player data
@@ -115,12 +114,12 @@ export function useTrackState() {
     return () => {
       Spicetify.Player.removeEventListener("songchange", updateCurrentTrack);
     };
-  }, [isLocked, isStorageLoaded]);
+  }, [isLocked]);
 
   // Cancel multi-tagging mode
   const cancelMultiTagging = () => {
     // Clear the multi-tagging states
-    setSelectedTracks([]);
+    setMultiTagTracks([]);
     setIsMultiTagging(false);
     setLockedMultiTrackUri(null);
 
@@ -214,13 +213,6 @@ export function useTrackState() {
     setLockedTrack,
     isLocked,
     setIsLocked,
-    isStorageLoaded,
-    selectedTracks,
-    setSelectedTracks,
-    isMultiTagging,
-    setIsMultiTagging,
-    lockedMultiTrackUri,
-    setLockedMultiTrackUri,
     activeTrack,
     toggleLock,
     handleTagTrack,
