@@ -711,7 +711,35 @@
     },
 
     /**
-     * Add column to tracklist header
+     * Build dynamic grid template based on column count
+     * @param {number} totalColumns - Total number of columns including ours
+     * @param {number} tagifyColumnIndex - The index where our Tagify column is positioned
+     * @returns {string} CSS grid template string
+     */
+    buildDynamicGrid(totalColumns, tagifyColumnIndex) {
+      let template = "[index] 16px [first] 3fr";
+
+      // Build variable columns
+      for (let i = 1; i < totalColumns - 1; i++) {
+        const columnIndex = i + 2; // Start from 3 since we have index(1) and first(2)
+
+        if (columnIndex === tagifyColumnIndex) {
+          // This is our Tagify column - make it narrow
+          template += ` [var${i}] 80px`;
+        } else {
+          // Other extension columns or standard columns
+          template += ` [var${i}] 2fr`;
+        }
+      }
+
+      // Add the last column (usually duration/menu)
+      template += " [last] minmax(120px,1fr)";
+
+      return `grid-template-columns: ${template} !important`;
+    },
+
+    /**
+     * Add column to tracklist header with dynamic grid management
      * @param {HTMLElement} header - The header element
      */
     addColumnToHeader(header) {
@@ -721,7 +749,11 @@
       const lastColumn = header.querySelector(".main-trackList-rowSectionEnd");
       if (!lastColumn) return;
 
-      // Get column index and increment it for the last column
+      // Count existing columns before adding ours
+      const existingColumns = header.querySelectorAll('[class*="main-trackList-rowSection"]');
+      const currentColumnCount = existingColumns.length;
+
+      // Get current column index and increment it for the last column
       const colIndex = parseInt(lastColumn.getAttribute("aria-colindex"));
       lastColumn.setAttribute("aria-colindex", (colIndex + 1).toString());
 
@@ -749,22 +781,10 @@
       // Insert our column before the last column
       header.insertBefore(tagColumn, lastColumn);
 
-      // Update grid template columns based on column count
-      const fiveColumnGridCss =
-        "grid-template-columns: [index] 16px [first] 3fr [var1] 2fr [var2] 2fr [var3] 1fr [last] minmax(120px,1fr) !important";
-      const sixColumnGridCss =
-        "grid-template-columns: [index] 16px [first] 5fr [var1] 3fr [var2] 2fr [var3] 2fr [last] minmax(120px,1fr) !important";
-
-      switch (colIndex) {
-        case 4:
-          header.setAttribute("style", fiveColumnGridCss);
-          break;
-        case 5:
-          header.setAttribute("style", sixColumnGridCss);
-          break;
-        default:
-          break;
-      }
+      // Build and apply dynamic grid template based on new column count
+      const newColumnCount = currentColumnCount + 1;
+      const gridTemplate = this.buildDynamicGrid(newColumnCount, colIndex);
+      header.setAttribute("style", gridTemplate);
     },
 
     /**
@@ -787,6 +807,10 @@
       // Find the last column to insert before
       const lastColumn = row.querySelector(".main-trackList-rowSectionEnd");
       if (!lastColumn) return;
+
+      // Count existing columns before adding ours
+      const existingColumns = row.querySelectorAll('[class*="main-trackList-rowSection"]');
+      const currentColumnCount = existingColumns.length;
 
       // Get column index and increment it for the last column
       const colIndex = parseInt(lastColumn.getAttribute("aria-colindex"));
@@ -834,14 +858,20 @@
         const summary = utils.getTrackTagSummary(trackUri);
         const tagText = document.createElement("div");
 
-        // Check if track has incomplete tags
+        // Check if track has incomplete tags (missing rating or energy)
         const incomplete = utils.hasIncompleteTags(trackUri);
 
         // Use orange bullet for incomplete tags, green for complete tags
         const bulletColor = incomplete ? "#FFA500" : "#1DB954";
 
-        tagText.innerHTML = `<span style="color:${bulletColor}; margin-right:4px;">●</span> <span class="tag-summary">${summary}</span>`;
+        // Truncate long summaries for narrow column
+        const truncatedSummary = summary.length > 12 ? summary.substring(0, 12) + "..." : summary;
+
+        tagText.innerHTML = `<span style="color:${bulletColor}; margin-right:4px;">●</span>${truncatedSummary}`;
         tagText.style.fontSize = "12px";
+        tagText.style.overflow = "hidden";
+        tagText.style.whiteSpace = "nowrap";
+        tagText.style.textOverflow = "ellipsis";
 
         // Add tooltip with detailed tag list
         if (
@@ -853,36 +883,55 @@
           tagText.title = tagList;
         }
         tagInfo.appendChild(tagText);
+
+        tagInfo.appendChild(tagText);
+      } else {
+        // Show untagged indicator with 3 dots
+        const untaggedText = document.createElement("div");
+        untaggedText.style.display = "flex";
+        untaggedText.style.alignItems = "center";
+        untaggedText.style.justifyContent = "center";
+        untaggedText.style.width = "100%";
+        untaggedText.style.height = "100%";
+        untaggedText.style.minHeight = "40px";
+        untaggedText.style.cursor = "pointer";
+
+        // Create the dots element
+        const dotsSpan = document.createElement("span");
+        dotsSpan.innerHTML = "⋯";
+        dotsSpan.style.color = "#999";
+        dotsSpan.style.fontSize = "20px";
+        dotsSpan.style.lineHeight = "1";
+        dotsSpan.style.transition = "color 0.2s ease";
+        dotsSpan.style.textAlign = "center";
+
+        untaggedText.appendChild(dotsSpan);
+
+        // Add hover tooltip
+        untaggedText.title = "Tag with Tagify";
+
+        // Add hover effect - only change the dots color
+        untaggedText.addEventListener("mouseenter", () => {
+          dotsSpan.style.color = "#fff";
+        });
+
+        untaggedText.addEventListener("mouseleave", () => {
+          dotsSpan.style.color = "#999";
+        });
+
+        tagInfo.appendChild(untaggedText);
       }
 
       container.appendChild(tagInfo);
-
-      // Add warning at the right side
-      const statusContainer = document.createElement("div");
-      statusContainer.style.marginLeft = "auto"; // Push to the right
-
-      container.appendChild(statusContainer);
       tagColumn.appendChild(container);
 
       // Insert our column before the last column
       row.insertBefore(tagColumn, lastColumn);
 
-      // Update grid template columns based on column count
-      const fiveColumnGridCss =
-        "grid-template-columns: [index] 16px [first] 3fr [var1] 2fr [var2] 2fr [var3] 1fr [last] minmax(120px,1fr) !important";
-      const sixColumnGridCss =
-        "grid-template-columns: [index] 16px [first] 5fr [var1] 3fr [var2] 2fr [var3] 2fr [last] minmax(120px,1fr) !important";
-
-      switch (colIndex) {
-        case 4:
-          row.setAttribute("style", fiveColumnGridCss);
-          break;
-        case 5:
-          row.setAttribute("style", sixColumnGridCss);
-          break;
-        default:
-          break;
-      }
+      // Apply the same dynamic grid template to maintain consistency
+      const newColumnCount = currentColumnCount + 1;
+      const gridTemplate = this.buildDynamicGrid(newColumnCount, colIndex);
+      row.setAttribute("style", gridTemplate);
     },
 
     /**
