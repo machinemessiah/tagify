@@ -764,7 +764,7 @@
       tagColumn.setAttribute("role", "columnheader");
       tagColumn.setAttribute("aria-colindex", colIndex.toString());
       tagColumn.style.display = "flex";
-      tagColumn.style.flexDirection = "column";
+      tagColumn.style.justifyContent = "center";
 
       // Add a button with header text
       const headerButton = document.createElement("button");
