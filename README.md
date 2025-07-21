@@ -49,7 +49,9 @@ You'll need **Spicetify** installed on your computer.
 
 ## Install Tagify
 
-### Windows - One-Click Install (Recommended)
+### **One-Click Install (recommended)**
+
+### Windows
 
 Open **Powershell** and run this command:
 
@@ -57,7 +59,15 @@ Open **Powershell** and run this command:
 iwr -useb "https://raw.githubusercontent.com/alexk218/tagify/main/install.ps1" | iex
 ```
 
-### Manual install
+### macOS/Linux
+
+Open **Terminal** and run:
+
+```bash
+curl -fsSL "https://raw.githubusercontent.com/alexk218/tagify/main/install.sh" | bash
+```
+
+### **Manual install**
 
 #### **1. Download Tagify**
 
