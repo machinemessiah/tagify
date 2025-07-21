@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Portal from "../utils/Portal";
 import styles from "./InfoModal.module.css";
+import packageJson from "../../package.json";
 
 interface InfoModalProps {
   onClose: () => void;
@@ -458,7 +459,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
           <div className={styles.modalFooter}>
             <div className={styles.footerContent}>
               <div className={styles.footerInfo}>
-                <span className={styles.version}>Tagify v1.0.0</span>
+                <span className={styles.version}>Tagify v{packageJson.version}</span>
                 <span className={styles.divider}>•</span>
                 <span className={styles.love}>Made with ❤️ for music lovers</span>
                 <a
