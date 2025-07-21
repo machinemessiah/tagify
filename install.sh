@@ -14,7 +14,8 @@ echo -e "${CYAN}🎵 Installing Tagify...${NC}"
 CUSTOM_APPS_DIR="$HOME/.config/spicetify/CustomApps"
 NAME="tagify"
 CUSTOM_APP_DIR="$CUSTOM_APPS_DIR/$NAME"
-ZIP_URL="https://github.com/alexk218/tagify/releases/latest/download/tagify.zip"
+LATEST_TAG=$(curl -s https://api.github.com/repos/alexk218/tagify/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+ZIP_URL="https://github.com/alexk218/tagify/releases/download/$LATEST_TAG/tagify-$LATEST_TAG.zip"
 ZIP_FILE="/tmp/tagify.zip"
 TEMP_DIR="/tmp/tagify-install"
 
@@ -38,7 +39,19 @@ fi
 
 # Download the zip file
 echo -e "${CYAN}📥 Downloading Tagify...${NC}"
-curl -L -o "$ZIP_FILE" "$ZIP_URL"
+if ! curl -L -o "$ZIP_FILE" "$ZIP_URL"; then
+    echo -e "${RED}❌ Failed to download Tagify${NC}"
+    echo "URL: $ZIP_URL"
+    exit 1
+fi
+
+# Check if download was successful
+if [ ! -f "$ZIP_FILE" ] || [ ! -s "$ZIP_FILE" ]; then
+    echo -e "${RED}❌ Downloaded file is empty or missing${NC}"
+    exit 1
+fi
+
+echo -e "${CYAN}✅ Download completed ($(du -h "$ZIP_FILE" | cut -f1))${NC}"
 
 # Create temp directory and unzip
 mkdir -p "$TEMP_DIR"
