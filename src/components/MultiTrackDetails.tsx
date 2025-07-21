@@ -62,7 +62,25 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
 
   // Use external draft tags if provided, otherwise use internal
   const draftTags = externalDraftTags || internalDraftTags;
-  const setDraftTags = onDraftTagsChange || setInternalDraftTags;
+  const setDraftTags = (
+    updaterOrValue: DraftTagState | ((prev: DraftTagState) => DraftTagState)
+  ) => {
+    if (onDraftTagsChange) {
+      // External handler - need to compute the new value
+      const newValue =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(externalDraftTags || {})
+          : updaterOrValue;
+      onDraftTagsChange(newValue);
+    } else {
+      // Internal state - can use the updater directly
+      if (typeof updaterOrValue === "function") {
+        setInternalDraftTags(updaterOrValue);
+      } else {
+        setInternalDraftTags(updaterOrValue);
+      }
+    }
+  };
 
   // Track if there are unsaved changes
   const [hasChanges, setHasChanges] = useState(false);
@@ -148,7 +166,11 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     });
   };
 
-  const commonTags = findCommonTags();
+  const commonTags = findCommonTags().sort((a, b) => {
+    const nameA = getTagName(a.categoryId, a.subcategoryId, a.tagId);
+    const nameB = getTagName(b.categoryId, b.subcategoryId, b.tagId);
+    return nameA.localeCompare(nameB);
+  });
 
   // Handle tag removal/addition in draft state
   const handleRemoveTagDraft = (tag: TrackTag) => {
@@ -452,16 +474,23 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
               <div className={styles.trackTagsInline}>
                 {(draftTags[track.uri] || []).length > 0 ? (
                   <div className={styles.tagList}>
-                    {draftTags[track.uri].map((tag, index) => (
-                      <div
-                        key={index}
-                        className={styles.tagItem}
-                        onClick={(e) => handleTagClickDraft(track.uri, tag, e)}
-                        title="Click to toggle this tag on this track"
-                      >
-                        {getTagName(tag.categoryId, tag.subcategoryId, tag.tagId)}
-                      </div>
-                    ))}
+                    {draftTags[track.uri]
+                      .slice()
+                      .sort((a, b) => {
+                        const nameA = getTagName(a.categoryId, a.subcategoryId, a.tagId);
+                        const nameB = getTagName(b.categoryId, b.subcategoryId, b.tagId);
+                        return nameA.localeCompare(nameB);
+                      })
+                      .map((tag, index) => (
+                        <div
+                          key={index}
+                          className={styles.tagItem}
+                          onClick={(e) => handleTagClickDraft(track.uri, tag, e)}
+                          title="Click to toggle this tag on this track"
+                        >
+                          {getTagName(tag.categoryId, tag.subcategoryId, tag.tagId)}
+                        </div>
+                      ))}
                   </div>
                 ) : (
                   <span className={styles.noTags}>No tags</span>
