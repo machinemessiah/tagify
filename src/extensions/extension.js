@@ -503,15 +503,26 @@
       }
 
       try {
-        // Create menu item
+        // Single track menu item
         new Spicetify.ContextMenu.Item(
           "Tag with Tagify",
           this.handleMenuClick,
-          this.shouldShowMenu,
+          this.shouldShowSingleMenu,
           `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M21.41,11.58L12.41,2.58C12.04,2.21 11.53,2 11,2H4C2.9,2 2,2.9 2,4V11C2,11.53 2.21,12.04 2.59,12.42L11.59,21.42C11.96,21.79 12.47,22 13,22C13.53,22 14.04,21.79 14.41,21.42L21.41,14.42C21.79,14.04 22,13.53 22,13C22,12.47 21.79,11.96 21.41,11.58M5.5,7C4.67,7 4,6.33 4,5.5C4,4.67 4.67,4 5.5,4C6.33,4 7,4.67 7,5.5C7,6.33 6.33,7 5.5,7Z"/>
+          <path d="M21.41,11.58L12.41,2.58C12.04,2.21 11.53,2 11,2H4C2.9,2 2,2.9 2,4V11C2,11.53 2.21,12.04 2.59,12.42L11.59,21.42C11.96,21.79 12.47,22 13,22C13.53,22 14.04,21.79 14.41,21.42L21.41,14.42C21.79,14.04 22,13.53 22,13C22,12.47 21.79,11.96 21.41,11.58M5.5,7C4.67,7 4,6.33 4,5.5C4,4.67 4.67,4 5.5,4C6.33,4 7,4.67 7,5.5C7,6.33 6.33,7 5.5,7Z"/>
+        </svg>`
+        ).register();
+
+        // Multiple tracks menu item
+        new Spicetify.ContextMenu.Item(
+          "Bulk Tag",
+          this.handleMenuClick,
+          this.shouldShowBulkMenu,
+          `<svg width="16" height="16" viewBox="0 0 24 24" fill="#FF6B35">
+          <path d="M21.41,11.58L12.41,2.58C12.04,2.21 11.53,2 11,2H4C2.9,2 2,2.9 2,4V11C2,11.53 2.21,12.04 2.59,12.42L11.59,21.42C11.96,21.79 12.47,22 13,22C13.53,22 14.04,21.79 14.41,21.42L21.41,14.42C21.79,14.04 22,13.53 22,13C22,12.47 21.79,11.96 21.41,11.58M5.5,7C4.67,7 4,6.33 4,5.5C4,4.67 4.67,4 5.5,4C6.33,4 7,4.67 7,5.5C7,6.33 6.33,7 5.5,7Z"/>
           </svg>`
         ).register();
+        // <path d="M9,19 L15,19 L15,21 L9,21 Z M9,15 L19,15 L19,17 L9,17 Z M9,11 L21,11 L21,13 L9,13 Z" fill="#FF6B35" opacity="0.8"/>
 
         state.initialized.menu = true;
       } catch (error) {
@@ -520,14 +531,27 @@
     },
 
     /**
-     * Determine whether to show the menu item
+     * Show single track menu for 1 track or mixed selection
      * @param {string[]} uris - The URIs of the selected items
-     * @returns {boolean} Whether to show the menu
+     * @returns {boolean} Whether to show single track menu
      */
-    shouldShowMenu(uris) {
-      return uris.some(
+    shouldShowSingleMenu(uris) {
+      const trackUris = uris.filter(
         (uri) => uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
       );
+      return trackUris.length === 1;
+    },
+
+    /**
+     * Show bulk menu for multiple tracks
+     * @param {string[]} uris - The URIs of the selected items
+     * @returns {boolean} Whether to show bulk menu
+     */
+    shouldShowBulkMenu(uris) {
+      const trackUris = uris.filter(
+        (uri) => uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
+      );
+      return trackUris.length > 1;
     },
 
     /**
@@ -537,23 +561,28 @@
     handleMenuClick(uris) {
       if (uris.length === 0) return;
 
-      if (uris.length === 1) {
+      // Filter to only track URIs
+      const trackUris = uris.filter(
+        (uri) => uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
+      );
+
+      if (trackUris.length === 1) {
         // Single track selection - use standard navigation
-        const trackUri = uris[0];
+        const trackUri = trackUris[0];
 
         Spicetify.Platform.History.push({
           pathname: `/${APP_NAME}`,
           search: `?uri=${encodeURIComponent(trackUri)}`,
           state: { trackUri },
         });
-      } else {
-        // We'll encode the array of URIs for the URL (you could also use state)
-        const encodedUris = encodeURIComponent(JSON.stringify(uris));
+      } else if (trackUris.length > 1) {
+        // Multiple track selection - use bulk tagging
+        const encodedUris = encodeURIComponent(JSON.stringify(trackUris));
 
         Spicetify.Platform.History.push({
           pathname: `/${APP_NAME}`,
           search: `?uris=${encodedUris}`,
-          state: { trackUris: uris },
+          state: { trackUris },
         });
       }
     },
@@ -711,7 +740,35 @@
     },
 
     /**
-     * Add column to tracklist header
+     * Build dynamic grid template based on column count
+     * @param {number} totalColumns - Total number of columns including ours
+     * @param {number} tagifyColumnIndex - The index where our Tagify column is positioned
+     * @returns {string} CSS grid template string
+     */
+    buildDynamicGrid(totalColumns, tagifyColumnIndex) {
+      let template = "[index] 16px [first] 3fr";
+
+      // Build variable columns
+      for (let i = 1; i < totalColumns - 1; i++) {
+        const columnIndex = i + 2; // Start from 3 since we have index(1) and first(2)
+
+        if (columnIndex === tagifyColumnIndex) {
+          // This is our Tagify column - make it narrow
+          template += ` [var${i}] 80px`;
+        } else {
+          // Other extension columns or standard columns
+          template += ` [var${i}] 2fr`;
+        }
+      }
+
+      // Add the last column (usually duration/menu)
+      template += " [last] minmax(120px,1fr)";
+
+      return `grid-template-columns: ${template} !important`;
+    },
+
+    /**
+     * Add column to tracklist header with dynamic grid management
      * @param {HTMLElement} header - The header element
      */
     addColumnToHeader(header) {
@@ -721,7 +778,11 @@
       const lastColumn = header.querySelector(".main-trackList-rowSectionEnd");
       if (!lastColumn) return;
 
-      // Get column index and increment it for the last column
+      // Count existing columns before adding ours
+      const existingColumns = header.querySelectorAll('[class*="main-trackList-rowSection"]');
+      const currentColumnCount = existingColumns.length;
+
+      // Get current column index and increment it for the last column
       const colIndex = parseInt(lastColumn.getAttribute("aria-colindex"));
       lastColumn.setAttribute("aria-colindex", (colIndex + 1).toString());
 
@@ -732,6 +793,7 @@
       tagColumn.setAttribute("role", "columnheader");
       tagColumn.setAttribute("aria-colindex", colIndex.toString());
       tagColumn.style.display = "flex";
+      tagColumn.style.justifyContent = "center";
 
       // Add a button with header text
       const headerButton = document.createElement("button");
@@ -749,22 +811,10 @@
       // Insert our column before the last column
       header.insertBefore(tagColumn, lastColumn);
 
-      // Update grid template columns based on column count
-      const fiveColumnGridCss =
-        "grid-template-columns: [index] 16px [first] 3fr [var1] 2fr [var2] 2fr [var3] 1fr [last] minmax(120px,1fr) !important";
-      const sixColumnGridCss =
-        "grid-template-columns: [index] 16px [first] 5fr [var1] 3fr [var2] 2fr [var3] 2fr [last] minmax(120px,1fr) !important";
-
-      switch (colIndex) {
-        case 4:
-          header.setAttribute("style", fiveColumnGridCss);
-          break;
-        case 5:
-          header.setAttribute("style", sixColumnGridCss);
-          break;
-        default:
-          break;
-      }
+      // Build and apply dynamic grid template based on new column count
+      const newColumnCount = currentColumnCount + 1;
+      const gridTemplate = this.buildDynamicGrid(newColumnCount, colIndex);
+      header.setAttribute("style", gridTemplate);
     },
 
     /**
@@ -788,6 +838,10 @@
       const lastColumn = row.querySelector(".main-trackList-rowSectionEnd");
       if (!lastColumn) return;
 
+      // Count existing columns before adding ours
+      const existingColumns = row.querySelectorAll('[class*="main-trackList-rowSection"]');
+      const currentColumnCount = existingColumns.length;
+
       // Get column index and increment it for the last column
       const colIndex = parseInt(lastColumn.getAttribute("aria-colindex"));
       lastColumn.setAttribute("aria-colindex", (colIndex + 1).toString());
@@ -799,7 +853,6 @@
       tagColumn.setAttribute("aria-colindex", colIndex.toString());
       tagColumn.style.display = "flex";
       tagColumn.style.alignItems = "center";
-      tagColumn.style.justifyContent = "space-between";
 
       // Make the entire column clickable
       tagColumn.style.cursor = "pointer";
@@ -820,12 +873,13 @@
       container.style.display = "flex";
       container.style.width = "100%";
       container.style.alignItems = "center";
-      container.style.justifyContent = "space-between";
+      container.style.justifyContent = "center";
 
       // Create the tag info element (left side)
       const tagInfo = document.createElement("div");
       tagInfo.style.display = "flex";
       tagInfo.style.alignItems = "center";
+      tagInfo.style.justifyContent = "center";
 
       // Check if track is tagged
       const isTagged = utils.isTrackTagged(trackUri);
@@ -834,14 +888,23 @@
         const summary = utils.getTrackTagSummary(trackUri);
         const tagText = document.createElement("div");
 
-        // Check if track has incomplete tags
+        // Check if track has incomplete tags (missing rating or energy)
         const incomplete = utils.hasIncompleteTags(trackUri);
 
         // Use orange bullet for incomplete tags, green for complete tags
         const bulletColor = incomplete ? "#FFA500" : "#1DB954";
 
-        tagText.innerHTML = `<span style="color:${bulletColor}; margin-right:4px;">●</span> <span class="tag-summary">${summary}</span>`;
+        // Truncate long summaries for narrow column
+        const truncatedSummary = summary.length > 12 ? summary.substring(0, 12) + "..." : summary;
+
+        tagText.innerHTML = `<span style="color:${bulletColor}; margin-right:4px;">●</span>${truncatedSummary}`;
         tagText.style.fontSize = "12px";
+        tagText.style.overflow = "hidden";
+        tagText.style.whiteSpace = "nowrap";
+        tagText.style.textOverflow = "ellipsis";
+        tagText.style.display = "flex";
+        tagText.style.alignItems = "center";
+        tagText.style.width = "100%";
 
         // Add tooltip with detailed tag list
         if (
@@ -852,37 +915,55 @@
           const tagList = tracklistEnhancer.createTagListTooltip(trackUri);
           tagText.title = tagList;
         }
+
         tagInfo.appendChild(tagText);
+      } else {
+        // Show untagged indicator with 3 dots
+        const untaggedText = document.createElement("div");
+        untaggedText.style.display = "flex";
+        untaggedText.style.alignItems = "center";
+        untaggedText.style.justifyContent = "center";
+        untaggedText.style.width = "100%";
+        untaggedText.style.height = "100%";
+        untaggedText.style.minHeight = "40px";
+        untaggedText.style.cursor = "pointer";
+
+        // Create the dots element
+        const dotsSpan = document.createElement("span");
+        dotsSpan.innerHTML = "⋯";
+        dotsSpan.style.color = "#999";
+        dotsSpan.style.fontSize = "20px";
+        dotsSpan.style.lineHeight = "1";
+        dotsSpan.style.transition = "color 0.2s ease";
+        dotsSpan.style.textAlign = "center";
+
+        untaggedText.appendChild(dotsSpan);
+
+        // Add hover tooltip
+        untaggedText.title = "Tag with Tagify";
+
+        // Add hover effect - only change the dots color
+        untaggedText.addEventListener("mouseenter", () => {
+          dotsSpan.style.color = "#fff";
+        });
+
+        untaggedText.addEventListener("mouseleave", () => {
+          dotsSpan.style.color = "#999";
+        });
+
+        tagInfo.appendChild(untaggedText);
       }
 
       container.appendChild(tagInfo);
-
-      // Add warning at the right side
-      const statusContainer = document.createElement("div");
-      statusContainer.style.marginLeft = "auto"; // Push to the right
-
-      container.appendChild(statusContainer);
       tagColumn.appendChild(container);
 
       // Insert our column before the last column
       row.insertBefore(tagColumn, lastColumn);
 
-      // Update grid template columns based on column count
-      const fiveColumnGridCss =
-        "grid-template-columns: [index] 16px [first] 3fr [var1] 2fr [var2] 2fr [var3] 1fr [last] minmax(120px,1fr) !important";
-      const sixColumnGridCss =
-        "grid-template-columns: [index] 16px [first] 5fr [var1] 3fr [var2] 2fr [var3] 2fr [last] minmax(120px,1fr) !important";
-
-      switch (colIndex) {
-        case 4:
-          row.setAttribute("style", fiveColumnGridCss);
-          break;
-        case 5:
-          row.setAttribute("style", sixColumnGridCss);
-          break;
-        default:
-          break;
-      }
+      // Apply the same dynamic grid template to maintain consistency
+      const newColumnCount = currentColumnCount + 1;
+      const gridTemplate = this.buildDynamicGrid(newColumnCount, colIndex);
+      row.setAttribute("style", gridTemplate);
     },
 
     /**

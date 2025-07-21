@@ -328,3 +328,12 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.commonTagHighlight {
+  background: #1e90ff !important;
+  color: white !important;
+}
+
+.commonTagHighlight:hover {
+  background: #1a7ee0 !important;
+}

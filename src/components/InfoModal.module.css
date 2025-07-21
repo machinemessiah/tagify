@@ -44,7 +44,6 @@
   align-items: center;
   padding: 20px 24px;
   border-bottom: 1px solid var(--spice-button-disabled);
-  background: linear-gradient(135deg, rgba(30, 144, 255, 0.1), rgba(138, 43, 226, 0.1));
   flex-shrink: 0;
 }
 
@@ -166,14 +165,14 @@
   color: var(--spice-text);
   margin: 0 0 20px 0;
   padding-bottom: 12px;
-  border-bottom: 2px solid rgba(30, 144, 255, 0.3);
+  border-bottom: 1px solid rgb(255 255 255 / 70%);
 }
 
 .text {
   font-size: 16px;
   line-height: 1.6;
   color: var(--spice-text);
-  margin: 0 0 24px 0;
+  margin: 0 0 8px 0;
 }
 
 .featureGrid {
@@ -289,7 +288,7 @@
 }
 
 .subsection {
-  margin: 24px 0;
+  margin: 8px 0;
 }
 
 .subsection h4 {
@@ -497,7 +496,7 @@
 }
 
 .primaryButton {
-  background: linear-gradient(135deg, #1e90ff, #8a2be2);
+  background: rgba(0, 0, 0, 0.2);
   color: white;
   border: none;
   border-radius: 8px;
@@ -506,12 +505,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
 }
 
 .primaryButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(30, 144, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .githubLink {
@@ -526,8 +524,7 @@
 }
 
 .githubLink:hover {
-  color: var(--spice-text);
-  background: rgba(255, 255, 255, 0.1);
+  /* color: var(--spice-text); */
 }
 
 /* Info button styling for DataManager */
@@ -690,11 +687,13 @@
 }
 
 .filterMode {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
+  background: rgba(0, 0, 0, 0.3);
   color: var(--spice-text);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .filterBadge {
@@ -790,12 +789,6 @@
     padding: 12px;
   }
 
-  .filterMode {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
   .massTaggingStep {
     flex-direction: column;
     align-items: flex-start;
@@ -811,5 +804,166 @@
 
   .proTipIcon {
     align-self: flex-start;
+  }
+}
+
+/* Add these styles to your InfoModal.module.css file */
+
+/* Compact features layout */
+.featuresCompact {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.featureItem {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.featureItem:hover {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(30, 144, 255, 0.2);
+}
+
+.featureHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.featureIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.featureHeader h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--spice-text);
+  margin: 0;
+}
+
+.featureItem p {
+  font-size: 14px;
+  color: var(--spice-subtext);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Tag demonstration styles */
+.includeTag {
+  background: #1e90ff;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.excludeTag {
+  background: #ff4c4c;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: line-through;
+}
+
+/* Indicator demonstration */
+.indicatorDemo {
+  margin-top: 8px;
+}
+
+.indicatorExamples {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+.indicatorExample {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--spice-text);
+}
+
+.orangeBullet {
+  color: #ffa500;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.greenBullet {
+  color: #28a745;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.indicatorTip {
+  font-size: 13px;
+  color: var(--spice-subtext);
+  font-style: italic;
+  margin-top: 8px;
+}
+
+/* Feature tip callout */
+.featureTip {
+  background: rgba(30, 144, 255, 0.1);
+  border: 1px solid rgba(30, 144, 255, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 24px 0 0 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.tipIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.featureTip div {
+  font-size: 14px;
+  color: var(--spice-text);
+  line-height: 1.4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .featuresCompact {
+    gap: 12px;
+  }
+
+  .featureItem {
+    padding: 12px;
+  }
+
+  .featureHeader h4 {
+    font-size: 15px;
+  }
+
+  .featureItem p {
+    font-size: 13px;
+  }
+
+  .indicatorExamples {
+    padding: 8px;
+  }
+
+  .featureTip {
+    padding: 12px;
   }
 }

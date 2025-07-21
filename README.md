@@ -108,12 +108,20 @@ curl -fsSL "https://raw.githubusercontent.com/alexk218/tagify/main/install.sh" |
 
 ## Roadmap
 
-**Full Rekordbox integration**:
+### Full Rekordbox integration
 
 - Export your Tagify ratings and tag data directly to Rekordbox.
 - Compare your Spotify playlists with your local Rekordbox collection.
   - Highlights playlist differences and sync opportunities.
   - Auto-downloads high-quality versions of your tagged Spotify tracks, keeping platforms synchronized.
   - Maintain folder organization and playlist hierarchy across platforms.
+
+### Additional tagging functionality
+
+- THE IDEA: Tags become more valuable over time. Allowing you to make connections between tracks you never noticed before.
+- A possibility: automatic playlists using pattern recognition.
+  - After enough tag data is collected... playlists will be suggested based on some matching criteria.
+  - "We found 10 tracks that we think will go well together based on your tags"
+- ... still thinking 🤔
 
 Have ideas or found a bug? Open an [issue](https://github.com/alexk218/tagify/issues)!
