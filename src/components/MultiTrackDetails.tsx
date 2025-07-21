@@ -172,6 +172,15 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     return nameA.localeCompare(nameB);
   });
 
+  const isCommonTag = (tag: TrackTag) => {
+    return commonTags.some(
+      (commonTag) =>
+        commonTag.categoryId === tag.categoryId &&
+        commonTag.subcategoryId === tag.subcategoryId &&
+        commonTag.tagId === tag.tagId
+    );
+  };
+
   // Handle tag removal/addition in draft state
   const handleRemoveTagDraft = (tag: TrackTag) => {
     if (lockedTrackUri) {
@@ -484,7 +493,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                       .map((tag, index) => (
                         <div
                           key={index}
-                          className={styles.tagItem}
+                          className={`${styles.tagItem} ${
+                            isCommonTag(tag) ? styles.commonTagHighlight : ""
+                          }`}
                           onClick={(e) => handleTagClickDraft(track.uri, tag, e)}
                           title="Click to toggle this tag on this track"
                         >
