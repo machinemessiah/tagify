@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./app.module.css";
 import "./styles/globals.css";
 import TrackDetails from "./components/TrackDetails";
@@ -20,6 +20,14 @@ import { SpotifyTrack } from "./types/SpotifyTypes";
 import ExportPanel from "./components/ExportPanel";
 
 function App() {
+  const [showTagManager, setShowTagManager] = useState<boolean>(false);
+  const [showExport, setShowExport] = useState<boolean>(false);
+  const [isMultiTagging, setIsMultiTagging] = useState<boolean>(false);
+  const [lockedMultiTrackUri, setLockedMultiTrackUri] = useState<string | null>(null);
+
+  const [multiTrackDraftTags, setMultiTrackDraftTags] = useState<DraftTagState | null>(null);
+  const [multiTagTracks, setMultiTagTracks] = useState<SpotifyTrack[]>([]);
+
   const {
     tagData,
     lastSaved,
@@ -39,23 +47,6 @@ function App() {
   } = useTagData();
 
   const {
-    currentTrack,
-    setLockedTrack,
-    isLocked,
-    setIsLocked,
-    selectedTracks,
-    setSelectedTracks,
-    isMultiTagging,
-    setIsMultiTagging,
-    lockedMultiTrackUri,
-    setLockedMultiTrackUri,
-    toggleLock,
-    handleTagTrack,
-    cancelMultiTagging,
-    activeTrack,
-  } = useTrackState();
-
-  const {
     activeTagFilters,
     excludedTagFilters,
     handleRemoveFilter,
@@ -73,10 +64,26 @@ function App() {
     createPlaylistFromFilters,
   } = usePlaylistState();
 
-  const [showTagManager, setShowTagManager] = useState(false);
+  const {
+    currentTrack,
+    setLockedTrack,
+    isLocked,
+    setIsLocked,
+    toggleLock,
+    handleTagTrack,
+    cancelMultiTagging,
+    activeTrack,
+  } = useTrackState({ setMultiTagTracks, setIsMultiTagging, setLockedMultiTrackUri });
 
-  const [multiTrackDraftTags, setMultiTrackDraftTags] = useState<DraftTagState | null>(null);
-  const [showExport, setShowExport] = useState(false);
+  // Set up history tracking and URL param handling
+  useSpicetifyHistory({
+    isMultiTagging,
+    setIsMultiTagging,
+    setMultiTagTracks,
+    setLockedTrack,
+    setIsLocked,
+    setLockedMultiTrackUri,
+  });
 
   useFontAwesome();
 
@@ -86,17 +93,6 @@ function App() {
   //     console.error("Error checking/updating playlist cache:", error);
   //   });
   // }, []);
-
-  // Set up history tracking and URL param handling
-  useSpicetifyHistory({
-    isMultiTagging,
-    setSelectedTracks,
-    setIsMultiTagging,
-    setLockedTrack,
-    setIsLocked,
-    setLockedMultiTrackUri,
-    currentTrack,
-  });
 
   const playTrackViaQueue = trackService.playTrackViaQueue;
   const getLegacyFormatTracks = () => trackService.getLegacyFormatTracksFromTagData(tagData);
@@ -137,11 +133,11 @@ function App() {
 
     return (
       <div className={styles.content}>
-        {isMultiTagging && selectedTracks.length > 0 ? (
+        {isMultiTagging && multiTagTracks.length > 0 ? (
           <MultiTrackDetails
-            tracks={selectedTracks}
+            tracks={multiTagTracks}
             trackTagsMap={Object.fromEntries(
-              selectedTracks.map((track) => [track.uri, tagData.tracks[track.uri]?.tags || []])
+              multiTagTracks.map((track) => [track.uri, tagData.tracks[track.uri]?.tags || []])
             )}
             categories={tagData.categories}
             onTagAllTracks={handleTagAllTracks}
@@ -213,7 +209,7 @@ function App() {
 
   // Render the tag selector conditionally
   const renderTagSelector = () => {
-    if (!activeTrack && !(isMultiTagging && selectedTracks.length > 0)) {
+    if (!activeTrack && !(isMultiTagging && multiTagTracks.length > 0)) {
       return null;
     }
 
@@ -221,19 +217,19 @@ function App() {
       <TagSelector
         track={
           isMultiTagging && lockedMultiTrackUri
-            ? selectedTracks.find((t) => t.uri === lockedMultiTrackUri) || selectedTracks[0]
-            : activeTrack || selectedTracks[0]
+            ? multiTagTracks.find((t) => t.uri === lockedMultiTrackUri) || multiTagTracks[0]
+            : activeTrack || multiTagTracks[0]
         }
         categories={tagData.categories}
         trackTags={
           isMultiTagging && multiTrackDraftTags
             ? lockedMultiTrackUri
               ? multiTrackDraftTags[lockedMultiTrackUri] || []
-              : findCommonTagsFromDraft(multiTrackDraftTags, selectedTracks)
+              : findCommonTagsFromDraft(multiTrackDraftTags, multiTagTracks)
             : isMultiTagging
             ? lockedMultiTrackUri
               ? tagData.tracks[lockedMultiTrackUri]?.tags || []
-              : findCommonTags(selectedTracks.map((track) => track.uri))
+              : findCommonTags(multiTagTracks.map((track) => track.uri))
             : tagData.tracks[activeTrack?.uri || ""]?.tags || []
         }
         onToggleTag={handleToggleTag}
@@ -264,7 +260,7 @@ function App() {
         }
       } else {
         // Toggle for all tracks
-        const allHaveTag = selectedTracks.every((track) => {
+        const allHaveTag = multiTagTracks.every((track) => {
           const tags = newDraft[track.uri] || [];
           return tags.some(
             (t) =>
@@ -272,7 +268,7 @@ function App() {
           );
         });
 
-        selectedTracks.forEach((track) => {
+        multiTagTracks.forEach((track) => {
           const trackTags = newDraft[track.uri] || [];
           const tagIndex = trackTags.findIndex(
             (t) =>
@@ -315,7 +311,7 @@ function App() {
   const handleTagAllTracks = (categoryId: string, subcategoryId: string, tagId: string) => {
     // Use the batch update function to apply to all selected tracks
     toggleTagForMultipleTracks(
-      selectedTracks.map((track) => track.uri),
+      multiTagTracks.map((track) => track.uri),
       categoryId,
       subcategoryId,
       tagId

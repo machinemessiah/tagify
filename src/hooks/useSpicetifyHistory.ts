@@ -4,22 +4,20 @@ import { parseLocalFileUri } from "../utils/LocalFileParser";
 
 interface UseSpicetifyHistoryProps {
   isMultiTagging: boolean;
-  setSelectedTracks: (tracks: SpotifyTrack[]) => void;
   setIsMultiTagging: (isMultiTagging: boolean) => void;
+  setMultiTagTracks: (tracks: SpotifyTrack[]) => void;
   setLockedTrack: (track: SpotifyTrack | null) => void;
   setIsLocked: (isLocked: boolean) => void;
   setLockedMultiTrackUri: (uri: string | null) => void;
-  currentTrack: SpotifyTrack | null;
 }
 
 export function useSpicetifyHistory({
   isMultiTagging,
-  setSelectedTracks,
   setIsMultiTagging,
+  setMultiTagTracks,
   setLockedTrack,
   setIsLocked,
   setLockedMultiTrackUri,
-  currentTrack,
 }: UseSpicetifyHistoryProps) {
   useEffect(() => {
     const checkForTrackUris = async () => {
@@ -104,7 +102,7 @@ export function useSpicetifyHistory({
 
             // Reset multi-tagging if active
             if (isMultiTagging) {
-              setSelectedTracks([]);
+              setMultiTagTracks([]);
               setIsMultiTagging(false);
             }
           }
@@ -135,63 +133,71 @@ export function useSpicetifyHistory({
           }));
 
           // Set placeholder tracks immediately - this triggers MultiTrackDetails to render
-          setSelectedTracks(placeholderTracks);
+          setMultiTagTracks(placeholderTracks);
 
           // ASYNC TRACK DATA FETCHING - Now fetch the real data in the background
           const fetchTrackData = async () => {
-            const fetchedTracks: SpotifyTrack[] = [];
+            const currentTracks = [...placeholderTracks];
 
-            // Process tracks in batches
             for (const uri of trackUris) {
-              // Handle local files
-              if (uri.startsWith("spotify:local:")) {
-                const parsedFile = parseLocalFileUri(uri);
-                fetchedTracks.push({
-                  uri,
-                  name: parsedFile.title,
-                  artists: [{ name: parsedFile.artist }],
-                  album: { name: parsedFile.album },
-                  duration_ms: 0,
-                });
-                continue;
-              }
-
-              // For Spotify tracks
               try {
-                const trackId = uri.split(":").pop();
-                if (!trackId) continue;
+                let updatedTrack: SpotifyTrack;
 
-                const response = await Spicetify.CosmosAsync.get(
-                  `https://api.spotify.com/v1/tracks/${trackId}`
-                );
-
-                if (response) {
-                  fetchedTracks.push({
+                // Handle local files
+                if (uri.startsWith("spotify:local:")) {
+                  const parsedFile = parseLocalFileUri(uri);
+                  updatedTrack = {
                     uri,
-                    name: response.name,
-                    artists: response.artists.map((artist: any) => ({
-                      name: artist.name,
-                    })),
-                    album: { name: response.album?.name || "Unknown Album" },
-                    duration_ms: response.duration_ms,
-                  });
+                    name: parsedFile.title,
+                    artists: [{ name: parsedFile.artist }],
+                    album: { name: parsedFile.album },
+                    duration_ms: 0,
+                  };
+                } else {
+                  // For Spotify tracks
+                  const trackId = uri.split(":").pop();
+                  if (!trackId) continue;
+
+                  const response = await Spicetify.CosmosAsync.get(
+                    `https://api.spotify.com/v1/tracks/${trackId}`
+                  );
+
+                  if (response) {
+                    updatedTrack = {
+                      uri,
+                      name: response.name,
+                      artists: response.artists.map((artist: any) => ({
+                        name: artist.name,
+                      })),
+                      album: { name: response.album?.name || "Unknown Album" },
+                      duration_ms: response.duration_ms,
+                    };
+                  } else {
+                    continue;
+                  }
+                }
+
+                const trackIndex = currentTracks.findIndex((track) => track.uri === uri);
+                if (trackIndex !== -1) {
+                  currentTracks[trackIndex] = updatedTrack;
+
+                  setMultiTagTracks([...currentTracks]);
                 }
               } catch (error) {
                 console.error(`Tagify: Error fetching track ${uri}:`, error);
-                // On error, keep the placeholder or create a fallback
-                fetchedTracks.push({
+                const errorTrack: SpotifyTrack = {
                   uri,
                   name: "Failed to load",
                   artists: [{ name: "Error" }],
                   album: { name: "Error" },
                   duration_ms: 0,
-                });
+                };
+                const trackIndex = currentTracks.findIndex((track) => track.uri === uri);
+                if (trackIndex !== -1) {
+                  currentTracks[trackIndex] = errorTrack;
+                  setMultiTagTracks([...currentTracks]);
+                }
               }
-            }
-
-            // Update with real data once fetching is complete
-            if (fetchedTracks.length > 0) {
-              setSelectedTracks(fetchedTracks);
             }
           };
 
