@@ -1,7 +1,3 @@
-param(
-    [string]$Version = "latest"
-)
-
 function Write-Success { param($Message) Write-Host "✅ $Message" -ForegroundColor Green }
 function Write-Error { param($Message) Write-Host "❌ $Message" -ForegroundColor Red }
 function Write-Info { param($Message) Write-Host "ℹ️  $Message" -ForegroundColor Cyan }
@@ -136,11 +132,11 @@ Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
 # Success!
 Write-Host @"
 
-🎉 Tagify installation completed successfully!
+Tagify installation completed successfully!
 
 Next steps:
 1. Restart Spotify completely
-2. Look for 'Tagify' in your Spotify sidebar
-3. Start organizing your music!
+2. Look for 'Tagify' in your Spotify top navigation bar
+3. Start tagging your tracks!
 
 "@ -ForegroundColor Green

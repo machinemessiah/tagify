@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e  # Exit on any error
 
@@ -8,7 +8,7 @@ RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-echo -e "${CYAN}🎵 Installing Tagify...${NC}"
+echo -e "${CYAN}Installing Tagify...${NC}"
 
 # Define variables
 CUSTOM_APPS_DIR="$HOME/.config/spicetify/CustomApps"
@@ -69,9 +69,9 @@ spicetify apply
 # Clean up
 rm -rf "$ZIP_FILE" "$TEMP_DIR"
 
-echo -e "${GREEN}🎉 Tagify installation complete!
+echo -e "${GREEN}Tagify installation complete!
 
 Next steps:
 1. Restart Spotify completely
-2. Look for 'Tagify' in your Spotify sidebar
-3. Start organizing your music!${NC}"
+2. Look for 'Tagify' in your Spotify top navigation bar
+3. Start tagging your tracks!
