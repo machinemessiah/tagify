@@ -503,15 +503,26 @@
       }
 
       try {
-        // Create menu item
+        // Single track menu item
         new Spicetify.ContextMenu.Item(
           "Tag with Tagify",
           this.handleMenuClick,
-          this.shouldShowMenu,
+          this.shouldShowSingleMenu,
           `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M21.41,11.58L12.41,2.58C12.04,2.21 11.53,2 11,2H4C2.9,2 2,2.9 2,4V11C2,11.53 2.21,12.04 2.59,12.42L11.59,21.42C11.96,21.79 12.47,22 13,22C13.53,22 14.04,21.79 14.41,21.42L21.41,14.42C21.79,14.04 22,13.53 22,13C22,12.47 21.79,11.96 21.41,11.58M5.5,7C4.67,7 4,6.33 4,5.5C4,4.67 4.67,4 5.5,4C6.33,4 7,4.67 7,5.5C7,6.33 6.33,7 5.5,7Z"/>
+          <path d="M21.41,11.58L12.41,2.58C12.04,2.21 11.53,2 11,2H4C2.9,2 2,2.9 2,4V11C2,11.53 2.21,12.04 2.59,12.42L11.59,21.42C11.96,21.79 12.47,22 13,22C13.53,22 14.04,21.79 14.41,21.42L21.41,14.42C21.79,14.04 22,13.53 22,13C22,12.47 21.79,11.96 21.41,11.58M5.5,7C4.67,7 4,6.33 4,5.5C4,4.67 4.67,4 5.5,4C6.33,4 7,4.67 7,5.5C7,6.33 6.33,7 5.5,7Z"/>
+        </svg>`
+        ).register();
+
+        // Multiple tracks menu item
+        new Spicetify.ContextMenu.Item(
+          "Bulk Tag",
+          this.handleMenuClick,
+          this.shouldShowBulkMenu,
+          `<svg width="16" height="16" viewBox="0 0 24 24" fill="#FF6B35">
+          <path d="M21.41,11.58L12.41,2.58C12.04,2.21 11.53,2 11,2H4C2.9,2 2,2.9 2,4V11C2,11.53 2.21,12.04 2.59,12.42L11.59,21.42C11.96,21.79 12.47,22 13,22C13.53,22 14.04,21.79 14.41,21.42L21.41,14.42C21.79,14.04 22,13.53 22,13C22,12.47 21.79,11.96 21.41,11.58M5.5,7C4.67,7 4,6.33 4,5.5C4,4.67 4.67,4 5.5,4C6.33,4 7,4.67 7,5.5C7,6.33 6.33,7 5.5,7Z"/>
           </svg>`
         ).register();
+        // <path d="M9,19 L15,19 L15,21 L9,21 Z M9,15 L19,15 L19,17 L9,17 Z M9,11 L21,11 L21,13 L9,13 Z" fill="#FF6B35" opacity="0.8"/>
 
         state.initialized.menu = true;
       } catch (error) {
@@ -520,14 +531,27 @@
     },
 
     /**
-     * Determine whether to show the menu item
+     * Show single track menu for 1 track or mixed selection
      * @param {string[]} uris - The URIs of the selected items
-     * @returns {boolean} Whether to show the menu
+     * @returns {boolean} Whether to show single track menu
      */
-    shouldShowMenu(uris) {
-      return uris.some(
+    shouldShowSingleMenu(uris) {
+      const trackUris = uris.filter(
         (uri) => uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
       );
+      return trackUris.length === 1;
+    },
+
+    /**
+     * Show bulk menu for multiple tracks
+     * @param {string[]} uris - The URIs of the selected items
+     * @returns {boolean} Whether to show bulk menu
+     */
+    shouldShowBulkMenu(uris) {
+      const trackUris = uris.filter(
+        (uri) => uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
+      );
+      return trackUris.length > 1;
     },
 
     /**
@@ -537,23 +561,28 @@
     handleMenuClick(uris) {
       if (uris.length === 0) return;
 
-      if (uris.length === 1) {
+      // Filter to only track URIs
+      const trackUris = uris.filter(
+        (uri) => uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
+      );
+
+      if (trackUris.length === 1) {
         // Single track selection - use standard navigation
-        const trackUri = uris[0];
+        const trackUri = trackUris[0];
 
         Spicetify.Platform.History.push({
           pathname: `/${APP_NAME}`,
           search: `?uri=${encodeURIComponent(trackUri)}`,
           state: { trackUri },
         });
-      } else {
-        // We'll encode the array of URIs for the URL (you could also use state)
-        const encodedUris = encodeURIComponent(JSON.stringify(uris));
+      } else if (trackUris.length > 1) {
+        // Multiple track selection - use bulk tagging
+        const encodedUris = encodeURIComponent(JSON.stringify(trackUris));
 
         Spicetify.Platform.History.push({
           pathname: `/${APP_NAME}`,
           search: `?uris=${encodedUris}`,
-          state: { trackUris: uris },
+          state: { trackUris },
         });
       }
     },
