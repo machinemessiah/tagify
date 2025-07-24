@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./app.module.css";
 import "./styles/globals.css";
 import TrackDetails from "./components/TrackDetails";
@@ -96,6 +96,21 @@ function App() {
 
   const playTrackViaQueue = trackService.playTrackViaQueue;
   const getLegacyFormatTracks = () => trackService.getLegacyFormatTracksFromTagData(tagData);
+
+  // Hide topbar when app mounts - restore when app unmounts
+  useEffect(() => {
+    const topbar = document.querySelector(".main-topBar-background") as HTMLElement;
+    if (topbar) {
+      topbar.style.display = "none";
+    }
+
+    return () => {
+      const topbar = document.querySelector(".main-topBar-background") as HTMLElement;
+      if (topbar) {
+        topbar.style.display = "";
+      }
+    };
+  }, []);
 
   const findCommonTagsFromDraft = (
     draftTags: DraftTagState,
