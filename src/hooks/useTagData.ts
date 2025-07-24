@@ -326,14 +326,9 @@ export function useTagData() {
   // Auto-save when data changes
   useEffect(() => {
     if (!isLoading) {
-      // Only save after initial load is complete
-      const timer = setTimeout(() => {
-        saveTagData(tagData);
-      }, 2000); // Debounce for performance
-
-      return () => clearTimeout(timer);
+      saveTagData(tagData);
     }
-  }, [tagData, isLoading]);
+  }, [tagData]);
 
   // ! CATEGORY MANAGEMENT
 
