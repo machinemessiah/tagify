@@ -92,14 +92,6 @@
         }
       }
     },
-
-    dispatchSettingsChange(settings) {
-      window.dispatchEvent(
-        new CustomEvent(SETTINGS_CHANGED_EVENT, {
-          detail: settings,
-        })
-      );
-    },
   };
 
   // Shared utilities
