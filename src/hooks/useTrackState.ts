@@ -18,6 +18,7 @@ export function useTrackState({
 }: UseTrackStateProps) {
   const [currentTrack, setCurrentTrack] = useState<SpotifyTrack | null>(null);
   const [lockedTrack, setLockedTrack] = useState<SpotifyTrack | null>(null);
+  const [isStorageLoaded, setIsStorageLoaded] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
   // Derived state - the active track is either locked track or current track
@@ -36,6 +37,8 @@ export function useTrackState({
       }
     } catch (error) {
       console.error("Tagify: Error loading saved lock state:", error);
+    } finally {
+      setIsStorageLoaded(true);
     }
   }, []);
 
@@ -52,6 +55,10 @@ export function useTrackState({
 
   // Listen for track changes
   useEffect(() => {
+    // only set up the listener if storage has been loaded
+    if (!isStorageLoaded) {
+      return;
+    }
     // Function to update current track based on Spicetify API
     const updateCurrentTrack = () => {
       // Check if we have a valid player data
@@ -114,7 +121,7 @@ export function useTrackState({
     return () => {
       Spicetify.Player.removeEventListener("songchange", updateCurrentTrack);
     };
-  }, [isLocked]);
+  }, [isLocked, isStorageLoaded]);
 
   // Cancel multi-tagging mode
   const cancelMultiTagging = () => {
