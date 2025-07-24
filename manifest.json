@@ -1,7 +1,7 @@
 {
     "name": "Tagify",
     "description": "Tag your tracks and organize your music",
-    "preview": "assets/preview.png",
+    "preview": "src/assets/preview.png",
     "readme": "README.md",
     "tags": ["tags", "music-management", "playlists"]
 }
