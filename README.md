@@ -112,14 +112,9 @@ curl -fsSL "https://raw.githubusercontent.com/alexk218/tagify/main/install.sh" |
 - Look for "Tagify" in your Spotify **top navigation bar** (next to the Spicetify Marketplace button)
 - Click it to open Tagify!
 
-## Roadmap
+## 💬 Community & Support
 
-**Full Rekordbox integration**:
-
-- Export your Tagify ratings and tag data directly to Rekordbox.
-- Compare your Spotify playlists with your local Rekordbox collection.
-  - Highlights playlist differences and sync opportunities.
-  - Auto-downloads high-quality versions of your tagged Spotify tracks, keeping platforms synchronized.
-  - Maintain folder organization and playlist hierarchy across platforms.
-
-Have ideas or found a bug? Open an [issue](https://github.com/alexk218/tagify/issues)!
+- **💡 Feature Requests**: [Share your ideas](https://github.com/alexk218/tagify/discussions/categories/ideas-feature-requests)
+- **❓ Get Help**: [Ask questions](https://github.com/alexk218/tagify/discussions/categories/q-a)
+- **🐛 Report Bugs**: [Bug reports](https://github.com/alexk218/tagify/discussions/categories/bug-report)
+- **📢 Announcements**: [Latest updates](https://github.com/alexk218/tagify/discussions/categories/announcements)
