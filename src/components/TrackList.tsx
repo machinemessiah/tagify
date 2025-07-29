@@ -1241,8 +1241,7 @@ const TrackList: React.FC<TrackListProps> = ({
                             </span>
                           </div>
                         )}
-                        {trackData.dateModified &&
-                          trackData.dateModified !== trackData.dateCreated && (
+                        {trackData.dateModified && (
                             <div className={styles.timestampWithIcon}>
                               <span className={styles.timestampIcon}>✏️</span>
                               <span

@@ -1039,7 +1039,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                   </span>
                 </div>
               )}
-              {trackData.dateModified && trackData.dateModified !== trackData.dateCreated && (
+              {trackData.dateModified && (
                 <div
                   className={styles.timestampItem}
                   title={"Last updated: " + new Date(trackData.dateModified).toLocaleString()}
