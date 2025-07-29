@@ -315,7 +315,6 @@ export function useTagData() {
   const importBackup = (backupData: TagDataStructure) => {
     setTagData(backupData);
     saveTagData(backupData);
-    Spicetify.showNotification("Data restored from backup");
   };
 
   // Load tag data on component mount

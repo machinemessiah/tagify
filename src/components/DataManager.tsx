@@ -22,7 +22,6 @@ const DataManager: React.FC<DataManagerProps> = ({
   onExportRekordbox,
   lastSaved,
 }) => {
-  const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [showMainSettings, setShowMainSettings] = useState(false);
@@ -37,8 +36,6 @@ const DataManager: React.FC<DataManagerProps> = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
-
-    setIsImporting(true);
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -64,7 +61,6 @@ const DataManager: React.FC<DataManagerProps> = ({
         console.error("Error parsing backup file:", error);
         Spicetify.showNotification("Error importing backup", true);
       } finally {
-        setIsImporting(false);
         // Reset the file input
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
@@ -74,7 +70,6 @@ const DataManager: React.FC<DataManagerProps> = ({
 
     reader.onerror = () => {
       Spicetify.showNotification("Error reading backup file", true);
-      setIsImporting(false);
     };
 
     reader.readAsText(file);
@@ -87,12 +82,14 @@ const DataManager: React.FC<DataManagerProps> = ({
           <button
             className={`${styles.pillButton} ${styles.exportButton}`}
             onClick={onExportBackup}
+            title="Export your tag data"
           >
             📤 Export
           </button>
           <button
             className={`${styles.pillButton} ${styles.importButton}`}
             onClick={handleImportClick}
+            title="Import your tag data"
           >
             📥 Import
           </button>
@@ -102,6 +99,7 @@ const DataManager: React.FC<DataManagerProps> = ({
           <button
             className={`${styles.pillButton} ${styles.statsButton}`}
             onClick={onExportRekordbox}
+            title="View your tag stats"
           >
             📊 Stats
           </button>
@@ -112,9 +110,6 @@ const DataManager: React.FC<DataManagerProps> = ({
           >
             ❓ Info
           </button>
-          {/* <button className={styles.iconOnlyButton} onClick={() => setShowMainSettings(true)}>
-            ⚙️
-          </button> */}
         </div>
       </div>
 
@@ -129,7 +124,11 @@ const DataManager: React.FC<DataManagerProps> = ({
       {lastSaved && (
         <div className={styles.saveStatus}>✓ Last backup: {lastSaved.toLocaleString()}</div>
       )}
-      <button className={styles.iconOnlyButton} onClick={() => setShowMainSettings(true)}>
+      <button
+        className={styles.iconOnlyButton}
+        onClick={() => setShowMainSettings(true)}
+        title="Settings"
+      >
         ⚙️
       </button>
       {showMainSettings && <MainSettingsModal onClose={() => setShowMainSettings(false)} />}

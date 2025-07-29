@@ -152,7 +152,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
             ?
             <div className={styles.tooltipContent}>
               <strong>💡 Pro tip:</strong> Select multiple tracks in any playlist, right-click, and
-              choose "Tag with Tagify" to tag multiple tracks at once!
+              choose "Bulk Tag" to tag multiple tracks at once!
             </div>
           </div>
         </div>
