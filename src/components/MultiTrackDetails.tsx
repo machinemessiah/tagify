@@ -82,10 +82,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     }
   };
 
-  // Track if there are unsaved changes
-  const [hasChanges, setHasChanges] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Update draft tags when props change (e.g., new tracks added)
+  // Update draft tags when props change - when new tracks are added
   useEffect(() => {
     const newDraft: DraftTagState = {};
     tracks.forEach((track) => {
@@ -97,7 +96,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       }
     });
     setDraftTags(newDraft);
-  }, [tracks.length]); // Only re-run when track count changes
+  }, [tracks.length]);
 
   // Check for changes whenever draft tags update
   useEffect(() => {
@@ -107,7 +106,6 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       const originalTags = trackTagsMap[track.uri] || [];
       const draftTrackTags = draftTags[track.uri] || [];
 
-      // Check if lengths differ
       if (originalTags.length !== draftTrackTags.length) {
         hasAnyChanges = true;
         break;
@@ -129,10 +127,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       }
     }
 
-    setHasChanges(hasAnyChanges);
+    setHasUnsavedChanges(hasAnyChanges);
   }, [draftTags, trackTagsMap, tracks]);
 
-  // Helper function to get tag name
   const getTagName = (categoryId: string, subcategoryId: string, tagId: string) => {
     const category = categories.find((c) => c.id === categoryId);
     if (!category) return "Unknown";
@@ -144,7 +141,6 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     return tag ? tag.name : "Unknown";
   };
 
-  // Find common tags across all tracks using draft state
   const findCommonTags = () => {
     if (tracks.length === 0) return [];
 
@@ -344,7 +340,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       });
       setDraftTags(newDraft);
 
-      setHasChanges(false);
+      setHasUnsavedChanges(false);
       Spicetify.showNotification(`Saved changes to ${changes.length} tracks`);
     } else {
       // Fallback to original behavior if batch update not available
@@ -365,7 +361,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
         });
       });
 
-      setHasChanges(false);
+      setHasUnsavedChanges(false);
       Spicetify.showNotification(`Saved changes to ${changes.length} tracks`);
     }
   };
@@ -377,12 +373,12 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       resetDraft[track.uri] = [...(trackTagsMap[track.uri] || [])];
     });
     setDraftTags(resetDraft);
-    setHasChanges(false);
+    setHasUnsavedChanges(false);
   };
 
   // Handle cancel with confirmation if there are unsaved changes
   const handleCancelTagging = () => {
-    if (hasChanges) {
+    if (hasUnsavedChanges) {
       if (confirm("You have unsaved changes. Are you sure you want to cancel?")) {
         onCancelTagging();
       }
@@ -397,19 +393,19 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
         <h2 className={styles.title}>Mass Tagging</h2>
         <div className={styles.summary}>
           <span className={styles.trackCount}>{tracks.length} tracks selected</span>
-          {hasChanges && <span className={styles.unsavedIndicator}>• Unsaved changes</span>}
+          {hasUnsavedChanges && <span className={styles.unsavedIndicator}>• Unsaved changes</span>}
           <div className={styles.actionButtons}>
             <button
               className={styles.saveButton}
               onClick={handleSaveChanges}
-              disabled={!hasChanges}
+              disabled={!hasUnsavedChanges}
             >
               Save Changes
             </button>
             <button
               className={styles.discardButton}
               onClick={handleCancelChanges}
-              disabled={!hasChanges}
+              disabled={!hasUnsavedChanges}
             >
               Discard
             </button>
@@ -525,7 +521,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       <div className={styles.instructions}>
         <p>
           Apply tags to {lockedTrackUri ? "the locked track" : "all selected tracks"} using the tag
-          selector below. {hasChanges && "Remember to save your changes!"}
+          selector below. {hasUnsavedChanges && "Remember to save your changes!"}
         </p>
         <p>
           {lockedTrackUri

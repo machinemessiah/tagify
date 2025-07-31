@@ -53,27 +53,20 @@ export function useTrackState({
     }
   }, [isLocked, lockedTrack]);
 
-  // Listen for track changes
+  // LISTEN FOR TRACK CHANGES
   useEffect(() => {
     // only set up the listener if storage has been loaded
     if (!isStorageLoaded) {
       return;
     }
-    // Function to update current track based on Spicetify API
+
     const updateCurrentTrack = () => {
       // Check if we have a valid player data
       if (!Spicetify?.Player?.data) return;
 
       try {
-        // Try to get the track data
         let trackData = null;
-
-        // First try 'track' property which is the most common
-        if (Spicetify.Player.data.track) {
-          trackData = Spicetify.Player.data.track;
-        }
-        // Then try 'item' property which might be present in some versions
-        else if ((Spicetify.Player.data as any).item) {
+        if ((Spicetify.Player.data as any).item) {
           trackData = (Spicetify.Player.data as any).item;
         }
 
@@ -82,7 +75,6 @@ export function useTrackState({
           return;
         }
 
-        // Map the data to our expected format
         const newTrack: SpotifyTrack = {
           uri: trackData.uri,
           name: trackData.name || "Unknown Track",
@@ -92,32 +84,24 @@ export function useTrackState({
         };
 
         // ALWAYS update currentTrack to reflect what's playing in Spotify
+        // so that when you unlock - it snaps to the currently playing track
         setCurrentTrack(newTrack);
 
         // ONLY update lockedTrack if we're NOT locked
         if (!isLocked) {
-          // Create a safe track object with defaults for missing values
-          const safeTrack = {
-            ...newTrack,
-            artists: newTrack.artists || [{ name: "Unknown Artist" }],
-            album: newTrack.album || { name: "Unknown Album" },
-            duration_ms: typeof newTrack.duration_ms === "number" ? newTrack.duration_ms : 0,
-          };
-
-          setLockedTrack(safeTrack);
+          setLockedTrack(newTrack);
         }
       } catch (error) {
         console.error("Error updating current track:", error);
       }
     };
 
-    // Set up event listener
+    // call updateCurrentTrack when song changes!
     Spicetify.Player.addEventListener("songchange", updateCurrentTrack);
 
-    // Initial track check
+    // initial track check
     updateCurrentTrack();
 
-    // Clean up on unmount
     return () => {
       Spicetify.Player.removeEventListener("songchange", updateCurrentTrack);
     };
@@ -125,7 +109,6 @@ export function useTrackState({
 
   // Cancel multi-tagging mode
   const cancelMultiTagging = () => {
-    // Clear the multi-tagging states
     setMultiTagTracks([]);
     setIsMultiTagging(false);
     setLockedMultiTrackUri(null);

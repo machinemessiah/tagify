@@ -225,11 +225,11 @@ class TrackService {
       if (response?.items?.[0]?.track?.uri) {
         return response.items[0].track.uri;
       }
-      // Fallback: use a well-known track URI (though this is less ideal)
-      return "spotify:track:4iV5W9uYEdYUVa79Axb7Rh"; // Never Gonna Give You Up by Rick Astley
+      // Fallback - Never Gonna Give You Up - Rick Astley
+      return "spotify:track:4iV5W9uYEdYUVa79Axb7Rh";
     } catch (error) {
       console.error("Error getting dummy track:", error);
-      return "spotify:track:4iV5W9uYEdYUVa79Axb7Rh"; // Fallback
+      return "spotify:track:4iV5W9uYEdYUVa79Axb7Rh";
     }
   };
 
