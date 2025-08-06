@@ -262,64 +262,57 @@ class TrackService {
 
   // Resolves tag IDs to display names - to be consumed by TrackList
   getTracksWithResolvedTags = (tagData: TagDataStructure) => {
-    const result: {
+    const trackMapWithResolvedTags: {
       [uri: string]: {
         rating: number;
         energy: number;
         bpm: number | null;
-        tags: { tag: string; category: string }[];
+        tagIds: { tagId: string }[];
         dateCreated?: number;
         dateModified?: number;
       };
     } = {};
 
     try {
-      // First check if we have valid tagData
       if (!tagData || typeof tagData !== "object") {
         console.error("TagData is invalid", tagData);
         return {};
       }
 
-      // Check if categories exist and is an array
       if (!tagData.categories || !Array.isArray(tagData.categories)) {
         console.error("TagData is missing valid categories array", tagData.categories);
         return {};
       }
 
-      // Check if tracks exist
       if (!tagData.tracks || typeof tagData.tracks !== "object") {
         console.error("TagData is missing valid tracks object", tagData.tracks);
         return {};
       }
 
       // Process each track
-      Object.entries(tagData.tracks).forEach(([uri, track]) => {
-        // Skip invalid tracks
-        if (!track) return;
+      Object.entries(tagData.tracks).forEach(([trackUri, trackData]) => {
+        if (!trackData) return;
 
-        // Skip tracks that have no meaningful data
-        if (track.rating === 0 && track.energy === 0 && (!track.tags || track.tags.length === 0)) {
+        if (trackData.rating === 0 && trackData.energy === 0 && (!trackData.tags || trackData.tags.length === 0)) {
           return;
         }
 
         // Create entry for this track
-        result[uri] = {
-          rating: track.rating || 0,
-          energy: track.energy || 0,
-          bpm: track.bpm || null,
-          tags: [],
-          dateCreated: track.dateCreated,
-          dateModified: track.dateModified,
+        trackMapWithResolvedTags[trackUri] = {
+          rating: trackData.rating || 0,
+          energy: trackData.energy || 0,
+          bpm: trackData.bpm || null,
+          tagIds: [],
+          dateCreated: trackData.dateCreated,
+          dateModified: trackData.dateModified,
         };
 
-        // Skip if no tags
-        if (!track.tags || !Array.isArray(track.tags) || track.tags.length === 0) {
+        if (!trackData.tags || !Array.isArray(trackData.tags) || trackData.tags.length === 0) {
           return;
         }
 
         // Process each tag
-        track.tags.forEach((tag) => {
-          // Find the tag info
+        trackData.tags.forEach((tag) => {
           const category = tagData.categories.find((c) => c.id === tag.categoryId);
           if (!category) return;
 
@@ -329,15 +322,13 @@ class TrackService {
           const tagObj = subcategory.tags.find((t) => t.id === tag.tagId);
           if (!tagObj) return;
 
-          // Add the tag with proper names
-          result[uri].tags.push({
-            tag: tagObj.name,
-            category: `${category.name} > ${subcategory.name}`,
+          trackMapWithResolvedTags[trackUri].tagIds.push({
+            tagId: tagObj.name,
           });
         });
       });
 
-      return result;
+      return trackMapWithResolvedTags;
     } catch (error) {
       console.error("Error formatting track data:", error);
       return {}; // Return empty object on error

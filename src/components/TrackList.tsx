@@ -21,15 +21,15 @@ import {
 } from "../types/SpotifyTypes";
 
 interface Tag {
-  tag: string;
-  category: string;
+  tagId: string;
+  categoryId?: string;
 }
 
 interface TrackData {
   rating: number;
   energy: number;
   bpm: number | null;
-  tags: Tag[];
+  tagIds: Tag[];
   dateCreated?: number;
   dateModified?: number;
 }
@@ -159,8 +159,8 @@ const TrackList: React.FC<TrackListProps> = ({
 
     // Sort the tags by their positions. Default to end if not found
     return [...tags].sort((a, b) => {
-      const posA = tagPositions[a.tag] || "999-999-999";
-      const posB = tagPositions[b.tag] || "999-999-999";
+      const posA = tagPositions[a.tagId] || "999-999-999";
+      const posB = tagPositions[b.tagId] || "999-999-999";
       return posA.localeCompare(posB);
     });
   };
@@ -381,14 +381,14 @@ const TrackList: React.FC<TrackListProps> = ({
           activeTagFilters.length === 0 ||
           (isOrFilterMode
             ? // OR logic - track must have ANY of the selected tags
-              activeTagFilters.some((tag) => trackData.tags.some((t) => t.tag === tag))
+              activeTagFilters.some((tag) => trackData.tagIds.some((t) => t.tagId === tag))
             : // AND logic - track must have ALL of the selected tags
-              activeTagFilters.every((tag) => trackData.tags.some((t) => t.tag === tag)));
+              activeTagFilters.every((tag) => trackData.tagIds.some((t) => t.tagId === tag)));
 
         // Exclude tags - track must NOT have ANY of these tags
         const matchesExcludeTags =
           excludedTagFilters.length === 0 ||
-          !excludedTagFilters.some((tag) => trackData.tags.some((t) => t.tag === tag));
+          !excludedTagFilters.some((tag) => trackData.tagIds.some((t) => t.tagId === tag));
 
         // Rating filter
         const matchesRating =
@@ -431,14 +431,14 @@ const TrackList: React.FC<TrackListProps> = ({
         activeTagFilters.length === 0 ||
         (isOrFilterMode
           ? // OR logic - track must have ANY of the selected tags
-            activeTagFilters.some((tag) => trackData.tags.some((t) => t.tag === tag))
+            activeTagFilters.some((tag) => trackData.tagIds.some((t) => t.tagId === tag))
           : // AND logic - track must have ALL of the selected tags
-            activeTagFilters.every((tag) => trackData.tags.some((t) => t.tag === tag)));
+            activeTagFilters.every((tag) => trackData.tagIds.some((t) => t.tagId === tag)));
 
       // Exclude tags - track must NOT have ANY of these tags (always AND logic for exclusions)
       const matchesExcludeTags =
         excludedTagFilters.length === 0 ||
-        !excludedTagFilters.some((tag) => trackData.tags.some((t) => t.tag === tag));
+        !excludedTagFilters.some((tag) => trackData.tagIds.some((t) => t.tagId === tag));
 
       // Rating filter
       const matchesRating =
@@ -533,7 +533,7 @@ const TrackList: React.FC<TrackListProps> = ({
     // Check if any of these are missing
     const missingRating = trackData.rating === 0 || trackData.rating === undefined;
     const missingEnergy = trackData.energy === 0 || trackData.energy === undefined;
-    const missingTags = !trackData.tags || trackData.tags.length === 0;
+    const missingTags = !trackData.tagIds || trackData.tagIds.length === 0;
 
     // Return true if any are missing
     return missingRating || missingEnergy || missingTags;
@@ -542,7 +542,7 @@ const TrackList: React.FC<TrackListProps> = ({
   // Extract all unique tags from all tracks
   const allTags = new Set<string>();
   Object.values(tracks).forEach((track) => {
-    track.tags.forEach(({ tag }) => {
+    track.tagIds.forEach(({ tagId: tag }) => {
       allTags.add(tag);
     });
   });
@@ -1037,6 +1037,7 @@ const TrackList: React.FC<TrackListProps> = ({
               <span
                 key={tag}
                 className={styles.activeFilterTag}
+                title={`Click to exclude "${tag}"`}
                 onClick={() => handleFilterTagClick(tag, false)}
               >
                 {tag}{" "}
@@ -1056,6 +1057,7 @@ const TrackList: React.FC<TrackListProps> = ({
               <span
                 key={tag}
                 className={styles.excludedFilterTag}
+                title={`Click to include "${tag}"`}
                 onClick={() => handleFilterTagClick(tag, true)}
               >
                 {tag}{" "}
@@ -1115,7 +1117,7 @@ const TrackList: React.FC<TrackListProps> = ({
 
             // Sort tags based on their position in the category hierarchy (not alphabetically)
             const sortedTagsArray =
-              categories && categories.length > 0 ? sortTags(data.tags) : data.tags;
+              categories && categories.length > 0 ? sortTags(data.tagIds) : data.tagIds;
 
             return (
               <div
@@ -1269,25 +1271,25 @@ const TrackList: React.FC<TrackListProps> = ({
                   {/* BOTTOM ROW - TRACK TAGS */}
                   {sortedTagsArray.length > 0 ? (
                     <div className={styles.trackItemTags}>
-                      {sortedTagsArray.map(({ tag }: { tag: string }, i: number) => (
+                      {sortedTagsArray.map(({ tagId }: { tagId: string }, i: number) => (
                         <span
                           key={i}
                           className={`${styles.trackItemTag} ${
-                            activeTagFilters.includes(tag) ? styles.activeTagFilter : ""
-                          } ${excludedTagFilters.includes(tag) ? styles.excludedTagFilter : ""}`}
+                            activeTagFilters.includes(tagId) ? styles.activeTagFilter : ""
+                          } ${excludedTagFilters.includes(tagId) ? styles.excludedTagFilter : ""}`}
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent track item click
-                            handleTrackItemTagClick(tag);
+                            handleTrackItemTagClick(tagId);
                           }}
                           title={
-                            activeTagFilters.includes(tag)
-                              ? `Click to remove "${tag}" from filters`
-                              : excludedTagFilters.includes(tag)
-                              ? `Click to remove "${tag}" from excluded filters`
-                              : `Click to filter by "${tag}"`
+                            activeTagFilters.includes(tagId)
+                              ? `Click to remove "${tagId}" from filters`
+                              : excludedTagFilters.includes(tagId)
+                              ? `Click to remove "${tagId}" from excluded filters`
+                              : `Click to filter by "${tagId}"`
                           }
                         >
-                          {tag}
+                          {tagId}
                         </span>
                       ))}
                     </div>
