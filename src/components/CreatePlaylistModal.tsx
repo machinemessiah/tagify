@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./CreatePlaylistModal.module.css";
 import Portal from "../utils/Portal";
 
 interface CreatePlaylistModalProps {
   trackCount: number;
   localTrackCount: number;
-  tagsFilter: string[];
+  activeTagFilters: string[];
+  excludedTagFilters: string[];
+  isOrFilterMode: boolean;
   energyMinFilter: number | null;
   energyMaxFilter: number | null;
   ratingFilter: number[];
@@ -18,7 +20,9 @@ interface CreatePlaylistModalProps {
 const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
   trackCount,
   localTrackCount,
-  tagsFilter,
+  activeTagFilters,
+  excludedTagFilters,
+  isOrFilterMode,
   energyMinFilter,
   energyMaxFilter,
   ratingFilter,
@@ -30,8 +34,8 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
   const defaultPlaylistName = (() => {
     const filterParts = [];
 
-    if (tagsFilter.length > 0) {
-      filterParts.push(tagsFilter.slice(0, 2).join(", ")); // Limit to first 2 tags for brevity
+    if (activeTagFilters.length > 0) {
+      filterParts.push(activeTagFilters.slice(0, 2).join(", ")); // Limit to first 2 tags for brevity
     }
 
     if (ratingFilter.length > 0) {
@@ -78,8 +82,14 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
   const defaultPlaylistDescription = (() => {
     const filterParts = [];
 
-    if (tagsFilter.length > 0) {
-      filterParts.push(`Tags: ${tagsFilter.join(", ")}`);
+    const filterMode = isOrFilterMode ? "ANY" : "ALL";
+
+    if (activeTagFilters.length > 0) {
+      filterParts.push(`Tags (${filterMode}): ${activeTagFilters.join(", ")}`);
+    }
+
+    if (excludedTagFilters.length > 0) {
+      filterParts.push(`Excluded: ${excludedTagFilters.join(", ")}`);
     }
 
     if (ratingFilter.length > 0) {
@@ -97,6 +107,20 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
         filterParts.push(`Energy: ≥${energyMinFilter}`);
       } else {
         filterParts.push(`Energy: ≤${energyMaxFilter}`);
+      }
+    }
+
+    if (bpmMinFilter !== null || bpmMaxFilter !== null) {
+      if (bpmMinFilter !== null && bpmMaxFilter !== null) {
+        if (bpmMinFilter === bpmMaxFilter) {
+          filterParts.push(`BPM: ${bpmMinFilter}`);
+        } else {
+          filterParts.push(`BPM: ${bpmMinFilter} - ${bpmMaxFilter}`);
+        }
+      } else if (bpmMinFilter !== null) {
+        filterParts.push(`BPM: ≥${bpmMinFilter}`);
+      } else {
+        filterParts.push(`BPM: ≤${bpmMaxFilter}`);
       }
     }
 
@@ -191,7 +215,7 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                 </label>
               </div>
 
-              {(tagsFilter.length > 0 ||
+              {(activeTagFilters.length > 0 ||
                 ratingFilter.length > 0 ||
                 energyMinFilter !== null ||
                 energyMaxFilter !== null ||
@@ -199,11 +223,11 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                 bpmMaxFilter !== null) && (
                 <div className={styles.filtersContainer}>
                   {/* Tags on their own row if they exist */}
-                  {tagsFilter.length > 0 && (
+                  {activeTagFilters.length > 0 && (
                     <div className={styles.filterRow}>
                       <span className={styles.filterLabel}>Tags:</span>
                       <div className={styles.tags}>
-                        {tagsFilter.map((tag) => (
+                        {activeTagFilters.map((tag) => (
                           <span key={tag} className={styles.tag}>
                             {tag}
                           </span>
