@@ -1097,7 +1097,6 @@ const TrackList: React.FC<TrackListProps> = ({
                 albumName: parsedLocalFile.album,
               };
             } else {
-              // Use info as is
               displayInfo = info || {
                 name: "Unknown Track",
                 artists: "Unknown Artist",
@@ -1242,18 +1241,18 @@ const TrackList: React.FC<TrackListProps> = ({
                           </div>
                         )}
                         {trackData.dateModified && (
-                            <div className={styles.timestampWithIcon}>
-                              <span className={styles.timestampIcon}>✏️</span>
-                              <span
-                                className={styles.trackItemTimestamp}
-                                title={`Last updated: ${new Date(
-                                  trackData.dateModified
-                                ).toLocaleString()}`}
-                              >
-                                {formatTimestamp(trackData.dateModified)}
-                              </span>
-                            </div>
-                          )}
+                          <div className={styles.timestampWithIcon}>
+                            <span className={styles.timestampIcon}>✏️</span>
+                            <span
+                              className={styles.trackItemTimestamp}
+                              title={`Last updated: ${new Date(
+                                trackData.dateModified
+                              ).toLocaleString()}`}
+                            >
+                              {formatTimestamp(trackData.dateModified)}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

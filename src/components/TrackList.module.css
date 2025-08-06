@@ -120,7 +120,7 @@
   padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   max-height: 300px;
   overflow-y: auto;
 }
@@ -141,7 +141,6 @@
 .filterSectionTitle {
   font-size: 14px;
   font-weight: 600;
-  margin: 0;
   color: var(--spice-text);
 }
 
@@ -184,8 +183,8 @@
 .tagFilters {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  max-height: 150px;
+  gap: 6px;
+  max-height: 225px;
   overflow-y: auto;
 }
 
@@ -231,7 +230,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .tagSearch {
