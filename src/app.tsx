@@ -99,15 +99,15 @@ function App() {
 
   // Hide topbar when app mounts - restore when app unmounts
   useEffect(() => {
-    const topbar = document.querySelector(".main-topBar-background") as HTMLElement;
+    const topbar = document.querySelector(".main-topBar-container") as HTMLElement;
     if (topbar) {
-      topbar.style.display = "none";
+      topbar.style.visibility = "hidden";
     }
 
     return () => {
-      const topbar = document.querySelector(".main-topBar-background") as HTMLElement;
+      const topbar = document.querySelector(".main-topBar-container") as HTMLElement;
       if (topbar) {
-        topbar.style.display = "";
+        topbar.style.visibility = "";
       }
     };
   }, []);
@@ -258,12 +258,12 @@ function App() {
   const handleToggleTag = (categoryId: string, subcategoryId: string, tagId: string) => {
     if (isMultiTagging && multiTrackDraftTags) {
       // When in multi-tagging mode with draft state, update the draft instead
-      const newDraft = { ...multiTrackDraftTags };
+      const newDraft: DraftTagState = { ...multiTrackDraftTags };
 
       if (lockedMultiTrackUri) {
         // Toggle for single track
         const trackTags = newDraft[lockedMultiTrackUri] || [];
-        const tagIndex = trackTags.findIndex(
+        const tagIndex: number = trackTags.findIndex(
           (t) =>
             t.categoryId === categoryId && t.subcategoryId === subcategoryId && t.tagId === tagId
         );
