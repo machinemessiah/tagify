@@ -783,8 +783,9 @@
 }
 
 .playAllButton::before {
-  content: "▶";
-  font-size: 12px;
+  font-family: "Font Awesome 5 Free";
+  content: "\f04b";
+  font-size: 8px;
 }
 
 /* Sort controls */
