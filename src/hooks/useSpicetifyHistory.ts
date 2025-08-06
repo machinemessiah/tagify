@@ -1,5 +1,10 @@
 import { useEffect } from "react";
-import { SpicetifyHistoryLocation, SpotifyTrack } from "../types/SpotifyTypes";
+import {
+  SpicetifyHistoryLocation,
+  SpotifyArtist,
+  SpotifyTrack,
+  SpotifyTrackResponse,
+} from "../types/SpotifyTypes";
 import { parseLocalFileUri } from "../utils/LocalFileParser";
 
 interface UseSpicetifyHistoryProps {
@@ -80,7 +85,7 @@ export function useSpicetifyHistory({
           }
 
           // Fetch track info using Spicetify's Cosmos API
-          const response = await Spicetify.CosmosAsync.get(
+          const response: SpotifyTrackResponse = await Spicetify.CosmosAsync.get(
             `https://api.spotify.com/v1/tracks/${trackId}`
           );
 
@@ -89,7 +94,7 @@ export function useSpicetifyHistory({
             const trackInfo: SpotifyTrack = {
               uri: trackUri,
               name: response.name,
-              artists: response.artists.map((artist: any) => ({
+              artists: response.artists.map((artist: SpotifyArtist) => ({
                 name: artist.name,
               })),
               album: { name: response.album?.name || "Unknown Album" },
@@ -158,7 +163,7 @@ export function useSpicetifyHistory({
                   const trackId = uri.split(":").pop();
                   if (!trackId) continue;
 
-                  const response = await Spicetify.CosmosAsync.get(
+                  const response: SpotifyTrackResponse = await Spicetify.CosmosAsync.get(
                     `https://api.spotify.com/v1/tracks/${trackId}`
                   );
 
@@ -166,7 +171,7 @@ export function useSpicetifyHistory({
                     updatedTrack = {
                       uri,
                       name: response.name,
-                      artists: response.artists.map((artist: any) => ({
+                      artists: response.artists.map((artist: SpotifyArtist) => ({
                         name: artist.name,
                       })),
                       album: { name: response.album?.name || "Unknown Album" },

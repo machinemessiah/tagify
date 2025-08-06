@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { SpotifyTrack } from "../types/SpotifyTypes";
+import { SpotifyArtist, SpotifyTrack, SpotifyTrackResponse } from "../types/SpotifyTypes";
 import { parseLocalFileUri } from "../utils/LocalFileParser";
 
 const LOCK_STATE_KEY = "tagify:lockState";
@@ -66,8 +66,8 @@ export function useTrackState({
 
       try {
         let trackData = null;
-        if ((Spicetify.Player.data as any).item) {
-          trackData = (Spicetify.Player.data as any).item;
+        if (Spicetify.Player.data.item) {
+          trackData = Spicetify.Player.data.item;
         }
 
         if (!trackData) {
@@ -172,14 +172,14 @@ export function useTrackState({
       // Fetch track info from Spotify API
       const response = await Spicetify.CosmosAsync.get(
         `https://api.spotify.com/v1/tracks/${trackId}`
-      );
+      ) as SpotifyTrackResponse;
 
       if (response) {
         // Format the track info to our needed structure
         const trackInfo: SpotifyTrack = {
           uri: uri,
           name: response.name,
-          artists: response.artists.map((artist: any) => ({
+          artists: response.artists.map((artist: SpotifyArtist) => ({
             name: artist.name,
           })),
           album: { name: response.album?.name || "Unknown Album" },

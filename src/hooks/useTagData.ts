@@ -61,6 +61,79 @@ interface BatchTagUpdate {
   toRemove: TrackTag[];
 }
 
+interface TagAnalytics {
+  id: string;
+  name: string;
+  order: number;
+  usage_count: number;
+  is_used: boolean;
+  full_path: string;
+}
+
+interface SubcategoryAnalytics {
+  id: string;
+  name: string;
+  order: number;
+  total_tags: number;
+  used_tags: number;
+  unused_tags: number;
+  tags: TagAnalytics[];
+}
+
+interface CategoryAnalytics {
+  id: string;
+  name: string;
+  order: number;
+  total_subcategories: number;
+  total_tags: number;
+  used_tags: number;
+  unused_tags: number;
+  subcategories: SubcategoryAnalytics[];
+}
+
+interface TagUsageSummary {
+  most_used_tags: Array<{
+    name: string;
+    usage_count: number;
+  }>;
+  unused_tag_names: string[];
+  usage_percentage: number;
+}
+
+interface ExportedTrackTag {
+  categoryId: string;
+  subcategoryId: string;
+  tagId: string;
+  name: string;
+}
+
+interface ExportedTrackData {
+  rating: number;
+  energy: number;
+  bpm: number | null;
+  tags: ExportedTrackTag[];
+  rekordbox_comment: string;
+}
+
+interface TagAnalyticsData {
+  total_categories: number;
+  total_subcategories: number;
+  total_tags: number;
+  used_tags: number;
+  unused_tags: number;
+  categories: CategoryAnalytics[];
+  tag_usage_summary: TagUsageSummary;
+}
+
+interface ExportDataResult {
+  version: string;
+  exported_at: string;
+  tracks: {
+    [trackUri: string]: ExportedTrackData;
+  };
+  tag_analytics: TagAnalyticsData;
+}
+
 // Default tag structure with 4 main categories
 const defaultTagData: TagDataStructure = {
   categories: [
@@ -936,7 +1009,7 @@ export function useTagData() {
 
   // Export data for rekordbox integration
   const exportData = () => {
-    const exportResult: any = {
+    const exportResult: ExportDataResult = {
       version: "1.0",
       exported_at: new Date().toISOString(),
       tracks: {},
@@ -947,7 +1020,11 @@ export function useTagData() {
         used_tags: 0,
         unused_tags: 0,
         categories: [],
-        tag_usage_summary: {},
+        tag_usage_summary: {
+          most_used_tags: [],
+          unused_tag_names: [],
+          usage_percentage: 0,
+        },
       },
     };
 
@@ -975,7 +1052,7 @@ export function useTagData() {
 
     // Build detailed category analytics
     tagData.categories.forEach((category, categoryIndex) => {
-      const categoryAnalytics = {
+      const categoryAnalytics: CategoryAnalytics = {
         id: category.id,
         name: category.name,
         order: categoryIndex,
@@ -987,7 +1064,7 @@ export function useTagData() {
       };
 
       category.subcategories.forEach((subcategory, subcategoryIndex) => {
-        const subcategoryAnalytics = {
+        const subcategoryAnalytics: SubcategoryAnalytics = {
           id: subcategory.id,
           name: subcategory.name,
           order: subcategoryIndex,
@@ -1002,7 +1079,7 @@ export function useTagData() {
           const usageCount = tagUsageMap.get(tagKey) || 0;
           const isUsed = usageCount > 0;
 
-          const tagAnalytics = {
+          const tagAnalytics: TagAnalytics = {
             id: tag.id,
             name: tag.name,
             order: tagIndex,
@@ -1035,9 +1112,9 @@ export function useTagData() {
     });
 
     // Create usage summary for quick reference
-    const usedTags = [];
-    const unusedTags = [];
-    const mostUsedTags = [];
+    const usedTags: { name: string; count: number; full_key: string; }[] = [];
+    const unusedTags: { name: string; full_key: string; }[] = [];
+    const mostUsedTags: { name: string; usage_count: number; }[] = [];
 
     tagUsageMap.forEach((count, tagKey) => {
       const [categoryId, subcategoryId, tagId] = tagKey.split(":");

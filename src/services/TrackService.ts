@@ -137,7 +137,7 @@ class TrackService {
       Spicetify.showNotification("No playable tracks match the filters", true);
       return;
     }
-    
+
     const spotifyTrackUris: string[] = trackUris.filter((uri) => !uri.startsWith("spotify:local:"));
     const isMixedTrackCollection: boolean = trackUris.some((uri) =>
       uri.startsWith("spotify:local:")
@@ -209,8 +209,9 @@ class TrackService {
     Spicetify.Player.next();
     await new Promise((resolve) => setTimeout(resolve, 200));
 
-    const playerData = Spicetify.Player.data as any;
-    const currentUri = playerData.item?.uri || playerData.track?.uri;
+    const playerData: Spicetify.PlayerState = Spicetify.Player.data;
+
+    const currentUri = playerData.item?.uri;
     if (currentUri === dummyUri) {
       Spicetify.Player.next();
     }
@@ -241,8 +242,8 @@ class TrackService {
         attempts++;
         // Check if we're playing and get the current track
         if (Spicetify.Player.isPlaying() && Spicetify.Player.data) {
-          const playerData = Spicetify.Player.data as any;
-          const currentUri = playerData.item?.uri || playerData.track?.uri;
+          const playerData: Spicetify.PlayerState = Spicetify.Player.data;
+          const currentUri = playerData.item?.uri;
           if (currentUri === expectedUri) {
             resolve();
             return;
@@ -259,7 +260,8 @@ class TrackService {
     });
   };
 
-  getLegacyFormatTracksFromTagData = (tagData: TagDataStructure) => {
+  // Resolves tag IDs to display names - to be consumed by TrackList
+  getTracksWithResolvedTags = (tagData: TagDataStructure) => {
     const result: {
       [uri: string]: {
         rating: number;

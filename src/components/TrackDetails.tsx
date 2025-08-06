@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import styles from "./TrackDetails.module.css";
 import { TagCategory, TrackTag } from "../hooks/useTagData";
 import ReactStars from "react-rating-stars-component";
+import {
+  SpotifyTrack,
+  SpotifyTrackResponse,
+  SpotifyImage,
+  SpotifyArtist,
+} from "../types/SpotifyTypes";
 
 interface TrackDetailsProps {
-  track: {
-    uri: string;
-    name: string;
-    artists: { name: string }[];
-    album: { name: string };
-  };
+  displayedTrack: SpotifyTrack; // The track displayed in TrackDetails
+  nowPlayingTrack?: SpotifyTrack | null; // The currently playing track
   trackData: {
     rating: number;
     energy: number;
@@ -30,8 +32,7 @@ interface TrackDetailsProps {
   onPlayTrack?: (uri: string) => void;
   isLocked?: boolean;
   onToggleLock?: () => void;
-  currentTrack?: any; // The currently playing track
-  onSwitchToCurrentTrack?: (track: any) => void;
+  onSwitchToCurrentTrack?: (track: SpotifyTrack | null) => void;
   onUpdateBpm: (trackUri: string) => Promise<number | null>;
 }
 
@@ -45,7 +46,8 @@ interface TrackMetadata {
 }
 
 const TrackDetails: React.FC<TrackDetailsProps> = ({
-  track,
+  displayedTrack,
+  nowPlayingTrack,
   trackData,
   categories,
   activeTagFilters,
@@ -59,13 +61,14 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   onPlayTrack,
   isLocked = false,
   onToggleLock,
-  currentTrack,
   onSwitchToCurrentTrack,
   onUpdateBpm,
 }: TrackDetailsProps) => {
   const [contextUri, setContextUri] = useState<string | null>(null);
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(true);
-  const artistNames = track.artists ? track.artists.map((artist) => artist.name).join(", ") : "";
+  const artistNames = displayedTrack.artists
+    ? displayedTrack.artists.map((artist) => artist.name).join(", ")
+    : "";
   const [albumCover, setAlbumCover] = useState<string | null>(null);
   const [isLoadingCover, setIsLoadingCover] = useState(true);
   const [trackMetadata, setTrackMetadata] = useState<TrackMetadata>({
@@ -171,14 +174,14 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   };
 
   const handleRefreshBpm = async () => {
-    if (track.uri.startsWith("spotify:local:")) {
+    if (displayedTrack.uri.startsWith("spotify:local:")) {
       Spicetify.showNotification("Cannot fetch BPM for local files", true);
       return;
     }
 
     setIsRefreshingBpm(true);
     try {
-      const updatedBpm = await onUpdateBpm(track.uri);
+      const updatedBpm = await onUpdateBpm(displayedTrack.uri);
       Spicetify.showNotification(`BPM updated to ${updatedBpm} from Spotify`);
     } catch (error) {
       console.error("Error refreshing BPM:", error);
@@ -195,7 +198,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
 
       try {
         // Check if this is a local file
-        if (track.uri.startsWith("spotify:local:")) {
+        if (displayedTrack.uri.startsWith("spotify:local:")) {
           // For local files, we set limited metadata
           setTrackMetadata({
             releaseDate: "",
@@ -210,10 +213,10 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
         }
 
         // Extract track ID from URI for Spotify tracks
-        const trackId = track.uri.split(":").pop();
+        const trackId = displayedTrack.uri.split(":").pop();
 
         if (!trackId) {
-          console.error("Invalid track URI:", track.uri);
+          console.error("Invalid track URI:", displayedTrack.uri);
           setIsLoadingMetadata(false);
           return;
         }
@@ -232,7 +235,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
         let sourceContext = null;
         try {
           if (Spicetify.Player && Spicetify.Player.data) {
-            const playerData = Spicetify.Player.data as any;
+            const playerData: Spicetify.PlayerState = Spicetify.Player.data;
 
             if (playerData.context) {
               const playerContextUri = playerData.context.uri;
@@ -258,7 +261,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                     contextName = "Playlist";
                   }
                 } else if (contextType === "album") {
-                  contextName = track.album.name;
+                  contextName = displayedTrack.album.name;
                 } else if (contextType === "artist") {
                   contextName = artistNames ? artistNames.split(",")[0] : "Artist";
                 } else if (contextType === "user") {
@@ -291,9 +294,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
 
         let playCount = null;
         try {
-          if (!track.uri.startsWith("spotify:local:")) {
+          if (!displayedTrack.uri.startsWith("spotify:local:")) {
             // Only try to get play count for Spotify tracks (not local files)
-            playCount = await getTrackPlayCount(track.uri);
+            playCount = await getTrackPlayCount(displayedTrack.uri);
           }
         } catch (error) {
           console.error("Error fetching play count:", error);
@@ -324,10 +327,10 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
       }
     };
 
-    if (track.uri) {
+    if (displayedTrack.uri) {
       fetchTrackMetadata();
     }
-  }, [track.uri, track.album.name, artistNames]);
+  }, [displayedTrack.uri, displayedTrack.album.name, artistNames]);
 
   // Fetch album cover when track changes
   useEffect(() => {
@@ -336,22 +339,22 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
 
       try {
         // No album art for Local Files
-        if (track.uri.startsWith("spotify:local:")) {
+        if (displayedTrack.uri.startsWith("spotify:local:")) {
           setAlbumCover(null);
           setIsLoadingCover(false);
           return;
         }
 
-        const trackId = track.uri.split(":").pop();
+        const trackId = displayedTrack.uri.split(":").pop();
 
         if (!trackId) {
-          console.error("Invalid track URI:", track.uri);
+          console.error("Invalid track URI:", displayedTrack.uri);
           setIsLoadingCover(false);
           return;
         }
 
         // Fetch track info to get album ID and cover
-        const trackInfo = await Spicetify.CosmosAsync.get(
+        const trackInfo: SpotifyTrackResponse = await Spicetify.CosmosAsync.get(
           `https://api.spotify.com/v1/tracks/${trackId}`
         );
 
@@ -363,7 +366,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
         ) {
           // Get medium size image (or the first available if medium doesn't exist)
           const image =
-            trackInfo.album.images.find((img: any) => img.height === 300) ||
+            trackInfo.album.images.find((img: SpotifyImage) => img.height === 300) ||
             trackInfo.album.images[0];
           setAlbumCover(image.url);
         } else {
@@ -377,10 +380,10 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
       }
     };
 
-    if (track.uri) {
+    if (displayedTrack.uri) {
       fetchAlbumCover();
     }
-  }, [track.uri]);
+  }, [displayedTrack.uri]);
 
   async function getTrackPlayCount(trackUri: string): Promise<number | null> {
     try {
@@ -458,8 +461,8 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   };
 
   const handlePlayTrack = () => {
-    if (onPlayTrack && track.uri) {
-      onPlayTrack(track.uri);
+    if (onPlayTrack && displayedTrack.uri) {
+      onPlayTrack(displayedTrack.uri);
     }
   };
 
@@ -550,9 +553,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   };
 
   // Navigation functions
-  const navigateToAlbum = () => {
+  const navigateToAlbum = (): void => {
     try {
-      if (track.uri.startsWith("spotify:local:")) {
+      if (displayedTrack.uri.startsWith("spotify:local:")) {
         Spicetify.Platform.History.push("/collection/local-files");
         return;
       }
@@ -560,18 +563,11 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
       // Extract album URI from track data or try to build it
       let albumUri = "";
 
-      // Try to extract from track info if available
-      if (
-        Spicetify.Player &&
-        Spicetify.Player.data &&
-        Spicetify.Player.data.track &&
-        Spicetify.Player.data.track.album &&
-        Spicetify.Player.data.track.album.uri
-      ) {
-        albumUri = Spicetify.Player.data.track.album.uri;
+      if (Spicetify.Player.data?.item?.uri == displayedTrack?.uri) {
+        albumUri = Spicetify.Player.data.item.album.uri;
       } else {
         // Try to extract album ID from track URI and build album URI
-        const trackId = track.uri.split(":").pop();
+        const trackId = displayedTrack.uri.split(":").pop();
         if (trackId) {
           // Get album ID
           Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/tracks/${trackId}`)
@@ -607,33 +603,20 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
     }
   };
 
-  const navigateToArtist = (artistName: string) => {
+  const navigateToArtist = (artistName: string): void => {
     try {
-      if (track.uri.startsWith("spotify:local:")) {
+      if (displayedTrack.uri.startsWith("spotify:local:")) {
         Spicetify.showNotification("Cannot navigate to artist for local files", true);
         return;
       }
 
-      // Try to get artist URI from track data
-      if (track.artists && track.artists.length > 0) {
-        const artist = track.artists.find((a) => a.name === artistName);
-        if (artist && (artist as any).uri) {
-          // If we have the artist URI directly
-          const artistId = (artist as any).uri.split(":").pop();
-          if (artistId) {
-            Spicetify.Platform.History.push(`/artist/${artistId}`);
-            return;
-          }
-        }
-      }
-
-      const trackId = track.uri.split(":").pop();
+      const trackId = displayedTrack.uri.split(":").pop();
       if (trackId) {
         Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/tracks/${trackId}`)
-          .then((response) => {
-            if (response && response.artists) {
-              const artist = response.artists.find((a: any) => a.name === artistName);
-              if (artist && artist.id) {
+          .then((response: SpotifyTrackResponse) => {
+            if (response?.artists) {
+              const artist = response.artists.find((a: SpotifyArtist) => a.name === artistName);
+              if (artist?.id) {
                 Spicetify.Platform.History.push(`/artist/${artist.id}`);
                 return;
               }
@@ -656,7 +639,12 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   };
 
   // Navigate to context (playlist, album, etc.)
-  const navigateToContext = () => {
+  const navigateToContext = (): void => {
+    if (trackMetadata.sourceContext == "Local Files") {
+      Spicetify.Platform.History.push("/collection/local-files");
+      return;
+    }
+
     if (!contextUri) {
       Spicetify.showNotification("No context available to navigate to", true);
       return;
@@ -732,12 +720,12 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
     <div className={styles.container}>
       {onToggleLock && (
         <div className={styles.lockControlContainer}>
-          {isLocked && currentTrack && currentTrack.uri !== track.uri && (
+          {isLocked && nowPlayingTrack && nowPlayingTrack.uri !== displayedTrack.uri && (
             <button
               className={styles.switchTrackButton}
               onClick={() => {
                 if (onSwitchToCurrentTrack) {
-                  onSwitchToCurrentTrack(currentTrack);
+                  onSwitchToCurrentTrack(nowPlayingTrack);
                 }
               }}
               title="Switch to currently playing track"
@@ -766,7 +754,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                 className={styles.albumCoverClickable}
                 onClick={() => navigateToAlbum()}
                 title={
-                  track.uri?.startsWith("spotify:local:") ? "Go to Local Files" : "Go to album"
+                  displayedTrack.uri?.startsWith("spotify:local:")
+                    ? "Go to Local Files"
+                    : "Go to album"
                 }
               >
                 {isLoadingCover ? (
@@ -776,7 +766,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                 ) : albumCover ? (
                   <img
                     src={albumCover}
-                    alt={`${track.album?.name || "Album"} cover`}
+                    alt={`${displayedTrack.album?.name || "Album"} cover`}
                     className={styles.albumCover}
                   />
                 ) : (
@@ -799,16 +789,20 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
             <h2
               className={styles.trackTitle}
               onClick={() => navigateToAlbum()}
-              title={track.uri?.startsWith("spotify:local:") ? "Go to Local Files" : "Go to album"}
+              title={
+                displayedTrack.uri?.startsWith("spotify:local:")
+                  ? "Go to Local Files"
+                  : "Go to album"
+              }
             >
-              {track.name || "Unknown Track"}
-              {track.uri?.startsWith("spotify:local:") && (
+              {displayedTrack.name || "Unknown Track"}
+              {displayedTrack.uri?.startsWith("spotify:local:") && (
                 <span style={{ fontSize: "0.8em", opacity: 0.7, marginLeft: "6px" }}>(Local)</span>
               )}
             </h2>
             <p className={styles.trackArtist}>
-              {track.artists && track.artists.length > 0
-                ? track.artists.map((artist, idx, arr) => (
+              {displayedTrack.artists && displayedTrack.artists.length > 0
+                ? displayedTrack.artists.map((artist, idx, arr) => (
                     <React.Fragment key={idx}>
                       <span
                         className={`${styles.clickableArtist}`}
@@ -822,7 +816,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                   ))
                 : "Unknown Artist"}
             </p>
-            <p className={styles.trackAlbum}>{track.album?.name || "Unknown Album"}</p>
+            <p className={styles.trackAlbum}>{displayedTrack.album?.name || "Unknown Album"}</p>
 
             {/* New Track Metadata Section */}
             <div className={styles.trackMetadata}>
@@ -887,7 +881,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                               {trackData.bpm || trackMetadata.bpm || "Unknown"}
                             </span>
 
-                            {!track.uri.startsWith("spotify:local:") && (
+                            {!displayedTrack.uri.startsWith("spotify:local:") && (
                               <button
                                 className={styles.bpmRefreshButton}
                                 onClick={handleRefreshBpm}

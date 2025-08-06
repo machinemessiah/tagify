@@ -95,7 +95,7 @@ function App() {
   // }, []);
 
   const playTrackViaQueue = trackService.playTrackViaQueue;
-  const getLegacyFormatTracks = () => trackService.getLegacyFormatTracksFromTagData(tagData);
+  const getTracksWithResolvedTags = () => trackService.getTracksWithResolvedTags(tagData);
 
   // Hide topbar when app mounts - restore when app unmounts
   useEffect(() => {
@@ -171,7 +171,8 @@ function App() {
         ) : (
           activeTrack && (
             <TrackDetails
-              track={activeTrack}
+              displayedTrack={activeTrack}
+              nowPlayingTrack={currentTrack}
               trackData={
                 tagData.tracks[activeTrack.uri] || {
                   rating: 0,
@@ -194,7 +195,6 @@ function App() {
               onPlayTrack={playTrackViaQueue}
               isLocked={isLocked}
               onToggleLock={toggleLock}
-              currentTrack={currentTrack}
               onSwitchToCurrentTrack={setLockedTrack}
               onUpdateBpm={updateBpm}
             />
@@ -204,7 +204,7 @@ function App() {
         {renderTagSelector()}
 
         <TrackList
-          tracks={getLegacyFormatTracks()}
+          tracks={getTracksWithResolvedTags()}
           categories={tagData.categories}
           activeTagFilters={activeTagFilters}
           excludedTagFilters={excludedTagFilters}

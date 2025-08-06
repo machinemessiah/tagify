@@ -14,6 +14,11 @@ import {
   SortOption,
   SortOrder,
 } from "../constants/trackList";
+import {
+  SpotifyArtist,
+  SpotifyBatchTracksResponse,
+  SpotifyTrackResponse,
+} from "../types/SpotifyTypes";
 
 interface Tag {
   tag: string;
@@ -160,7 +165,7 @@ const TrackList: React.FC<TrackListProps> = ({
     });
   };
 
-  const getSortedTracks = (tracksToSort: [string, any][]) => {
+  const getSortedTracks = (tracksToSort: [string, TrackData][]): [string, TrackData][] => {
     return [...tracksToSort].sort((a, b) => {
       const [uriA, dataA] = a;
       const [uriB, dataB] = b;
@@ -281,23 +286,23 @@ const TrackList: React.FC<TrackListProps> = ({
 
       try {
         const trackIds = batch.map((uri) => uri.split(":")[2]).filter(Boolean);
-        const response = await Spicetify.CosmosAsync.get(
+        const response = (await Spicetify.CosmosAsync.get(
           `https://api.spotify.com/v1/tracks?ids=${trackIds.join(",")}`
-        );
+        )) as SpotifyBatchTracksResponse;
 
         if (response?.tracks) {
           const updatedTrackInfo = { ...currentTrackInfo };
 
-          response.tracks.forEach((track: any) => {
+          response.tracks.forEach((track: SpotifyTrackResponse | null) => {
             if (track?.id) {
               const uri = `spotify:track:${track.id}`;
 
               const trackInfo = {
                 name: track.name,
-                artists: track.artists.map((a: any) => a.name).join(", "),
+                artists: track.artists.map((a: SpotifyArtist) => a.name).join(", "),
                 albumName: track.album?.name || "Unknown Album",
                 albumUri: track.album?.uri || null,
-                artistsData: track.artists.map((a: any) => ({
+                artistsData: track.artists.map((a: SpotifyArtist) => ({
                   name: a.name,
                   uri: a.uri,
                 })),
@@ -354,23 +359,74 @@ const TrackList: React.FC<TrackListProps> = ({
   };
 
   // Filter tracks based on all applied filters
-  const filteredTracks = Object.entries(tracks).filter(([uri, trackData]) => {
-    const info = trackInfo[uri];
-    const isLocalFile = uri.startsWith("spotify:local:");
-    const hasMetadata = !!info;
+  const filteredTracks: [uri: string, trackData: TrackData][] = Object.entries(tracks).filter(
+    ([uri, trackData]) => {
+      const info = trackInfo[uri];
+      const isLocalFile = uri.startsWith("spotify:local:");
+      const hasMetadata = !!info;
 
-    // Skip if we don't have info for this track
-    // But KEEP local files even if we have no info yet
-    if (!isLocalFile && !hasMetadata) {
-      return false;
-    }
+      // Skip if we don't have info for this track
+      // But KEEP local files even if we have no info yet
+      if (!isLocalFile && !hasMetadata) {
+        return false;
+      }
 
-    // If it's a local file that we don't have info for yet, keep it visible
-    // This ensures local files appear while metadata is still loading
-    if (isLocalFile && !hasMetadata) {
-      // Only apply tag/rating/energy/bpm filters since we can't search without metadata
+      // If it's a local file that we don't have info for yet, keep it visible
+      // This ensures local files appear while metadata is still loading
+      if (isLocalFile && !hasMetadata) {
+        // Only apply tag/rating/energy/bpm filters since we can't search without metadata
 
-      // Tag filters - include and exclude logic
+        // Tag filters - include and exclude logic
+        const matchesIncludeTags =
+          activeTagFilters.length === 0 ||
+          (isOrFilterMode
+            ? // OR logic - track must have ANY of the selected tags
+              activeTagFilters.some((tag) => trackData.tags.some((t) => t.tag === tag))
+            : // AND logic - track must have ALL of the selected tags
+              activeTagFilters.every((tag) => trackData.tags.some((t) => t.tag === tag)));
+
+        // Exclude tags - track must NOT have ANY of these tags
+        const matchesExcludeTags =
+          excludedTagFilters.length === 0 ||
+          !excludedTagFilters.some((tag) => trackData.tags.some((t) => t.tag === tag));
+
+        // Rating filter
+        const matchesRating =
+          ratingFilters.length === 0 ||
+          (trackData.rating > 0 && ratingFilters.includes(trackData.rating));
+
+        // Energy range filter
+        const matchesEnergyMin = energyMinFilter === null || trackData.energy >= energyMinFilter;
+        const matchesEnergyMax = energyMaxFilter === null || trackData.energy <= energyMaxFilter;
+
+        // BPM range filter
+        const matchesBpmMin =
+          bpmMinFilter === null || (trackData.bpm !== null && trackData.bpm >= bpmMinFilter);
+        const matchesBpmMax =
+          bpmMaxFilter === null || (trackData.bpm !== null && trackData.bpm <= bpmMaxFilter);
+
+        // If search term is empty, then return based on other filters
+        // Otherwise, hide it since we can't search on local files without metadata yet
+        return (
+          searchTerm === "" &&
+          matchesIncludeTags &&
+          matchesExcludeTags &&
+          matchesRating &&
+          matchesEnergyMin &&
+          matchesEnergyMax &&
+          matchesBpmMin &&
+          matchesBpmMax
+        );
+      }
+
+      // For tracks with info (both Spotify and loaded local files)
+      // Search term filter
+      const matchesSearch =
+        searchTerm === "" ||
+        info.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        info.artists.toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Tag filters - Combined include/exclude logic
       const matchesIncludeTags =
         activeTagFilters.length === 0 ||
         (isOrFilterMode
@@ -379,7 +435,7 @@ const TrackList: React.FC<TrackListProps> = ({
           : // AND logic - track must have ALL of the selected tags
             activeTagFilters.every((tag) => trackData.tags.some((t) => t.tag === tag)));
 
-      // Exclude tags - track must NOT have ANY of these tags
+      // Exclude tags - track must NOT have ANY of these tags (always AND logic for exclusions)
       const matchesExcludeTags =
         excludedTagFilters.length === 0 ||
         !excludedTagFilters.some((tag) => trackData.tags.some((t) => t.tag === tag));
@@ -395,14 +451,12 @@ const TrackList: React.FC<TrackListProps> = ({
 
       // BPM range filter
       const matchesBpmMin =
-        bpmMinFilter === null || (trackData.bpm !== null && trackData.bpm >= bpmMinFilter);
+        bpmMinFilter === null || (trackData.bpm && trackData.bpm >= bpmMinFilter);
       const matchesBpmMax =
-        bpmMaxFilter === null || (trackData.bpm !== null && trackData.bpm <= bpmMaxFilter);
+        bpmMaxFilter === null || (trackData.bpm && trackData.bpm <= bpmMaxFilter);
 
-      // If search term is empty, then return based on other filters
-      // Otherwise, hide it since we can't search on local files without metadata yet
       return (
-        searchTerm === "" &&
+        matchesSearch &&
         matchesIncludeTags &&
         matchesExcludeTags &&
         matchesRating &&
@@ -412,52 +466,7 @@ const TrackList: React.FC<TrackListProps> = ({
         matchesBpmMax
       );
     }
-
-    // For tracks with info (both Spotify and loaded local files)
-    // Search term filter
-    const matchesSearch =
-      searchTerm === "" ||
-      info.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      info.artists.toLowerCase().includes(searchTerm.toLowerCase());
-
-    // Tag filters - Combined include/exclude logic
-    const matchesIncludeTags =
-      activeTagFilters.length === 0 ||
-      (isOrFilterMode
-        ? // OR logic - track must have ANY of the selected tags
-          activeTagFilters.some((tag) => trackData.tags.some((t) => t.tag === tag))
-        : // AND logic - track must have ALL of the selected tags
-          activeTagFilters.every((tag) => trackData.tags.some((t) => t.tag === tag)));
-
-    // Exclude tags - track must NOT have ANY of these tags (always AND logic for exclusions)
-    const matchesExcludeTags =
-      excludedTagFilters.length === 0 ||
-      !excludedTagFilters.some((tag) => trackData.tags.some((t) => t.tag === tag));
-
-    // Rating filter
-    const matchesRating =
-      ratingFilters.length === 0 ||
-      (trackData.rating > 0 && ratingFilters.includes(trackData.rating));
-
-    // Energy range filter
-    const matchesEnergyMin = energyMinFilter === null || trackData.energy >= energyMinFilter;
-    const matchesEnergyMax = energyMaxFilter === null || trackData.energy <= energyMaxFilter;
-
-    // BPM range filter
-    const matchesBpmMin = bpmMinFilter === null || (trackData.bpm && trackData.bpm >= bpmMinFilter);
-    const matchesBpmMax = bpmMaxFilter === null || (trackData.bpm && trackData.bpm <= bpmMaxFilter);
-
-    return (
-      matchesSearch &&
-      matchesIncludeTags &&
-      matchesExcludeTags &&
-      matchesRating &&
-      matchesEnergyMin &&
-      matchesEnergyMax &&
-      matchesBpmMin &&
-      matchesBpmMax
-    );
-  });
+  );
 
   const handleBpmMinChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value === "" ? null : parseInt(event.target.value);
@@ -518,7 +527,7 @@ const TrackList: React.FC<TrackListProps> = ({
     onFilterByTag(tag);
   };
 
-  const hasIncompleteTags = (trackData: any): boolean => {
+  const hasIncompleteTags = (trackData: TrackData): boolean => {
     if (!trackData) return true;
 
     // Check if any of these are missing

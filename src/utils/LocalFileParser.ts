@@ -62,7 +62,7 @@ export function parseLocalFileUri(uri: string): ParsedLocalFile {
           title = combinedInfo;
         }
       }
-      // Format: spotify:local:artist::title:duration (like your second example)
+      // Format: spotify:local:artist::title:duration
       else if (parts[2] && parts[3] === "" && parts[4]) {
         artist = decodeURIComponent(parts[2].replace(/\+/g, " "));
         title = decodeURIComponent(parts[4].replace(/\+/g, " "));
