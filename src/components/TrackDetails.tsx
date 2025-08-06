@@ -197,9 +197,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
       setIsLoadingMetadata(true);
 
       try {
-        // Check if this is a local file
         if (displayedTrack.uri.startsWith("spotify:local:")) {
-          // For local files, we set limited metadata
           setTrackMetadata({
             releaseDate: "",
             trackLength: "",
@@ -221,12 +219,10 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
           return;
         }
 
-        // Fetch track info
         const trackInfo = await Spicetify.CosmosAsync.get(
           `https://api.spotify.com/v1/tracks/${trackId}`
         );
 
-        // Fetch audio features for BPM
         const audioFeatures = await Spicetify.CosmosAsync.get(
           `https://api.spotify.com/v1/audio-features/${trackId}`
         );
@@ -265,7 +261,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                 } else if (contextType === "artist") {
                   contextName = artistNames ? artistNames.split(",")[0] : "Artist";
                 } else if (contextType === "user") {
-                  contextName = "Liked Songs"; // Default for user context is often Liked Songs
+                  contextName = "Liked Songs";
                 }
 
                 // Simply use the context name without the type prefix
@@ -295,7 +291,6 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
         let playCount = null;
         try {
           if (!displayedTrack.uri.startsWith("spotify:local:")) {
-            // Only try to get play count for Spotify tracks (not local files)
             playCount = await getTrackPlayCount(displayedTrack.uri);
           }
         } catch (error) {
@@ -306,14 +301,13 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
           releaseDate: formatDate(trackInfo.album?.release_date || ""),
           trackLength: formatDuration(trackInfo.duration_ms || 0),
           bpm: audioFeatures?.tempo ? Math.round(audioFeatures.tempo) : null,
-          playCount, // Add the play count here
+          playCount,
           sourceContext,
           genres: genres.slice(0, 3),
         });
       } catch (error) {
         console.error("Error fetching track metadata:", error);
 
-        // Set minimal metadata for error cases
         setTrackMetadata({
           releaseDate: "",
           trackLength: "",
@@ -338,7 +332,6 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
       setIsLoadingCover(true);
 
       try {
-        // No album art for Local Files
         if (displayedTrack.uri.startsWith("spotify:local:")) {
           setAlbumCover(null);
           setIsLoadingCover(false);
@@ -387,11 +380,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
 
   async function getTrackPlayCount(trackUri: string): Promise<number | null> {
     try {
-      // Extract track ID and album ID
       const trackId = trackUri.split(":").pop();
       if (!trackId) return null;
 
-      // First, get the track info to get the album ID
       const trackInfo = await Spicetify.CosmosAsync.get(
         `https://api.spotify.com/v1/tracks/${trackId}`
       );
@@ -443,7 +434,6 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   }
 
   const handleTagClick = (tag: string) => {
-    // If we have the special track list tag click handler, use it
     // This toggle tags ON/OFF in TrackDetails (no EXCLUDE)
     if (onFilterByTagOnOff) {
       onFilterByTagOnOff(tag);
@@ -466,7 +456,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
     }
   };
 
-  // Helper function to find tag name by ids
+  // Find tag name by ids
   const findTagInfo = (categoryId: string, subcategoryId: string, tagId: string) => {
     const category = categories.find((c) => c.id === categoryId);
     if (!category) return null;
@@ -481,7 +471,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
       categoryName: category.name,
       subcategoryName: subcategory.name,
       tagName: tag.name,
-      tagOrder: subcategory.tags.findIndex((t) => t.id === tagId), // Add order information
+      tagOrder: subcategory.tags.findIndex((t) => t.id === tagId),
     };
   };
 
@@ -560,7 +550,6 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
         return;
       }
 
-      // Extract album URI from track data or try to build it
       let albumUri = "";
 
       if (Spicetify.Player.data?.item?.uri == displayedTrack?.uri) {
@@ -569,14 +558,12 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
         // Try to extract album ID from track URI and build album URI
         const trackId = displayedTrack.uri.split(":").pop();
         if (trackId) {
-          // Get album ID
           Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/tracks/${trackId}`)
             .then((response) => {
               if (response && response.album && response.album.id) {
                 const albumId = response.album.id;
                 albumUri = `spotify:album:${albumId}`;
 
-                // Navigate to album page
                 Spicetify.Platform.History.push(`/album/${albumId}`);
               }
             })
@@ -1098,6 +1085,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                                 <span className={styles.tagName}>{tag.name}</span>
                                 <button
                                   className={styles.removeTag}
+                                  title={`Click to delete this tag`}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     onRemoveTag(categoryId, subcategoryId, tag.id);

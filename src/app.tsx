@@ -222,7 +222,6 @@ function App() {
     );
   };
 
-  // Render the tag selector conditionally
   const renderTagSelector = () => {
     if (!activeTrack && !(isMultiTagging && multiTagTracks.length > 0)) {
       return null;
