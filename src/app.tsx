@@ -346,7 +346,6 @@ function App() {
         onImportBackup={importBackup}
         onExportRekordbox={() => setShowExport(true)}
         lastSaved={lastSaved}
-        taggedTracks={tagData.tracks}
       />
 
       {renderContent()}

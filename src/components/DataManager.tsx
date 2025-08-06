@@ -13,7 +13,6 @@ interface DataManagerProps {
   onImportBackup: (data: TagDataStructure) => void;
   onExportRekordbox: () => void;
   lastSaved: Date | null;
-  taggedTracks: Record<string, any>;
 }
 
 const DataManager: React.FC<DataManagerProps> = ({
