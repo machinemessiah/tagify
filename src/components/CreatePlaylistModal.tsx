@@ -215,17 +215,23 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                     onChange={(e) => setIsPublic(e.target.checked)}
                     className="form-checkbox"
                   />
-                  Make playlist public
+                  <span className="checkbox-text">Public playlist</span>
                 </label>
                 <label className="form-checkbox-label">
                   <input
                     type="checkbox"
                     checked={isSmartPlaylist}
-                    title="Automatically add new tracks to this playlist when they match the current filter criteria"
                     onChange={(e) => setIsSmartPlaylist(e.target.checked)}
                     className="form-checkbox"
                   />
-                  Make smart playlist
+                  <span className="checkbox-text">Smart playlist</span>
+                  <div className={styles.helpTooltip}>
+                    ?
+                    <div className={styles.tooltipContent}>
+                      <strong>💡 </strong> When new tracks match the filter criteria, they'll be
+                      automatically added to this playlist!
+                    </div>
+                  </div>
                 </label>
               </div>
 
@@ -237,12 +243,17 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                 bpmMaxFilter !== null) && (
                 <div className={styles.filtersContainer}>
                   {/* Tags on their own row if they exist */}
-                  {activeTagDisplayNames.length > 0 && (
+                  {(activeTagDisplayNames.length > 0 || excludedTagDisplayNames.length > 0) && (
                     <div className={styles.filterRow}>
-                      <span className={styles.filterLabel}>Tags:</span>
+                      <span className={styles.filterLabel}>🏷️ Tags:</span>
                       <div className={styles.tags}>
                         {activeTagDisplayNames.map((displayName) => (
                           <span key={displayName} className={styles.tag}>
+                            {displayName}
+                          </span>
+                        ))}
+                        {excludedTagDisplayNames.map((displayName) => (
+                          <span key={displayName} className={styles.excludedTag}>
                             {displayName}
                           </span>
                         ))}
@@ -264,7 +275,7 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                       )}
                       {(energyMinFilter !== null || energyMaxFilter !== null) && (
                         <span className={styles.compactFilter}>
-                          <strong>Energy:</strong>{" "}
+                          <strong>⚡ Energy:</strong>{" "}
                           {energyMinFilter !== null && energyMaxFilter !== null
                             ? energyMinFilter === energyMaxFilter
                               ? energyMinFilter
@@ -276,7 +287,7 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                       )}
                       {(bpmMinFilter !== null || bpmMaxFilter !== null) && (
                         <span className={styles.compactFilter}>
-                          <strong>BPM:</strong>{" "}
+                          <strong>🎵 BPM:</strong>{" "}
                           {bpmMinFilter !== null && bpmMaxFilter !== null
                             ? `${bpmMinFilter} - ${bpmMaxFilter}`
                             : bpmMinFilter !== null

@@ -673,6 +673,7 @@ const TrackList: React.FC<TrackListProps> = ({
     isPublic: boolean,
     isSmartPlaylist: boolean
   ) => {
+    setShowCreatePlaylistModal(false);
     if (filteredTracks.length === 0) return;
 
     const trackUris: string[] = filteredTracks.map(([uri]) => uri);
@@ -692,24 +693,6 @@ const TrackList: React.FC<TrackListProps> = ({
       );
       onStoreSmartPlaylist(smartPlaylistCriteria);
     }
-    setShowCreatePlaylistModal(false);
-  };
-
-  // searches through category tree by tagName, returns tag's full hierarchical path (categoryId, subcategoryId, tagId)
-  const findTagHierarchy = (tagName: string): TrackTag | null => {
-    for (const category of categories) {
-      for (const subcategory of category.subcategories) {
-        const tag = subcategory.tags.find((t) => t.name === tagName);
-        if (tag) {
-          return {
-            categoryId: category.id,
-            subcategoryId: subcategory.id,
-            tagId: tag.id,
-          };
-        }
-      }
-    }
-    return null; // When tag not found
   };
 
   const handleCreatePlaylistClick = () => {

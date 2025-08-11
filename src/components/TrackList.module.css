@@ -204,26 +204,30 @@
 }
 
 .tagFilter.active {
-  background-color: #1e90ff;
+  background-color: #1e40af;
   font-weight: 600;
 }
 
+.tagFilter.active:hover {
+  background-color: #1e3a8a;
+}
+
 .tagFilter.excluded {
-  background: #ff4c4c; /* Red color for excluded filters */
+  background: #b91c1c;
   color: white;
 }
 
 .tagFilter.excluded:hover {
-  background: #e64444;
+  background: #991b1b;
 }
 
 .excludedTagFilter {
-  background: #ff4c4c !important; /* Red color for excluded filters */
+  background: #b91c1c;
   color: white !important;
 }
 
 .excludedTagFilter:hover {
-  background: #e64444 !important;
+  background: #991b1b;
 }
 
 .filterSectionHeader {
@@ -463,7 +467,6 @@
   padding: 2px 8px;
   max-width: 100%;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .trackItemTag:hover {
@@ -503,7 +506,6 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .actionButton:hover {
@@ -511,14 +513,13 @@
 }
 
 .activeTagFilter {
-  background: #1e90ff;
+  background: #1e40af;
   color: white;
-  font-weight: 600;
+  font-weight: 550;
 }
 
-/* Optional: add even more emphasis on hover for active tags */
 .activeTagFilter:hover {
-  background: #1a7ee0;
+  background: #1e3a8a;
   opacity: 0.95;
 }
 
@@ -704,7 +705,7 @@
 .activeFilterTag {
   display: inline-flex;
   align-items: center;
-  background: #1e90ff;
+  background: #1e40af;
   color: white;
   border-radius: 16px;
   padding: 3px 10px;
@@ -714,10 +715,14 @@
   cursor: pointer;
 }
 
+.activeFilterTag:hover {
+  background-color: #1e3a8a;
+}
+
 .excludedFilterTag {
   display: inline-flex;
   align-items: center;
-  background: #ff4c4c;
+  background: #b91c1c;
   color: white;
   border-radius: 16px;
   padding: 3px 10px;
@@ -726,6 +731,10 @@
   max-width: 100%;
   text-decoration: line-through;
   cursor: pointer;
+}
+
+.excludedFilterTag:hover {
+  background: #991b1b;
 }
 
 .removeFilterButton {
