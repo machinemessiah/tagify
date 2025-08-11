@@ -233,7 +233,6 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                           <h3
                             className={styles.playlistName}
                             onClick={() => navigateToPlaylist(playlist.playlistId)}
-                            title="Click to open in Spotify"
                           >
                             {playlist.playlistName}
                           </h3>
@@ -301,12 +300,6 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                       )}
 
                       <div className={styles.playlistActions}>
-                        <button
-                          className={styles.actionButton}
-                          onClick={() => navigateToPlaylist(playlist.playlistId)}
-                        >
-                          Open Playlist
-                        </button>
                         <button
                           className={styles.actionButton}
                           onClick={() => toggleSmartPlaylistActive(playlist.playlistId)}

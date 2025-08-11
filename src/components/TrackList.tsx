@@ -805,8 +805,6 @@ const TrackList: React.FC<TrackListProps> = ({
           </div>
         </div>
         <div className={styles.filterControlsCenterGrid}>
-          {/* Sort Controls */}
-          {/* <div className={styles.filterControlsRightGrid}> */}
           {/* Play All button */}
           <button
             className={styles.playAllButton}
@@ -815,9 +813,7 @@ const TrackList: React.FC<TrackListProps> = ({
               title: `Play all ${filteredTracks.length} tracks`,
             })}
             disabled={filteredTracks.length === 0}
-          >
-            Play All
-          </button>
+          ></button>
 
           {/* Create Playlist button */}
           <button
@@ -831,12 +827,14 @@ const TrackList: React.FC<TrackListProps> = ({
             Create Playlist
           </button>
 
-          {/* {smartPlaylists.length > 0 && ( */}
-          <button className={styles.smartPlaylistButton} onClick={handleSmartPlaylistClick}>
-            Smart Playlists ({smartPlaylists.length})
+          {/* Smart Playlist button */}
+          <button
+            className={styles.smartPlaylistButton}
+            onClick={handleSmartPlaylistClick}
+            title={`Smart Playlists (${smartPlaylists.length})`}
+          >
+            <i className="fas fa-bolt"></i>
           </button>
-          {/* )} */}
-          {/* </div> */}
         </div>
         <div className={styles.filterControlsRightGrid}>
           <div className={styles.searchBox}>
