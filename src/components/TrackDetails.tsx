@@ -27,13 +27,13 @@ interface TrackDetailsProps {
   onRemoveTag: (categoryId: string, subcategoryId: string, tagId: string) => void;
   activeTagFilters: string[];
   excludedTagFilters: string[];
-  onFilterByTag: (tag: string) => void;
-  onFilterByTagOnOff?: (tag: string) => void;
+  onFilterByTagOnOff: (categoryId: string, subcategoryId: string, tagId: string) => void;
   onPlayTrack?: (uri: string) => void;
   isLocked?: boolean;
   onToggleLock?: () => void;
   onSwitchToCurrentTrack?: (track: SpotifyTrack | null) => void;
   onUpdateBpm: (trackUri: string) => Promise<number | null>;
+  createTagId: (categoryId: string, subcategoryId: string, tagId: string) => string;
 }
 
 interface TrackMetadata {
@@ -56,13 +56,13 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   onSetEnergy,
   onSetBpm,
   onRemoveTag,
-  onFilterByTag,
   onFilterByTagOnOff,
   onPlayTrack,
   isLocked = false,
   onToggleLock,
   onSwitchToCurrentTrack,
   onUpdateBpm,
+  createTagId,
 }: TrackDetailsProps) => {
   const [contextUri, setContextUri] = useState<string | null>(null);
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(true);
@@ -433,21 +433,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
     }
   }
 
-  const handleTagClick = (tag: string) => {
+  const handleTagClick = (categoryId: string, subcategoryId: string, tagId: string) => {
     // This toggle tags ON/OFF in TrackDetails (no EXCLUDE)
-    if (onFilterByTagOnOff) {
-      onFilterByTagOnOff(tag);
-      return;
-    }
-
-    // Otherwise fall back to the original logic
-    if (activeTagFilters.includes(tag)) {
-      onFilterByTag(tag);
-    } else if (excludedTagFilters.includes(tag)) {
-      onFilterByTag(tag);
-    } else {
-      onFilterByTag(tag);
-    }
+    onFilterByTagOnOff(categoryId, subcategoryId, tagId);
   };
 
   const handlePlayTrack = () => {
@@ -1065,19 +1053,21 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
 
                         <div className={styles.tagList}>
                           {subcategory.tags.map((tag) => {
+                            const fullTagId = createTagId(categoryId, subcategoryId, tag.id);
+
                             return (
                               <div
                                 key={tag.id}
                                 className={`${styles.tagItem} ${
-                                  activeTagFilters.includes(tag.name) ? styles.tagFilter : ""
+                                  activeTagFilters.includes(fullTagId) ? styles.tagFilter : ""
                                 } ${
-                                  excludedTagFilters.includes(tag.name) ? styles.tagExcluded : ""
+                                  excludedTagFilters.includes(fullTagId) ? styles.tagExcluded : ""
                                 }`}
-                                onClick={() => handleTagClick(tag.name)}
+                                onClick={() => handleTagClick(categoryId, subcategoryId, tag.id)}
                                 title={
-                                  activeTagFilters.includes(tag.name)
+                                  activeTagFilters.includes(fullTagId)
                                     ? `Click to remove filter for "${tag.name}"`
-                                    : excludedTagFilters.includes(tag.name)
+                                    : excludedTagFilters.includes(fullTagId)
                                     ? `Click to remove "${tag.name}" filter`
                                     : `Click to include "${tag.name}"`
                                 }
