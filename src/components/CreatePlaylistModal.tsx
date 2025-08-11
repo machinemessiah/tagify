@@ -235,70 +235,77 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                 </label>
               </div>
 
-              {(activeTagDisplayNames.length > 0 ||
-                ratingFilters.length > 0 ||
-                energyMinFilter !== null ||
-                energyMaxFilter !== null ||
-                bpmMinFilter !== null ||
-                bpmMaxFilter !== null) && (
-                <div className={styles.filtersContainer}>
-                  {/* Tags on their own row if they exist */}
-                  {(activeTagDisplayNames.length > 0 || excludedTagDisplayNames.length > 0) && (
-                    <div className={styles.filterRow}>
-                      <span className={styles.filterLabel}>🏷️ Tags:</span>
-                      <div className={styles.tags}>
-                        {activeTagDisplayNames.map((displayName) => (
-                          <span key={displayName} className={styles.tag}>
-                            {displayName}
-                          </span>
-                        ))}
-                        {excludedTagDisplayNames.map((displayName) => (
-                          <span key={displayName} className={styles.excludedTag}>
-                            {displayName}
-                          </span>
-                        ))}
+              <div className={styles.filtersContainer}>
+                {activeTagDisplayNames.length === 0 &&
+                excludedTagDisplayNames.length === 0 &&
+                ratingFilters.length === 0 &&
+                energyMinFilter === null &&
+                energyMaxFilter === null &&
+                bpmMinFilter === null &&
+                bpmMaxFilter === null ? (
+                  <div className={styles.filterRow}>
+                    <span className={styles.filterLabel}>No filters applied</span>
+                  </div>
+                ) : (
+                  <>
+                    {/* Tags on their own row if they exist */}
+                    {(activeTagDisplayNames.length > 0 || excludedTagDisplayNames.length > 0) && (
+                      <div className={styles.filterRow}>
+                        <span className={styles.filterLabel}>🏷️ Tags:</span>
+                        <div className={styles.tags}>
+                          {activeTagDisplayNames.map((displayName) => (
+                            <span key={displayName} className={styles.tag}>
+                              {displayName}
+                            </span>
+                          ))}
+                          {excludedTagDisplayNames.map((displayName) => (
+                            <span key={displayName} className={styles.excludedTag}>
+                              {displayName}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {/* Rating, Energy, and BPM on separate rows */}
-                  {(ratingFilters.length > 0 ||
-                    energyMinFilter !== null ||
-                    energyMaxFilter !== null ||
-                    bpmMinFilter !== null ||
-                    bpmMaxFilter !== null) && (
-                    <div className={styles.compactFilterRow}>
-                      {ratingFilters.length > 0 && (
-                        <span className={styles.compactFilter}>
-                          <strong>Rating:</strong> {ratingFilters.sort((a, b) => a - b).join(", ")}{" "}
-                          ★
-                        </span>
-                      )}
-                      {(energyMinFilter !== null || energyMaxFilter !== null) && (
-                        <span className={styles.compactFilter}>
-                          <strong>⚡ Energy:</strong>{" "}
-                          {energyMinFilter !== null && energyMaxFilter !== null
-                            ? energyMinFilter === energyMaxFilter
-                              ? energyMinFilter
-                              : `${energyMinFilter} - ${energyMaxFilter}`
-                            : energyMinFilter !== null
-                            ? `≥${energyMinFilter}`
-                            : `≤${energyMaxFilter}`}
-                        </span>
-                      )}
-                      {(bpmMinFilter !== null || bpmMaxFilter !== null) && (
-                        <span className={styles.compactFilter}>
-                          <strong>🎵 BPM:</strong>{" "}
-                          {bpmMinFilter !== null && bpmMaxFilter !== null
-                            ? `${bpmMinFilter} - ${bpmMaxFilter}`
-                            : bpmMinFilter !== null
-                            ? `≥${bpmMinFilter}`
-                            : `≤${bpmMaxFilter}`}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
+                    {/* Rating, Energy, and BPM on separate rows */}
+                    {(ratingFilters.length > 0 ||
+                      energyMinFilter !== null ||
+                      energyMaxFilter !== null ||
+                      bpmMinFilter !== null ||
+                      bpmMaxFilter !== null) && (
+                      <div className={styles.compactFilterRow}>
+                        {ratingFilters.length > 0 && (
+                          <span className={styles.compactFilter}>
+                            <strong>🏆 Rating:</strong>{" "}
+                            {ratingFilters.sort((a, b) => a - b).join(", ")} ★
+                          </span>
+                        )}
+                        {(energyMinFilter !== null || energyMaxFilter !== null) && (
+                          <span className={styles.compactFilter}>
+                            <strong>⚡ Energy:</strong>{" "}
+                            {energyMinFilter !== null && energyMaxFilter !== null
+                              ? energyMinFilter === energyMaxFilter
+                                ? energyMinFilter
+                                : `${energyMinFilter} - ${energyMaxFilter}`
+                              : energyMinFilter !== null
+                              ? `≥${energyMinFilter}`
+                              : `≤${energyMaxFilter}`}
+                          </span>
+                        )}
+                        {(bpmMinFilter !== null || bpmMaxFilter !== null) && (
+                          <span className={styles.compactFilter}>
+                            <strong>🎵 BPM:</strong>{" "}
+                            {bpmMinFilter !== null && bpmMaxFilter !== null
+                              ? `${bpmMinFilter} - ${bpmMaxFilter}`
+                              : bpmMinFilter !== null
+                              ? `≥${bpmMinFilter}`
+                              : `≤${bpmMaxFilter}`}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
 
               <div className={styles.formActions}>
                 <button type="button" className={styles.cancelButton} onClick={onClose}>

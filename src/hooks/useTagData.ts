@@ -472,7 +472,6 @@ export function useTagData() {
         offset += limit;
       }
 
-      console.log(`❌ ${trackUri} not found in playlist`);
       return false;
     } catch (error) {
       console.error("❌ Error checking if track is in playlist:", error);
