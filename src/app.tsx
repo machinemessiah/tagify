@@ -45,6 +45,9 @@ function App() {
     applyBatchTagUpdates,
     exportData,
     storeSmartPlaylist,
+    smartPlaylists,
+    setSmartPlaylists,
+    syncSmartPlaylistFull,
   } = useTagData();
 
   const {
@@ -223,6 +226,9 @@ function App() {
           onCreatePlaylist={createPlaylistFromFilters}
           onStoreSmartPlaylist={storeSmartPlaylist}
           parseTagId={parseTagId}
+          smartPlaylists={smartPlaylists}
+          onSetSmartPlaylists={setSmartPlaylists}
+          onSyncPlaylist={syncSmartPlaylistFull}
         />
       </div>
     );

@@ -19,6 +19,7 @@ import {
   SpotifyBatchTracksResponse,
   SpotifyTrackResponse,
 } from "../types/SpotifyTypes";
+import SmartPlaylistModal from "./SmartPlaylistModal";
 
 export interface TrackData {
   rating: number;
@@ -66,6 +67,9 @@ interface TrackListProps {
   parseTagId: (
     fullTagId: string
   ) => { categoryId: string; subcategoryId: string; tagId: string } | null;
+  smartPlaylists: SmartPlaylistCriteria[];
+  onSetSmartPlaylists: (updatedPlaylists: SmartPlaylistCriteria[]) => void;
+  onSyncPlaylist: (playlist: SmartPlaylistCriteria) => Promise<void>;
 }
 
 const TrackList: React.FC<TrackListProps> = ({
@@ -84,10 +88,14 @@ const TrackList: React.FC<TrackListProps> = ({
   onCreatePlaylist,
   onStoreSmartPlaylist,
   parseTagId,
+  smartPlaylists,
+  onSetSmartPlaylists,
+  onSyncPlaylist,
 }) => {
   const [trackInfo, setTrackInfo] = useState<{ [uri: string]: SpotifyTrackInfo }>({});
   const [searchTerm, setSearchTerm] = useLocalStorage<string>("tagify:trackSearchTerm", "");
   const [showCreatePlaylistModal, setShowCreatePlaylistModal] = useState<boolean>(false);
+  const [showSmartPlaylistModal, setShowSmartPlaylistModal] = useState<boolean>(false);
   const [displayCount, setDisplayCount] = useState<number>(PAGINATION_BATCH_SIZE); // Initial batch size
   const observerRef = useRef<HTMLDivElement>(null);
 
@@ -701,6 +709,10 @@ const TrackList: React.FC<TrackListProps> = ({
     }
   };
 
+  const handleSmartPlaylistClick = () => {
+    setShowSmartPlaylistModal(true);
+  };
+
   const navigateToAlbum = (uri: string) => {
     try {
       if (uri.startsWith("spotify:local:")) {
@@ -794,31 +806,37 @@ const TrackList: React.FC<TrackListProps> = ({
         </div>
         <div className={styles.filterControlsCenterGrid}>
           {/* Sort Controls */}
-          <div className={styles.filterControlsRightGrid}>
-            {/* Play All button */}
-            <button
-              className={styles.playAllButton}
-              onClick={playAllFilteredTracks}
-              {...(filteredTracks.length > 0 && {
-                title: `Play all ${filteredTracks.length} tracks`,
-              })}
-              disabled={filteredTracks.length === 0}
-            >
-              Play All
-            </button>
+          {/* <div className={styles.filterControlsRightGrid}> */}
+          {/* Play All button */}
+          <button
+            className={styles.playAllButton}
+            onClick={playAllFilteredTracks}
+            {...(filteredTracks.length > 0 && {
+              title: `Play all ${filteredTracks.length} tracks`,
+            })}
+            disabled={filteredTracks.length === 0}
+          >
+            Play All
+          </button>
 
-            {/* Create Playlist button */}
-            <button
-              className={styles.createPlaylistButton}
-              onClick={handleCreatePlaylistClick}
-              {...(filteredTracks.length > 0 && {
-                title: `Create playlist with ${filteredTracks.length} tracks`,
-              })}
-              disabled={filteredTracks.length === 0}
-            >
-              Create Playlist
-            </button>
-          </div>
+          {/* Create Playlist button */}
+          <button
+            className={styles.createPlaylistButton}
+            onClick={handleCreatePlaylistClick}
+            {...(filteredTracks.length > 0 && {
+              title: `Create playlist with ${filteredTracks.length} tracks`,
+            })}
+            disabled={filteredTracks.length === 0}
+          >
+            Create Playlist
+          </button>
+
+          {/* {smartPlaylists.length > 0 && ( */}
+          <button className={styles.smartPlaylistButton} onClick={handleSmartPlaylistClick}>
+            Smart Playlists ({smartPlaylists.length})
+          </button>
+          {/* )} */}
+          {/* </div> */}
         </div>
         <div className={styles.filterControlsRightGrid}>
           <div className={styles.searchBox}>
@@ -1417,6 +1435,15 @@ const TrackList: React.FC<TrackListProps> = ({
           bpmMaxFilter={bpmMaxFilter}
           onClose={() => setShowCreatePlaylistModal(false)}
           onCreatePlaylist={handleCreatePlaylist}
+        />
+      )}
+      {showSmartPlaylistModal && (
+        <SmartPlaylistModal
+          smartPlaylists={smartPlaylists}
+          tagCategories={categories}
+          onUpdateSmartPlaylists={onSetSmartPlaylists}
+          onSyncPlaylist={onSyncPlaylist}
+          onClose={() => setShowSmartPlaylistModal(false)}
         />
       )}
     </div>

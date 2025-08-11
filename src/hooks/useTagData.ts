@@ -514,12 +514,9 @@ export function useTagData() {
     playlistId: string
   ): Promise<boolean> => {
     try {
-      await Spicetify.CosmosAsync.del(
-        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-        {
-          tracks: [{ uri: trackUri }],
-        }
-      );
+      await Spicetify.CosmosAsync.del(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+        tracks: [{ uri: trackUri }],
+      });
 
       // Delay to let Spotify's cache sync
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -642,6 +639,78 @@ export function useTagData() {
     if (hasChanges) {
       setSmartPlaylists(updatedPlaylists);
     }
+  };
+
+  const syncSmartPlaylistFull = async (playlist: SmartPlaylistCriteria): Promise<void> => {
+    if (!playlist.isActive) {
+      console.log("⏸️ Skipping sync for inactive playlist:", playlist.playlistName);
+      return;
+    }
+
+    const matchingTrackUris: string[] = [];
+
+    Object.entries(tagData.tracks).forEach(([trackUri, trackData]) => {
+      const matches = evaluateTrackMatchesCriteria(trackData, playlist.criteria);
+      if (matches) {
+        matchingTrackUris.push(trackUri);
+      }
+    });
+
+    const tracksToAdd = matchingTrackUris.filter(
+      (uri) => !playlist.smartPlaylistTrackUris.includes(uri)
+    );
+
+    const tracksToRemove = playlist.smartPlaylistTrackUris.filter(
+      (uri) => !matchingTrackUris.includes(uri)
+    );
+
+    let hasChanges = false;
+    let addedCount = 0;
+    let removedCount = 0;
+
+    for (const trackUri of tracksToRemove) {
+      const success = await removeTrackFromSpotifyPlaylist(trackUri, playlist.playlistId);
+      if (success) {
+        removedCount++;
+        hasChanges = true;
+      }
+    }
+
+    for (const trackUri of tracksToAdd) {
+      const result = await addTrackToSpotifyPlaylist(trackUri, playlist.playlistId);
+      if (result.success && result.wasAdded) {
+        addedCount++;
+        hasChanges = true;
+      }
+    }
+
+    // Update the smart playlist tracking
+    if (hasChanges) {
+      const updatedPlaylists = smartPlaylists.map((p) => {
+        if (p.playlistId === playlist.playlistId) {
+          return {
+            ...p,
+            smartPlaylistTrackUris: matchingTrackUris,
+            lastSyncAt: Date.now(),
+          };
+        }
+        return p;
+      });
+
+      setSmartPlaylists(updatedPlaylists);
+
+      if (addedCount > 0 || removedCount > 0) {
+        Spicetify.showNotification(
+          `✅ Synced "${playlist.playlistName}": +${addedCount} tracks, -${removedCount} tracks`,
+          false,
+          10000
+        );
+      } else {
+        Spicetify.showNotification(`✅ "${playlist.playlistName}" is already in sync`, false, 5000);
+      }
+    }
+
+    console.log(`🏁 Full sync completed for playlist: ${playlist.playlistName}`);
   };
 
   const saveToLocalStorage = (data: TagDataStructure) => {
@@ -1555,8 +1624,7 @@ export function useTagData() {
     tagData,
     isLoading,
     lastSaved,
-    smartPlaylists, // todo: are we using this?
-
+    
     // Track tag management
     toggleTagForTrack,
     setRating,
@@ -1566,12 +1634,15 @@ export function useTagData() {
     toggleTagForMultipleTracks,
     findCommonTags,
     applyBatchTagUpdates,
-
+    
     // Category management
     replaceCategories,
-
+    
     // Smart playlists
+    smartPlaylists,
+    setSmartPlaylists,
     storeSmartPlaylist,
+    syncSmartPlaylistFull,
 
     // Import/Export
     exportData,
