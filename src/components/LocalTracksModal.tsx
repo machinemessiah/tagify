@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./LocalTracksModal.module.css";
 import { parseLocalFileUri } from "../utils/LocalFileParser";
 import Portal from "../utils/Portal";

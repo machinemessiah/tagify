@@ -44,6 +44,7 @@ function App() {
     updateBpm,
     applyBatchTagUpdates,
     exportData,
+    storeSmartPlaylist,
   } = useTagData();
 
   const {
@@ -54,6 +55,9 @@ function App() {
     onFilterByTag,
     onFilterByTagOnOff,
     clearTagFilters,
+    createTagId,
+    parseTagId,
+    getTagDisplayName,
   } = useFilterState();
 
   const {
@@ -191,12 +195,12 @@ function App() {
                 toggleTagForTrack(activeTrack.uri, categoryId, subcategoryId, tagId)
               }
               onFilterByTagOnOff={onFilterByTagOnOff}
-              onFilterByTag={onFilterByTag}
               onPlayTrack={playTrackViaQueue}
               isLocked={isLocked}
               onToggleLock={toggleLock}
               onSwitchToCurrentTrack={setLockedTrack}
               onUpdateBpm={updateBpm}
+              createTagId={createTagId}
             />
           )
         )}
@@ -209,14 +213,16 @@ function App() {
           activeTagFilters={activeTagFilters}
           excludedTagFilters={excludedTagFilters}
           activeTrackUri={activeTrack?.uri || null}
-          onFilterByTag={onFilterByTag}
           onRemoveFilter={handleRemoveFilter}
           onToggleFilterType={handleToggleFilterType}
+          onFilterByTag={onFilterByTag}
           onTrackListTagClick={onFilterByTagOnOff}
           onClearTagFilters={clearTagFilters}
           onPlayTrack={playTrackViaQueue}
           onTagTrack={handleTagTrack}
           onCreatePlaylist={createPlaylistFromFilters}
+          onStoreSmartPlaylist={storeSmartPlaylist}
+          parseTagId={parseTagId}
         />
       </div>
     );

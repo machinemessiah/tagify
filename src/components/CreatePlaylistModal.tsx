@@ -5,27 +5,32 @@ import Portal from "../utils/Portal";
 interface CreatePlaylistModalProps {
   trackCount: number;
   localTrackCount: number;
-  activeTagFilters: string[];
-  excludedTagFilters: string[];
+  activeTagDisplayNames: string[];
+  excludedTagDisplayNames: string[];
   isOrFilterMode: boolean;
   energyMinFilter: number | null;
   energyMaxFilter: number | null;
-  ratingFilter: number[];
+  ratingFilters: number[];
   bpmMinFilter: number | null;
   bpmMaxFilter: number | null;
   onClose: () => void;
-  onCreatePlaylist: (name: string, description: string, isPublic: boolean) => void;
+  onCreatePlaylist: (
+    playlistName: string,
+    description: string,
+    isPublic: boolean,
+    isSmartPlaylist: boolean
+  ) => void;
 }
 
 const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
   trackCount,
   localTrackCount,
-  activeTagFilters,
-  excludedTagFilters,
+  activeTagDisplayNames,
+  excludedTagDisplayNames,
   isOrFilterMode,
   energyMinFilter,
   energyMaxFilter,
-  ratingFilter,
+  ratingFilters,
   bpmMinFilter,
   bpmMaxFilter,
   onClose,
@@ -34,12 +39,12 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
   const defaultPlaylistName = (() => {
     const filterParts = [];
 
-    if (activeTagFilters.length > 0) {
-      filterParts.push(activeTagFilters.slice(0, 2).join(", ")); // Limit to first 2 tags for brevity
+    if (activeTagDisplayNames.length > 0) {
+      filterParts.push(activeTagDisplayNames.slice(0, 2).join(", ")); // Limit to first 2 tags for brevity
     }
 
-    if (ratingFilter.length > 0) {
-      filterParts.push(`${ratingFilter.sort((a, b) => a - b).join(",")}★`);
+    if (ratingFilters.length > 0) {
+      filterParts.push(`${ratingFilters.sort((a, b) => a - b).join(",")}★`);
     }
 
     if (energyMinFilter !== null || energyMaxFilter !== null) {
@@ -84,16 +89,16 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
 
     const filterMode = isOrFilterMode ? "ANY" : "ALL";
 
-    if (activeTagFilters.length > 0) {
-      filterParts.push(`Tags (${filterMode}): ${activeTagFilters.join(", ")}`);
+    if (activeTagDisplayNames.length > 0) {
+      filterParts.push(`Tags (${filterMode}): ${activeTagDisplayNames.join(", ")}`);
     }
 
-    if (excludedTagFilters.length > 0) {
-      filterParts.push(`Excluded: ${excludedTagFilters.join(", ")}`);
+    if (excludedTagDisplayNames.length > 0) {
+      filterParts.push(`Excluded: ${excludedTagDisplayNames.join(", ")}`);
     }
 
-    if (ratingFilter.length > 0) {
-      filterParts.push(`Rating: ${ratingFilter.sort((a, b) => a - b).join(", ")} ★`);
+    if (ratingFilters.length > 0) {
+      filterParts.push(`Rating: ${ratingFilters.sort((a, b) => a - b).join(", ")} ★`);
     }
 
     if (energyMinFilter !== null || energyMaxFilter !== null) {
@@ -124,10 +129,7 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
       }
     }
 
-    let description =
-      filterParts.length > 0
-        ? `Created with Tagify | ${filterParts.join(" | ")}`
-        : "Created with Tagify";
+    let description = filterParts.length > 0 ? `${filterParts.join(" | ")}` : "Created with Tagify";
 
     // Truncate if too long
     if (description.length > 300) {
@@ -140,13 +142,15 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
   const [playlistName, setPlaylistName] = useState(defaultPlaylistName);
   const [playlistDescription, setPlaylistDescription] = useState(defaultPlaylistDescription);
   const [isPublic, setIsPublic] = useState(false);
+  const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onCreatePlaylist(
       playlistName.trim() || defaultPlaylistName,
       playlistDescription.trim() || defaultPlaylistDescription,
-      isPublic
+      isPublic,
+      isSmartPlaylist
     );
   };
 
@@ -213,38 +217,49 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                   />
                   Make playlist public
                 </label>
+                <label className="form-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={isSmartPlaylist}
+                    title="Automatically add new tracks to this playlist when they match the current filter criteria"
+                    onChange={(e) => setIsSmartPlaylist(e.target.checked)}
+                    className="form-checkbox"
+                  />
+                  Make smart playlist
+                </label>
               </div>
 
-              {(activeTagFilters.length > 0 ||
-                ratingFilter.length > 0 ||
+              {(activeTagDisplayNames.length > 0 ||
+                ratingFilters.length > 0 ||
                 energyMinFilter !== null ||
                 energyMaxFilter !== null ||
                 bpmMinFilter !== null ||
                 bpmMaxFilter !== null) && (
                 <div className={styles.filtersContainer}>
                   {/* Tags on their own row if they exist */}
-                  {activeTagFilters.length > 0 && (
+                  {activeTagDisplayNames.length > 0 && (
                     <div className={styles.filterRow}>
                       <span className={styles.filterLabel}>Tags:</span>
                       <div className={styles.tags}>
-                        {activeTagFilters.map((tag) => (
-                          <span key={tag} className={styles.tag}>
-                            {tag}
+                        {activeTagDisplayNames.map((displayName) => (
+                          <span key={displayName} className={styles.tag}>
+                            {displayName}
                           </span>
                         ))}
                       </div>
                     </div>
                   )}
                   {/* Rating, Energy, and BPM on separate rows */}
-                  {(ratingFilter.length > 0 ||
+                  {(ratingFilters.length > 0 ||
                     energyMinFilter !== null ||
                     energyMaxFilter !== null ||
                     bpmMinFilter !== null ||
                     bpmMaxFilter !== null) && (
                     <div className={styles.compactFilterRow}>
-                      {ratingFilter.length > 0 && (
+                      {ratingFilters.length > 0 && (
                         <span className={styles.compactFilter}>
-                          <strong>Rating:</strong> {ratingFilter.sort((a, b) => a - b).join(", ")} ★
+                          <strong>Rating:</strong> {ratingFilters.sort((a, b) => a - b).join(", ")}{" "}
+                          ★
                         </span>
                       )}
                       {(energyMinFilter !== null || energyMaxFilter !== null) && (
