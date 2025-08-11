@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./TrackList.module.css";
 import { parseLocalFileUri } from "../utils/LocalFileParser";
-import { TagCategory } from "../hooks/useTagData";
+import { TagCategory, SmartPlaylistCriteria, TrackTag } from "../hooks/useTagData";
 import CreatePlaylistModal from "./CreatePlaylistModal";
 import ReactStars from "react-rating-stars-component";
 import { useLocalStorage } from "../hooks/useLocalStorage";
@@ -20,16 +20,11 @@ import {
   SpotifyTrackResponse,
 } from "../types/SpotifyTypes";
 
-interface Tag {
-  tagId: string;
-  categoryId?: string;
-}
-
-interface TrackData {
+export interface TrackData {
   rating: number;
   energy: number;
   bpm: number | null;
-  tagIds: Tag[];
+  resolvedTagNames: { displayName: string; fullTagId: string }[];
   dateCreated?: number;
   dateModified?: number;
 }
@@ -48,19 +43,29 @@ interface TrackListProps {
   activeTagFilters: string[];
   excludedTagFilters: string[];
   activeTrackUri: string | null;
-  onFilterByTag: (tag: string) => void;
-  onRemoveFilter?: (tag: string) => void;
-  onToggleFilterType?: (tag: string, isExcluded: boolean) => void;
-  onTrackListTagClick?: (tag: string) => void;
+  onFilterByTag: (categoryId: string, subcategoryId: string, tagId: string) => void;
+  onRemoveFilter: (categoryId: string, subcategoryId: string, tagId: string) => void;
+  onToggleFilterType?: (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string,
+    isExcluded: boolean
+  ) => void;
+  onTrackListTagClick: (categoryId: string, subcategoryId: string, tagId: string) => void;
   onPlayTrack: (uri: string) => void;
-  onTagTrack?: (uri: string) => void;
+  onTagTrack: (uri: string) => void;
   onClearTagFilters?: () => void;
-  onCreatePlaylist?: (
+  onCreatePlaylist: (
     trackUris: string[],
     name: string,
     description: string,
-    isPublic: boolean
-  ) => void;
+    isPublic: boolean,
+    isSmartPlaylist: boolean
+  ) => Promise<string | null>;
+  onStoreSmartPlaylist: (criteria: SmartPlaylistCriteria) => void;
+  parseTagId: (
+    fullTagId: string
+  ) => { categoryId: string; subcategoryId: string; tagId: string } | null;
 }
 
 const TrackList: React.FC<TrackListProps> = ({
@@ -77,10 +82,12 @@ const TrackList: React.FC<TrackListProps> = ({
   onTagTrack,
   onClearTagFilters,
   onCreatePlaylist,
+  onStoreSmartPlaylist,
+  parseTagId,
 }) => {
   const [trackInfo, setTrackInfo] = useState<{ [uri: string]: SpotifyTrackInfo }>({});
   const [searchTerm, setSearchTerm] = useLocalStorage<string>("tagify:trackSearchTerm", "");
-  const [showCreatePlaylistModal, setShowCreatePlaylistModal] = useState(false);
+  const [showCreatePlaylistModal, setShowCreatePlaylistModal] = useState<boolean>(false);
   const [displayCount, setDisplayCount] = useState<number>(PAGINATION_BATCH_SIZE); // Initial batch size
   const observerRef = useRef<HTMLDivElement>(null);
 
@@ -140,7 +147,7 @@ const TrackList: React.FC<TrackListProps> = ({
   };
 
   // Sort tags based on their position in the hierarchy
-  const sortTags = (tags: Tag[]) => {
+  const sortTags = (tags: { displayName: string; fullTagId: string }[]) => {
     // Build an index of tag positions in the category hierarchy
     const tagPositions: { [tagName: string]: string } = {};
 
@@ -148,7 +155,8 @@ const TrackList: React.FC<TrackListProps> = ({
     categories.forEach((category, categoryIndex) => {
       category.subcategories.forEach((subcategory, subcategoryIndex) => {
         subcategory.tags.forEach((tag, tagIndex) => {
-          // Create a sortable position string (pad with zeros for correct string sorting)
+          // Create a sortable position string
+          // categoryIndex - subcategoryIndex - tagIndex => 000-000-000 format
           const positionKey = `${String(categoryIndex).padStart(3, "0")}-${String(
             subcategoryIndex
           ).padStart(3, "0")}-${String(tagIndex).padStart(3, "0")}`;
@@ -159,8 +167,8 @@ const TrackList: React.FC<TrackListProps> = ({
 
     // Sort the tags by their positions. Default to end if not found
     return [...tags].sort((a, b) => {
-      const posA = tagPositions[a.tagId] || "999-999-999";
-      const posB = tagPositions[b.tagId] || "999-999-999";
+      const posA = tagPositions[a.displayName] || "999-999-999";
+      const posB = tagPositions[b.displayName] || "999-999-999";
       return posA.localeCompare(posB);
     });
   };
@@ -341,21 +349,23 @@ const TrackList: React.FC<TrackListProps> = ({
     bpmMaxFilter,
   ]);
 
-  const filterTagBySearch = (tag: string) => {
+  const filterTagBySearch = (tagName: string) => {
     if (!tagSearchTerm.trim()) return true;
-    return tag.toLowerCase().includes(tagSearchTerm.toLowerCase());
+    return tagName.toLowerCase().includes(tagSearchTerm.toLowerCase());
   };
 
-  const handleFilterTagClick = (tag: string, isExcluded: boolean) => {
-    if (onToggleFilterType) {
-      onToggleFilterType(tag, isExcluded);
-    }
+  const handleFilterTagClick = (fullTagId: string, isExcluded: boolean) => {
+    const parsed = parseTagId(fullTagId);
+    if (!parsed || !onToggleFilterType) return;
+
+    onToggleFilterType(parsed.categoryId, parsed.subcategoryId, parsed.tagId, isExcluded);
   };
 
-  const handleRemoveFilter = (tag: string) => {
-    if (onRemoveFilter) {
-      onRemoveFilter(tag);
-    }
+  const handleRemoveFilter = (fullTagId: string) => {
+    const parsed = parseTagId(fullTagId);
+    if (!parsed || !onRemoveFilter) return;
+
+    onRemoveFilter(parsed.categoryId, parsed.subcategoryId, parsed.tagId);
   };
 
   // Filter tracks based on all applied filters
@@ -375,20 +385,21 @@ const TrackList: React.FC<TrackListProps> = ({
       // This ensures local files appear while metadata is still loading
       if (isLocalFile && !hasMetadata) {
         // Only apply tag/rating/energy/bpm filters since we can't search without metadata
+        const trackTagIds = trackData.resolvedTagNames.map((tag) => tag.fullTagId);
 
         // Tag filters - include and exclude logic
         const matchesIncludeTags =
           activeTagFilters.length === 0 ||
           (isOrFilterMode
             ? // OR logic - track must have ANY of the selected tags
-              activeTagFilters.some((tag) => trackData.tagIds.some((t) => t.tagId === tag))
+              activeTagFilters.some((filterId) => trackTagIds.includes(filterId))
             : // AND logic - track must have ALL of the selected tags
-              activeTagFilters.every((tag) => trackData.tagIds.some((t) => t.tagId === tag)));
+              activeTagFilters.every((filterId) => trackTagIds.includes(filterId)));
 
         // Exclude tags - track must NOT have ANY of these tags
         const matchesExcludeTags =
           excludedTagFilters.length === 0 ||
-          !excludedTagFilters.some((tag) => trackData.tagIds.some((t) => t.tagId === tag));
+          !excludedTagFilters.some((filterId) => trackTagIds.includes(filterId));
 
         // Rating filter
         const matchesRating =
@@ -426,19 +437,19 @@ const TrackList: React.FC<TrackListProps> = ({
         info.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         info.artists.toLowerCase().includes(searchTerm.toLowerCase());
 
+      const trackTagIds = trackData.resolvedTagNames.map((tag) => tag.fullTagId);
+
       // Tag filters - Combined include/exclude logic
       const matchesIncludeTags =
         activeTagFilters.length === 0 ||
         (isOrFilterMode
-          ? // OR logic - track must have ANY of the selected tags
-            activeTagFilters.some((tag) => trackData.tagIds.some((t) => t.tagId === tag))
-          : // AND logic - track must have ALL of the selected tags
-            activeTagFilters.every((tag) => trackData.tagIds.some((t) => t.tagId === tag)));
+          ? activeTagFilters.some((filterId) => trackTagIds.includes(filterId))
+          : activeTagFilters.every((filterId) => trackTagIds.includes(filterId)));
 
       // Exclude tags - track must NOT have ANY of these tags (always AND logic for exclusions)
       const matchesExcludeTags =
         excludedTagFilters.length === 0 ||
-        !excludedTagFilters.some((tag) => trackData.tagIds.some((t) => t.tagId === tag));
+        !excludedTagFilters.some((filterId) => trackTagIds.includes(filterId));
 
       // Rating filter
       const matchesRating =
@@ -516,15 +527,11 @@ const TrackList: React.FC<TrackListProps> = ({
     };
   }, [sortedTracksVisible.length, filteredTracks.length]);
 
-  const handleTrackItemTagClick = (tag: string) => {
-    // If we have the special track list tag click handler, use it
-    if (onTrackListTagClick) {
-      onTrackListTagClick(tag);
-      return;
-    }
+  const handleTrackItemTagClick = (fullTagId: string) => {
+    const parsed = parseTagId(fullTagId);
+    if (!parsed) return;
 
-    // Otherwise fall back to the original logic
-    onFilterByTag(tag);
+    onTrackListTagClick(parsed.categoryId, parsed.subcategoryId, parsed.tagId);
   };
 
   const hasIncompleteTags = (trackData: TrackData): boolean => {
@@ -533,19 +540,26 @@ const TrackList: React.FC<TrackListProps> = ({
     // Check if any of these are missing
     const missingRating = trackData.rating === 0 || trackData.rating === undefined;
     const missingEnergy = trackData.energy === 0 || trackData.energy === undefined;
-    const missingTags = !trackData.tagIds || trackData.tagIds.length === 0;
+    const missingTags = !trackData.resolvedTagNames || trackData.resolvedTagNames.length === 0;
 
     // Return true if any are missing
     return missingRating || missingEnergy || missingTags;
   };
 
   // Extract all unique tags from all tracks
-  const allTags = new Set<string>();
+  const allUniqueTagsMap = new Map<string, string>();
   Object.values(tracks).forEach((track) => {
-    track.tagIds.forEach(({ tagId: tag }) => {
-      allTags.add(tag);
+    track.resolvedTagNames.forEach(({ fullTagId, displayName }) => {
+      allUniqueTagsMap.set(fullTagId, displayName);
     });
   });
+
+  const activeTagDisplayNames = activeTagFilters.map(
+    (fullTagId) => allUniqueTagsMap.get(fullTagId) || fullTagId
+  );
+  const excludedTagDisplayNames = excludedTagFilters.map(
+    (fullTagId) => allUniqueTagsMap.get(fullTagId) || fullTagId
+  );
 
   // Extract all possible rating values
   const allRatings = new Set<number>();
@@ -614,17 +628,88 @@ const TrackList: React.FC<TrackListProps> = ({
     (bpmMinFilter !== null || bpmMaxFilter !== null ? 1 : 0) +
     (searchTerm.trim() !== "" ? 1 : 0);
 
-  const handleCreatePlaylist = (name: string, description: string, isPublic: boolean) => {
+  const createSmartPlaylistCriteria = (
+    playlistId: string,
+    playlistName: string,
+    trackUris: string[]
+  ): SmartPlaylistCriteria => {
+    const mapTagFiltersToHierarchy = (tagIds: string[]): TrackTag[] =>
+      tagIds
+        .map((tagId) => {
+          const parsed = parseTagId(tagId);
+          if (!parsed) return null;
+
+          return {
+            categoryId: parsed.categoryId,
+            subcategoryId: parsed.subcategoryId,
+            tagId: parsed.tagId,
+          };
+        })
+        .filter((tag): tag is TrackTag => tag !== null);
+
+    return {
+      playlistId,
+      playlistName,
+      criteria: {
+        activeTagFilters: mapTagFiltersToHierarchy(activeTagFilters),
+        excludedTagFilters: mapTagFiltersToHierarchy(excludedTagFilters),
+        ratingFilters,
+        energyMinFilter,
+        energyMaxFilter,
+        bpmMinFilter,
+        bpmMaxFilter,
+        isOrFilterMode,
+      },
+      isActive: true,
+      createdAt: Date.now(),
+      lastSyncAt: Date.now(),
+      smartPlaylistTrackUris: trackUris,
+    };
+  };
+
+  const handleCreatePlaylist = async (
+    playlistName: string,
+    description: string,
+    isPublic: boolean,
+    isSmartPlaylist: boolean
+  ) => {
     if (filteredTracks.length === 0) return;
 
-    // Extract URIs from the filtered tracks
-    const trackUris = filteredTracks.map(([uri]) => uri);
+    const trackUris: string[] = filteredTracks.map(([uri]) => uri);
+    const playlistId: string | null = await onCreatePlaylist(
+      trackUris,
+      playlistName,
+      description,
+      isPublic,
+      isSmartPlaylist
+    );
 
-    if (onCreatePlaylist) {
-      onCreatePlaylist(trackUris, name, description, isPublic);
+    if (isSmartPlaylist && playlistId) {
+      const smartPlaylistCriteria: SmartPlaylistCriteria = createSmartPlaylistCriteria(
+        playlistId,
+        playlistName,
+        trackUris
+      );
+      onStoreSmartPlaylist(smartPlaylistCriteria);
     }
-
     setShowCreatePlaylistModal(false);
+  };
+
+  // searches through category tree by tagName, returns tag's full hierarchical path (categoryId, subcategoryId, tagId)
+  const findTagHierarchy = (tagName: string): TrackTag | null => {
+    for (const category of categories) {
+      for (const subcategory of category.subcategories) {
+        const tag = subcategory.tags.find((t) => t.name === tagName);
+        if (tag) {
+          return {
+            categoryId: category.id,
+            subcategoryId: subcategory.id,
+            tagId: tag.id,
+          };
+        }
+      }
+    }
+    return null; // When tag not found
   };
 
   const handleCreatePlaylistClick = () => {
@@ -977,7 +1062,7 @@ const TrackList: React.FC<TrackListProps> = ({
             )}
           </div>
 
-          {allTags.size > 0 && (
+          {allUniqueTagsMap.size > 0 && (
             <div className={styles.filterSection}>
               <div className={styles.filterSectionHeader}>
                 <h3 className={styles.filterSectionTitle}>Tags</h3>
@@ -993,31 +1078,36 @@ const TrackList: React.FC<TrackListProps> = ({
                 </div>
               </div>
               <div className={styles.tagFilters}>
-                {Array.from(allTags)
-                  .sort()
-                  .filter(filterTagBySearch)
-                  .map((tag) => {
+                {Array.from(allUniqueTagsMap.entries())
+                  .sort(([, nameA], [, nameB]) => nameA.localeCompare(nameB))
+                  .filter(([, displayName]) => filterTagBySearch(displayName))
+                  .map(([fullTagId, displayName]) => {
                     return (
                       <button
-                        key={tag}
+                        key={fullTagId}
                         className={`${styles.tagFilter} ${
-                          activeTagFilters.includes(tag) ? styles.active : ""
-                        } ${excludedTagFilters.includes(tag) ? styles.excluded : ""}`}
-                        onClick={() => onFilterByTag(tag)}
+                          activeTagFilters.includes(fullTagId) ? styles.active : ""
+                        } ${excludedTagFilters.includes(fullTagId) ? styles.excluded : ""}`}
+                        onClick={() => {
+                          const parsed = parseTagId(fullTagId);
+                          if (parsed) {
+                            onFilterByTag(parsed.categoryId, parsed.subcategoryId, parsed.tagId);
+                          }
+                        }}
                         title={
-                          activeTagFilters.includes(tag)
-                            ? `Click to exclude "${tag}"`
-                            : excludedTagFilters.includes(tag)
-                            ? `Click to remove "${tag}" filter`
-                            : `Click to include "${tag}"`
+                          activeTagFilters.includes(fullTagId)
+                            ? `Click to exclude "${displayName}"`
+                            : excludedTagFilters.includes(fullTagId)
+                            ? `Click to remove "${displayName}" filter`
+                            : `Click to include "${displayName}"`
                         }
                       >
-                        {excludedTagFilters.includes(tag)
+                        {excludedTagFilters.includes(fullTagId)
                           ? "–"
-                          : activeTagFilters.includes(tag)
+                          : activeTagFilters.includes(fullTagId)
                           ? "+"
                           : ""}{" "}
-                        {tag}
+                        {displayName}
                       </button>
                     );
                   })}
@@ -1033,46 +1123,54 @@ const TrackList: React.FC<TrackListProps> = ({
           <span className={styles.noTagFilters}>No tag filters applied</span>
         ) : (
           <>
-            {activeTagFilters.map((tag) => (
-              <span
-                key={tag}
-                className={styles.activeFilterTag}
-                title={`Click to exclude "${tag}"`}
-                onClick={() => handleFilterTagClick(tag, false)}
-              >
-                {tag}{" "}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering parent's onClick
-                    handleRemoveFilter(tag);
-                  }}
-                  className={styles.removeFilterButton}
-                  title="Remove filter"
+            {activeTagFilters.map((fullTagId) => {
+              const displayName = allUniqueTagsMap.get(fullTagId) || fullTagId; // Fallback to ID if not found
+
+              return (
+                <span
+                  key={fullTagId}
+                  className={styles.activeFilterTag}
+                  title={`Click to exclude "${displayName}"`}
+                  onClick={() => handleFilterTagClick(fullTagId, false)}
                 >
-                  ×
-                </button>
-              </span>
-            ))}
-            {excludedTagFilters.map((tag) => (
-              <span
-                key={tag}
-                className={styles.excludedFilterTag}
-                title={`Click to include "${tag}"`}
-                onClick={() => handleFilterTagClick(tag, true)}
-              >
-                {tag}{" "}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering parent's onClick
-                    handleRemoveFilter(tag);
-                  }}
-                  className={styles.removeFilterButton}
-                  title="Remove filter"
+                  {displayName}{" "}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFilter(fullTagId);
+                    }}
+                    className={styles.removeFilterButton}
+                    title="Remove filter"
+                  >
+                    ×
+                  </button>
+                </span>
+              );
+            })}
+            {excludedTagFilters.map((fullTagId) => {
+              const displayName = allUniqueTagsMap.get(fullTagId) || fullTagId;
+
+              return (
+                <span
+                  key={fullTagId}
+                  className={styles.excludedFilterTag}
+                  title={`Click to include "${displayName}"`}
+                  onClick={() => handleFilterTagClick(fullTagId, true)}
                 >
-                  ×
-                </button>
-              </span>
-            ))}
+                  {displayName}{" "}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFilter(fullTagId);
+                    }}
+                    className={styles.removeFilterButton}
+                    title="Remove filter"
+                  >
+                    ×
+                  </button>
+                </span>
+              );
+            })}
           </>
         )}
       </div>
@@ -1117,7 +1215,9 @@ const TrackList: React.FC<TrackListProps> = ({
 
             // Sort tags based on their position in the category hierarchy (not alphabetically)
             const sortedTagsArray =
-              categories && categories.length > 0 ? sortTags(data.tagIds) : data.tagIds;
+              categories && categories.length > 0
+                ? sortTags(data.resolvedTagNames)
+                : data.resolvedTagNames;
 
             return (
               <div
@@ -1185,22 +1285,18 @@ const TrackList: React.FC<TrackListProps> = ({
                       {"Play"}
                     </button>
 
-                    {onTagTrack && (
-                      <button
-                        className={`${styles.actionButton} ${
-                          isActiveTrack ? styles.activeTagButton : ""
-                        }`}
-                        onClick={() => onTagTrack(uri)}
-                        title={
-                          isActiveTrack
-                            ? "Currently tagging this track"
-                            : "Edit tags for this track"
-                        }
-                        disabled={isActiveTrack}
-                      >
-                        {isActiveTrack ? "Tagging" : "Tag"}
-                      </button>
-                    )}
+                    <button
+                      className={`${styles.actionButton} ${
+                        isActiveTrack ? styles.activeTagButton : ""
+                      }`}
+                      onClick={() => onTagTrack(uri)}
+                      title={
+                        isActiveTrack ? "Currently tagging this track" : "Edit tags for this track"
+                      }
+                      disabled={isActiveTrack}
+                    >
+                      {isActiveTrack ? "Tagging" : "Tag"}
+                    </button>
                   </div>
                 </div>
 
@@ -1271,25 +1367,29 @@ const TrackList: React.FC<TrackListProps> = ({
                   {/* BOTTOM ROW - TRACK TAGS */}
                   {sortedTagsArray.length > 0 ? (
                     <div className={styles.trackItemTags}>
-                      {sortedTagsArray.map(({ tagId }: { tagId: string }, i: number) => (
+                      {sortedTagsArray.map((tag, i) => (
                         <span
                           key={i}
                           className={`${styles.trackItemTag} ${
-                            activeTagFilters.includes(tagId) ? styles.activeTagFilter : ""
-                          } ${excludedTagFilters.includes(tagId) ? styles.excludedTagFilter : ""}`}
+                            activeTagFilters.includes(tag.fullTagId) ? styles.activeTagFilter : ""
+                          } ${
+                            excludedTagFilters.includes(tag.fullTagId)
+                              ? styles.excludedTagFilter
+                              : ""
+                          }`}
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent track item click
-                            handleTrackItemTagClick(tagId);
+                            handleTrackItemTagClick(tag.fullTagId);
                           }}
                           title={
-                            activeTagFilters.includes(tagId)
-                              ? `Click to remove "${tagId}" from filters`
-                              : excludedTagFilters.includes(tagId)
-                              ? `Click to remove "${tagId}" from excluded filters`
-                              : `Click to filter by "${tagId}"`
+                            activeTagFilters.includes(tag.fullTagId)
+                              ? `Click to remove "${tag.displayName}" from filters`
+                              : excludedTagFilters.includes(tag.fullTagId)
+                              ? `Click to remove "${tag.displayName}" from excluded filters`
+                              : `Click to filter by "${tag.displayName}"`
                           }
                         >
-                          {tagId}
+                          {tag.displayName}
                         </span>
                       ))}
                     </div>
@@ -1324,12 +1424,12 @@ const TrackList: React.FC<TrackListProps> = ({
           localTrackCount={
             allSortedTracks.filter(([uri]) => uri.startsWith("spotify:local:")).length
           }
-          activeTagFilters={activeTagFilters}
-          excludedTagFilters={excludedTagFilters}
+          activeTagDisplayNames={activeTagDisplayNames}
+          excludedTagDisplayNames={excludedTagDisplayNames}
           isOrFilterMode={isOrFilterMode}
           energyMinFilter={energyMinFilter}
           energyMaxFilter={energyMaxFilter}
-          ratingFilter={ratingFilters}
+          ratingFilters={ratingFilters}
           bpmMinFilter={bpmMinFilter}
           bpmMaxFilter={bpmMaxFilter}
           onClose={() => setShowCreatePlaylistModal(false)}

@@ -1,4 +1,5 @@
 import { TagDataStructure } from "../hooks/useTagData";
+import { TrackData } from "../components/TrackList";
 
 class TrackService {
   playTrackViaQueue = (uri: string): Promise<boolean> => {
@@ -262,16 +263,7 @@ class TrackService {
 
   // Resolves tag IDs to display names - to be consumed by TrackList
   getTracksWithResolvedTags = (tagData: TagDataStructure) => {
-    const trackMapWithResolvedTags: {
-      [uri: string]: {
-        rating: number;
-        energy: number;
-        bpm: number | null;
-        tagIds: { tagId: string }[];
-        dateCreated?: number;
-        dateModified?: number;
-      };
-    } = {};
+    const trackMapWithResolvedTags: { [uri: string]: TrackData } = {};
 
     try {
       if (!tagData || typeof tagData !== "object") {
@@ -293,7 +285,11 @@ class TrackService {
       Object.entries(tagData.tracks).forEach(([trackUri, trackData]) => {
         if (!trackData) return;
 
-        if (trackData.rating === 0 && trackData.energy === 0 && (!trackData.tags || trackData.tags.length === 0)) {
+        if (
+          trackData.rating === 0 &&
+          trackData.energy === 0 &&
+          (!trackData.tags || trackData.tags.length === 0)
+        ) {
           return;
         }
 
@@ -302,7 +298,7 @@ class TrackService {
           rating: trackData.rating || 0,
           energy: trackData.energy || 0,
           bpm: trackData.bpm || null,
-          tagIds: [],
+          resolvedTagNames: [],
           dateCreated: trackData.dateCreated,
           dateModified: trackData.dateModified,
         };
@@ -312,18 +308,24 @@ class TrackService {
         }
 
         // Process each tag
-        trackData.tags.forEach((tag) => {
-          const category = tagData.categories.find((c) => c.id === tag.categoryId);
+        trackData.tags.forEach((tagReference) => {
+          const category = tagData.categories.find((c) => c.id === tagReference.categoryId);
           if (!category) return;
 
-          const subcategory = category.subcategories.find((s) => s.id === tag.subcategoryId);
+          const subcategory = category.subcategories.find(
+            (s) => s.id === tagReference.subcategoryId
+          );
           if (!subcategory) return;
 
-          const tagObj = subcategory.tags.find((t) => t.id === tag.tagId);
-          if (!tagObj) return;
+          const resolvedTag = subcategory.tags.find((t) => t.id === tagReference.tagId);
+          if (!resolvedTag) return;
 
-          trackMapWithResolvedTags[trackUri].tagIds.push({
-            tagId: tagObj.name,
+          // Create the unique identifier
+          const fullTagId = `${tagReference.categoryId}:${tagReference.subcategoryId}:${tagReference.tagId}`;
+
+          trackMapWithResolvedTags[trackUri].resolvedTagNames.push({
+            displayName: resolvedTag.name,
+            fullTagId: fullTagId,
           });
         });
       });
