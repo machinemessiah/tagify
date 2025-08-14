@@ -527,6 +527,30 @@ export function useTagData() {
     }
   };
 
+  const cleanupDeletedSmartPlaylists = async (): Promise<void> => {
+    try {
+      const allPlaylistsApi = await Spicetify.CosmosAsync.get(
+        `https://api.spotify.com/v1/me/playlists/`
+      );
+      const apiPlaylistIds = allPlaylistsApi.items.map((p: { id: string }) => p.id);
+
+      const validPlaylists: SmartPlaylistCriteria[] = smartPlaylists.filter(
+        (sp: SmartPlaylistCriteria) => apiPlaylistIds.includes(sp.playlistId)
+      );
+
+      if (validPlaylists.length !== smartPlaylists.length) {
+        setSmartPlaylists(validPlaylists);
+        Spicetify.showNotification(
+          `Cleaned up ${smartPlaylists.length - validPlaylists.length} deleted smart playlist(s)`,
+          false,
+          3000
+        );
+      }
+    } catch (error) {
+      console.error(`Problem fetching or processing playlists:`, error);
+    }
+  };
+
   const syncTrackWithSmartPlaylists = async (
     trackUri: string,
     trackData: TrackData | null
@@ -537,13 +561,13 @@ export function useTagData() {
       let hasChanges = false;
 
       for (let i = 0; i < updatedPlaylists.length; i++) {
-        const autoPlaylist = updatedPlaylists[i];
-        if (autoPlaylist.smartPlaylistTrackUris.includes(trackUri)) {
-          const success = await removeTrackFromSpotifyPlaylist(trackUri, autoPlaylist.playlistId);
+        const smartPlaylist = updatedPlaylists[i];
+        if (smartPlaylist.smartPlaylistTrackUris.includes(trackUri)) {
+          const success = await removeTrackFromSpotifyPlaylist(trackUri, smartPlaylist.playlistId);
           if (success) {
             updatedPlaylists[i] = {
-              ...autoPlaylist,
-              smartPlaylistTrackUris: autoPlaylist.smartPlaylistTrackUris.filter(
+              ...smartPlaylist,
+              smartPlaylistTrackUris: smartPlaylist.smartPlaylistTrackUris.filter(
                 (uri) => uri !== trackUri
               ),
               lastSyncAt: Date.now(),
@@ -642,6 +666,7 @@ export function useTagData() {
   };
 
   const syncSmartPlaylistFull = async (playlist: SmartPlaylistCriteria): Promise<void> => {
+    await cleanupDeletedSmartPlaylists();
     if (!playlist.isActive) {
       console.log("⏸️ Skipping sync for inactive playlist:", playlist.playlistName);
       return;
@@ -689,7 +714,7 @@ export function useTagData() {
       const updatedPlaylists = smartPlaylists.map((p) => {
         if (p.playlistId === playlist.playlistId) {
           return {
-            ...p,
+            ...playlist,
             smartPlaylistTrackUris: matchingTrackUris,
             lastSyncAt: Date.now(),
           };
@@ -1624,7 +1649,7 @@ export function useTagData() {
     tagData,
     isLoading,
     lastSaved,
-    
+
     // Track tag management
     toggleTagForTrack,
     setRating,
@@ -1634,15 +1659,16 @@ export function useTagData() {
     toggleTagForMultipleTracks,
     findCommonTags,
     applyBatchTagUpdates,
-    
+
     // Category management
     replaceCategories,
-    
+
     // Smart playlists
     smartPlaylists,
     setSmartPlaylists,
     storeSmartPlaylist,
     syncSmartPlaylistFull,
+    cleanupDeletedSmartPlaylists,
 
     // Import/Export
     exportData,

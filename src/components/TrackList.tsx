@@ -70,6 +70,7 @@ interface TrackListProps {
   smartPlaylists: SmartPlaylistCriteria[];
   onSetSmartPlaylists: (updatedPlaylists: SmartPlaylistCriteria[]) => void;
   onSyncPlaylist: (playlist: SmartPlaylistCriteria) => Promise<void>;
+  cleanupDeletedSmartPlaylists: () => Promise<void>;
 }
 
 const TrackList: React.FC<TrackListProps> = ({
@@ -91,6 +92,7 @@ const TrackList: React.FC<TrackListProps> = ({
   smartPlaylists,
   onSetSmartPlaylists,
   onSyncPlaylist,
+  cleanupDeletedSmartPlaylists,
 }) => {
   const [trackInfo, setTrackInfo] = useState<{ [uri: string]: SpotifyTrackInfo }>({});
   const [searchTerm, setSearchTerm] = useLocalStorage<string>("tagify:trackSearchTerm", "");
@@ -709,8 +711,9 @@ const TrackList: React.FC<TrackListProps> = ({
     }
   };
 
-  const handleSmartPlaylistClick = () => {
+  const handleSmartPlaylistClick = async () => {
     setShowSmartPlaylistModal(true);
+    cleanupDeletedSmartPlaylists();
   };
 
   const navigateToAlbum = (uri: string) => {

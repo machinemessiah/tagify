@@ -48,6 +48,7 @@ function App() {
     smartPlaylists,
     setSmartPlaylists,
     syncSmartPlaylistFull,
+    cleanupDeletedSmartPlaylists,
   } = useTagData();
 
   const {
@@ -100,6 +101,12 @@ function App() {
   //     console.error("Error checking/updating playlist cache:", error);
   //   });
   // }, []);
+
+  useEffect(() => {
+    cleanupDeletedSmartPlaylists().catch((error) => {
+      console.error("Error during smart playlist cleanup:", error);
+    });
+  }, []);
 
   const playTrackViaQueue = trackService.playTrackViaQueue;
   const getTracksWithResolvedTags = () => trackService.getTracksWithResolvedTags(tagData);
@@ -229,6 +236,7 @@ function App() {
           smartPlaylists={smartPlaylists}
           onSetSmartPlaylists={setSmartPlaylists}
           onSyncPlaylist={syncSmartPlaylistFull}
+          cleanupDeletedSmartPlaylists={cleanupDeletedSmartPlaylists}
         />
       </div>
     );

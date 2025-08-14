@@ -91,11 +91,16 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
       setSyncingPlaylists((prev) => new Set(prev).add(playlistId));
 
       try {
-        const updatedPlaylist = { ...playlist, isActive: true };
+        const updatedPlaylist = updatedPlaylists.find((p) => p.playlistId === playlistId)!;
         await onSyncPlaylist(updatedPlaylist);
       } catch (error) {
         console.error("Failed to sync playlist after activation:", error);
         Spicetify.showNotification("Failed to sync playlist", true);
+        // Revert the isActive state on error
+        const revertedPlaylists = smartPlaylists.map((p) =>
+          p.playlistId === playlistId ? { ...p, isActive: false } : p
+        );
+        onUpdateSmartPlaylists(revertedPlaylists);
       } finally {
         setSyncingPlaylists((prev) => {
           const newSet = new Set(prev);
@@ -305,9 +310,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                           onClick={() => toggleSmartPlaylistActive(playlist.playlistId)}
                           disabled={syncingPlaylists.has(playlist.playlistId)}
                         >
-                          {syncingPlaylists.has(playlist.playlistId)
-                            ? "Syncing..."
-                            : `${playlist.isActive ? "Disable" : "Enable"} Sync`}
+                          {playlist.isActive ? "Disable Sync" : "Enable Sync"}
                         </button>
                         {playlist.isActive && (
                           <button
