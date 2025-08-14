@@ -125,3 +125,14 @@ export interface SpotifyTrackResponse {
 export interface SpotifyBatchTracksResponse {
   tracks: (SpotifyTrackResponse | null)[];
 }
+
+export interface PlaylistTrackItem {
+  track: {
+    uri: string;
+  } | null;
+}
+
+export interface PlaylistTracksResponse {
+  items: PlaylistTrackItem[];
+  total: number;
+}
