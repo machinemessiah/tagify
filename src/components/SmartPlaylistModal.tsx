@@ -22,7 +22,6 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
 
   useEffect(() => {
     const syncPlaylistNames = async () => {
-
       let hasUpdates = false;
       const updatedPlaylists = await Promise.all(
         smartPlaylists.map(async (playlist) => {
@@ -50,12 +49,10 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
       if (hasUpdates) {
         onUpdateSmartPlaylists(updatedPlaylists);
       }
-
     };
 
     if (smartPlaylists.length > 0) {
       syncPlaylistNames();
-    } else {
     }
   }, []);
 
