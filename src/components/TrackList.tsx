@@ -1426,6 +1426,7 @@ const TrackList: React.FC<TrackListProps> = ({
           localTrackCount={
             allSortedTracks.filter(([uri]) => uri.startsWith("spotify:local:")).length
           }
+          currentSearchTerm={searchTerm}
           activeTagDisplayNames={activeTagDisplayNames}
           excludedTagDisplayNames={excludedTagDisplayNames}
           isOrFilterMode={isOrFilterMode}

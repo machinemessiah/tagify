@@ -4,6 +4,7 @@ import Portal from "../utils/Portal";
 
 interface CreatePlaylistModalProps {
   trackCount: number;
+  currentSearchTerm: string;
   localTrackCount: number;
   activeTagDisplayNames: string[];
   excludedTagDisplayNames: string[];
@@ -24,6 +25,7 @@ interface CreatePlaylistModalProps {
 
 const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
   trackCount,
+  currentSearchTerm,
   localTrackCount,
   activeTagDisplayNames,
   excludedTagDisplayNames,
@@ -144,6 +146,9 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
   const [isPublic, setIsPublic] = useState(false);
   const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
 
+  const hasActiveSearchTerm = currentSearchTerm && currentSearchTerm.trim() !== "";
+  const showSearchTermWarning = isSmartPlaylist && hasActiveSearchTerm;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onCreatePlaylist(
@@ -233,6 +238,15 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                     </div>
                   </div>
                 </label>
+                {showSearchTermWarning && (
+                  <div className={styles.warningBox}>
+                    <p className={styles.warning}>
+                      <strong>Note:</strong> Search term "{currentSearchTerm}" will not be included
+                      in smart playlist criteria. The smart playlist will only use tag, rating,
+                      energy, and BPM filters for automatic updates.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className={styles.filtersContainer}>
