@@ -1,4 +1,4 @@
-import { SpotifyPlaylistTracksResponse } from "../types/SpotifyTypes";
+import { SpotifyPlaylistTracksResponse, SpotifyUserPlaylistsResponse } from "../types/SpotifyTypes";
 
 class SpotifyApiService {
   constructor(private baseUrl: string = "https://api.spotify.com/v1") {}
@@ -62,10 +62,63 @@ class SpotifyApiService {
     }
   };
 
+  getAllUserPlaylists = async (): Promise<string[]> => {
+    try {
+      const allApiPlaylistIds: string[] = [];
+      let offset = 0;
+      const limit = 50;
+      while (true) {
+        const response: SpotifyUserPlaylistsResponse = await Spicetify.CosmosAsync.get(
+          `${this.baseUrl}/me/playlists?offset=${offset}&limit=${limit}&fields=items(id),total`
+        );
+
+        console.log(JSON.stringify(response));
+
+        if (!response?.items?.length) break;
+
+        const batchIds = response.items.map((p: { id: string }) => p.id);
+        allApiPlaylistIds.push(...batchIds);
+
+        if (response.items.length < limit || offset + limit >= response.total) {
+          break;
+        }
+
+        offset += limit;
+      }
+      return allApiPlaylistIds;
+    } catch (error) {
+      console.error(`Problem fetching or processing playlists:`, error);
+      return [];
+    }
+  };
+
+  /**
+   * Get track count for multiple playlists
+   */
+  getPlaylistTrackCounts = async (playlistIds: string[]): Promise<Record<string, number>> => {
+    const counts: Record<string, number> = {};
+
+    await Promise.all(
+      playlistIds.map(async (playlistId) => {
+        try {
+          const response = await Spicetify.CosmosAsync.get(
+            `${this.baseUrl}/playlists/${playlistId}/tracks?limit=1&fields=total`
+          );
+          counts[playlistId] = response?.total || 0;
+        } catch (error) {
+          console.error(`Error fetching track count for playlist ${playlistId}:`, error);
+          counts[playlistId] = 0;
+        }
+      })
+    );
+
+    return counts;
+  };
+
   /**
    * Get audio features for a track (for BPM)
    */
-  async getAudioFeatures(trackId: string): Promise<{ tempo: number } | null> {
+  getAudioFeatures = async (trackId: string): Promise<{ tempo: number } | null> => {
     try {
       const audioFeatures = await Spicetify.CosmosAsync.get(
         `${this.baseUrl}/audio-features/${trackId}`
@@ -75,7 +128,7 @@ class SpotifyApiService {
       console.error("Error fetching audio features:", error);
       return null;
     }
-  }
+  };
 
   /**
    * Extract track ID from Spotify URI

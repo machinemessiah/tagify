@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import styles from "./SmartPlaylistModal.module.css";
 import Portal from "../utils/Portal";
 import { SmartPlaylistCriteria, TagCategory } from "../hooks/useTagData";
+import { formatTimestamp } from "../utils/formatters";
+import { spotifyApiService } from "../services/SpotifyApiService";
 
 interface SmartPlaylistModalProps {
   smartPlaylists: SmartPlaylistCriteria[];
@@ -19,6 +21,8 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
   onClose,
 }) => {
   const [syncingPlaylists, setSyncingPlaylists] = useState<Set<string>>(new Set());
+  const [playlistTrackCounts, setPlaylistTrackCounts] = useState<Record<string, number>>({});
+  const [isLoadingCounts, setIsLoadingCounts] = useState(false);
 
   useEffect(() => {
     const syncPlaylistNames = async () => {
@@ -55,6 +59,20 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
       syncPlaylistNames();
     }
   }, []);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (smartPlaylists.length === 0) return;
+
+      setIsLoadingCounts(true);
+      const playlistIds = smartPlaylists.map((p) => p.playlistId);
+      const counts = await spotifyApiService.getPlaylistTrackCounts(playlistIds);
+      setPlaylistTrackCounts(counts);
+      setIsLoadingCounts(false);
+    };
+
+    fetchCounts();
+  }, [smartPlaylists]);
 
   const toggleSmartPlaylistActive = async (playlistId: string) => {
     const playlist = smartPlaylists.find((p) => p.playlistId === playlistId);
@@ -239,10 +257,17 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
 
                         <div className={styles.playlistMeta}>
                           <span className={styles.trackCount}>
-                            {playlist.smartPlaylistTrackUris.length} tracks
+                            {isLoadingCounts ? (
+                              "Loading track counts..."
+                            ) : (
+                              <>
+                                {playlistTrackCounts[playlist.playlistId] || 0} tracks in playlist •{" "}
+                                {playlist.smartPlaylistTrackUris.length} matching criteria
+                              </>
+                            )}
                           </span>
                           <span className={styles.lastSync}>
-                            Synced: {new Date(playlist.lastSyncAt).toLocaleDateString()}
+                            Synced: {formatTimestamp(playlist.lastSyncAt)}
                           </span>
                         </div>
                       </div>
