@@ -72,8 +72,6 @@ class SpotifyApiService {
           `${this.baseUrl}/me/playlists?offset=${offset}&limit=${limit}&fields=items(id),total`
         );
 
-        console.log(JSON.stringify(response));
-
         if (!response?.items?.length) break;
 
         const batchIds = response.items.map((p: { id: string }) => p.id);
