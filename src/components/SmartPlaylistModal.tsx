@@ -1,9 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./SmartPlaylistModal.module.css";
 import Portal from "../utils/Portal";
 import { SmartPlaylistCriteria, TagCategory } from "../hooks/useTagData";
 import { formatTimestamp } from "../utils/formatters";
 import { spotifyApiService } from "../services/SpotifyApiService";
+
+const PLAYLIST_SORT_OPTIONS = {
+  ALPHABETICAL: "alphabetical",
+  DATE_CREATED: "dateCreated",
+  NEEDS_SYNC: "needsSync",
+} as const;
+
+const SORT_ORDERS = {
+  ASC: "asc",
+  DESC: "desc",
+} as const;
+
+type PlaylistSortOption = (typeof PLAYLIST_SORT_OPTIONS)[keyof typeof PLAYLIST_SORT_OPTIONS];
+type SortOrder = (typeof SORT_ORDERS)[keyof typeof SORT_ORDERS];
 
 interface SmartPlaylistModalProps {
   smartPlaylists: SmartPlaylistCriteria[];
@@ -23,6 +37,11 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
   const [syncingPlaylists, setSyncingPlaylists] = useState<Set<string>>(new Set());
   const [playlistTrackCounts, setPlaylistTrackCounts] = useState<Record<string, number>>({});
   const [isLoadingCounts, setIsLoadingCounts] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortBy, setSortBy] = useState<PlaylistSortOption>(PLAYLIST_SORT_OPTIONS.ALPHABETICAL);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_ORDERS.ASC);
+
   const getSyncStatus = (playlist: SmartPlaylistCriteria): "synced" | "needsSync" | "unknown" => {
     const actualCount = playlistTrackCounts[playlist.playlistId];
     const expectedCount = playlist.smartPlaylistTrackUris.length;
@@ -31,6 +50,66 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
     if (actualCount === expectedCount) return "synced";
     return "needsSync";
   };
+
+  const filteredAndSortedPlaylists = useMemo(() => {
+    // First, filter by search query
+    const filtered = smartPlaylists.filter((playlist) =>
+      playlist.playlistName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Then sort based on selected criteria
+    return [...filtered].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case PLAYLIST_SORT_OPTIONS.ALPHABETICAL: {
+          comparison = a.playlistName.localeCompare(b.playlistName);
+          break;
+        }
+
+        case PLAYLIST_SORT_OPTIONS.DATE_CREATED: {
+          // Use lastSyncAt as creation date (you may need to add dateCreated to SmartPlaylistCriteria)
+          const dateA = a.lastSyncAt || 0;
+          const dateB = b.lastSyncAt || 0;
+          comparison = dateA - dateB;
+          break;
+        }
+
+        case PLAYLIST_SORT_OPTIONS.NEEDS_SYNC: {
+          const syncStatusA = getSyncStatus(a);
+          const syncStatusB = getSyncStatus(b);
+
+          // Prioritize playlists that need sync
+          if (syncStatusA === "needsSync" && syncStatusB !== "needsSync") {
+            comparison = -1; // A comes first
+          } else if (syncStatusA !== "needsSync" && syncStatusB === "needsSync") {
+            comparison = 1; // B comes first
+          } else {
+            // If both have same sync status, sort alphabetically
+            comparison = a.playlistName.localeCompare(b.playlistName);
+          }
+          break;
+        }
+
+        default:
+          return 0;
+      }
+
+      // Apply sort order (except for needsSync which has custom logic)
+      if (sortBy !== PLAYLIST_SORT_OPTIONS.NEEDS_SYNC) {
+        return sortOrder === SORT_ORDERS.DESC ? -comparison : comparison;
+      }
+
+      return comparison;
+    });
+  }, [smartPlaylists, searchQuery, sortBy, sortOrder, playlistTrackCounts]);
+
+  // Clear search when modal closes
+  useEffect(() => {
+    return () => {
+      setSearchQuery("");
+    };
+  }, []);
 
   useEffect(() => {
     const syncPlaylistNames = async () => {
@@ -210,22 +289,87 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
       <div className={styles.modalOverlay} onClick={onClose}>
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <div className={styles.modalHeader}>
-            <h2 className={styles.modalTitle}>Smart Playlists ({smartPlaylists.length})</h2>
+            <h2 className={styles.modalTitle}>
+              Smart Playlists ({filteredAndSortedPlaylists.length}
+              {searchQuery &&
+                filteredAndSortedPlaylists.length !== smartPlaylists.length &&
+                ` of ${smartPlaylists.length}`}
+              )
+            </h2>
             <button className={styles.closeButton} onClick={onClose}>
               ×
             </button>
           </div>
 
+          {/* Search and Sort Controls */}
+          <div className={styles.controlsSection}>
+            <div className={styles.searchSection}>
+              <input
+                type="text"
+                placeholder="Search playlists..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+              {searchQuery && (
+                <button
+                  className={styles.clearSearchButton}
+                  onClick={() => setSearchQuery("")}
+                  title="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <div className={styles.sortSection}>
+              <label className={styles.sortLabel}>Sort by:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as PlaylistSortOption)}
+                className={styles.sortSelect}
+              >
+                <option value={PLAYLIST_SORT_OPTIONS.ALPHABETICAL}>Name</option>
+                <option value={PLAYLIST_SORT_OPTIONS.DATE_CREATED}>Date Created</option>
+                <option value={PLAYLIST_SORT_OPTIONS.NEEDS_SYNC}>Needs Sync</option>
+              </select>
+
+              {sortBy !== PLAYLIST_SORT_OPTIONS.NEEDS_SYNC && (
+                <button
+                  className={styles.sortOrderButton}
+                  onClick={() =>
+                    setSortOrder(sortOrder === SORT_ORDERS.ASC ? SORT_ORDERS.DESC : SORT_ORDERS.ASC)
+                  }
+                  title={`Sort ${sortOrder === SORT_ORDERS.ASC ? "descending" : "ascending"}`}
+                >
+                  {sortOrder === SORT_ORDERS.ASC ? "↑" : "↓"}
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className={styles.modalBody}>
-            {smartPlaylists.length === 0 ? (
+            {filteredAndSortedPlaylists.length === 0 ? (
               <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>🎵</div>
-                <h3>No Smart Playlists Yet</h3>
-                <p>Create a playlist with filters and enable "Smart Playlist" to get started!</p>
+                {searchQuery ? (
+                  <>
+                    <div className={styles.emptyIcon}>🔍</div>
+                    <h3>No playlists found</h3>
+                    <p>No playlists match "{searchQuery}"</p>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.emptyIcon}>🎵</div>
+                    <h3>No Smart Playlists Yet</h3>
+                    <p>
+                      Create a playlist with filters and enable "Smart Playlist" to get started!
+                    </p>
+                  </>
+                )}
               </div>
             ) : (
               <div className={styles.playlistList}>
-                {smartPlaylists.map((playlist) => {
+                {filteredAndSortedPlaylists.map((playlist) => {
                   const activeTagsText = formatActiveTagFilters(playlist);
                   const excludedTagsText = formatExcludedTagFilters(playlist);
                   const ratingText = formatRatingFilters(playlist.criteria.ratingFilters);
@@ -237,10 +381,8 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                     playlist.criteria.bpmMinFilter,
                     playlist.criteria.bpmMaxFilter
                   );
-
                   const hasCriteria =
                     activeTagsText || excludedTagsText || ratingText || energyText || bpmText;
-
                   return (
                     <div
                       key={playlist.playlistId}
@@ -264,7 +406,6 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                           </div>
                         </div>
                       </div>
-
                       {/* STATS ROW: Track counts and sync status */}
                       <div className={styles.playlistStatsRow}>
                         <div className={styles.trackRowItem}>
@@ -275,14 +416,12 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                           </div>
                           <div className={styles.trackCountLabel}>In Playlist</div>
                         </div>
-
                         <div className={styles.trackRowItem}>
                           <div className={styles.trackCountNumber}>
                             {playlist.smartPlaylistTrackUris.length}
                           </div>
                           <div className={styles.trackCountLabel}>Expected</div>
                         </div>
-
                         {/* Sync Status Indicator */}
                         {!isLoadingCounts && (
                           <div className={styles.trackRowItem}>
@@ -304,7 +443,6 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                           </div>
                         )}
                       </div>
-
                       {/* CRITERIA SECTION */}
                       {hasCriteria ? (
                         <div className={styles.criteriaSection}>
@@ -312,7 +450,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                             <h4 className={styles.criteriaTitle}>Filter Criteria</h4>
                             {/* Last Sync Info */}
                             <div className={styles.lastSyncInfo}>
-                              <span className={styles.lastSyncText}>Synced: {formatTimestamp(playlist.lastSyncAt)}</span>
+                              <span className={styles.lastSyncText}>
+                                Synced: {formatTimestamp(playlist.lastSyncAt)}
+                              </span>
                             </div>
                           </div>
                           <div className={styles.criteriaList}>
@@ -322,28 +462,24 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                                 <span className={styles.criteriaValue}>{activeTagsText}</span>
                               </div>
                             )}
-
                             {excludedTagsText && (
                               <div className={styles.criteriaItem}>
                                 <span className={styles.criteriaLabel}>🚫 Excluded:</span>
                                 <span className={styles.criteriaValue}>{excludedTagsText}</span>
                               </div>
                             )}
-
                             {ratingText && (
                               <div className={styles.criteriaItem}>
                                 <span className={styles.criteriaLabel}>🏆 Rating:</span>
                                 <span className={styles.criteriaValue}>{ratingText}</span>
                               </div>
                             )}
-
                             {energyText && (
                               <div className={styles.criteriaItem}>
                                 <span className={styles.criteriaLabel}>⚡ Energy:</span>
                                 <span className={styles.criteriaValue}>{energyText}</span>
                               </div>
                             )}
-
                             {bpmText && (
                               <div className={styles.criteriaItem}>
                                 <span className={styles.criteriaLabel}>🎵 BPM:</span>
@@ -357,7 +493,6 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                           <span>No filter criteria set</span>
                         </div>
                       )}
-
                       {/* ACTIONS: Stay at bottom */}
                       <div className={styles.playlistActions}>
                         <button

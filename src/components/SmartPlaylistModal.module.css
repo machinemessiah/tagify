@@ -357,7 +357,7 @@
 }
 
 .syncButton.syncButtonUrgent:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(255, 165, 0, 0.60), rgba(255, 140, 0, 0.60));
+  background: linear-gradient(135deg, rgba(255, 165, 0, 0.6), rgba(255, 140, 0, 0.6));
   border-color: rgba(255, 165, 0, 0.8);
   box-shadow: 0 4px 12px rgba(255, 165, 0, 0.4);
 }
@@ -585,5 +585,161 @@
 
   .criteriaLabel {
     min-width: auto;
+  }
+}
+
+/* Search and Sort Controls */
+.controlsSection {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--spice-card);
+  border-bottom: 1px solid var(--spice-button-disabled);
+  flex-wrap: wrap;
+}
+
+.searchSection {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px 32px 8px 12px;
+  border: 1px solid var(--spice-button-disabled);
+  border-radius: 6px;
+  background: var(--spice-main);
+  color: var(--spice-text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.searchInput:focus {
+  border-color: var(--spice-accent);
+}
+
+.searchInput::placeholder {
+  color: var(--spice-subtext);
+}
+
+.clearSearchButton {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--spice-subtext);
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.clearSearchButton:hover {
+  background: var(--spice-button-disabled);
+  color: var(--spice-text);
+}
+
+.sortSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.sortLabel {
+  color: var(--spice-text);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sortSelect {
+  padding: 6px 8px;
+  border: 1px solid var(--spice-button-disabled);
+  border-radius: 4px;
+  background: var(--spice-main);
+  color: var(--spice-text);
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.sortSelect:focus {
+  border-color: var(--spice-accent);
+}
+
+.sortOrderButton {
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--spice-text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.sortOrderButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--spice-subtext);
+}
+
+.emptyState p {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+}
+
+.emptyState .clearSearchButton {
+  position: static;
+  transform: none;
+  background: var(--spice-button);
+  color: var(--spice-text);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  width: auto;
+  height: auto;
+}
+
+.emptyState .clearSearchButton:hover {
+  background: var(--spice-button-active);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .controlsSection {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .searchSection {
+    min-width: unset;
+  }
+
+  .sortSection {
+    justify-content: space-between;
   }
 }
