@@ -743,3 +743,17 @@
     justify-content: space-between;
   }
 }
+
+/* Playlist Creation Date */
+.playlistMetadata {
+  margin-top: 4px;
+}
+
+.timeStamp {
+  font-size: 12px;
+  color: var(--spice-subtext);
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

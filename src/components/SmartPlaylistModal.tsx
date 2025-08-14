@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import styles from "./SmartPlaylistModal.module.css";
 import Portal from "../utils/Portal";
 import { SmartPlaylistCriteria, TagCategory } from "../hooks/useTagData";
-import { formatTimestamp } from "../utils/formatters";
+import { formatCondensedDate, formatTimestamp } from "../utils/formatters";
 import { spotifyApiService } from "../services/SpotifyApiService";
 
 const PLAYLIST_SORT_OPTIONS = {
@@ -68,9 +68,8 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
         }
 
         case PLAYLIST_SORT_OPTIONS.DATE_CREATED: {
-          // Use lastSyncAt as creation date (you may need to add dateCreated to SmartPlaylistCriteria)
-          const dateA = a.lastSyncAt || 0;
-          const dateB = b.lastSyncAt || 0;
+          const dateA = a.createdAt || 0;
+          const dateB = b.createdAt || 0;
           comparison = dateA - dateB;
           break;
         }
@@ -405,6 +404,15 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                             )}
                           </div>
                         </div>
+                        {/* Creation Date */}
+                        <div className={styles.playlistMetadata}>
+                          <span
+                            className={styles.timeStamp}
+                            title={`Created: ${formatTimestamp(playlist.createdAt)}`}
+                          >
+                            {formatCondensedDate(playlist.createdAt, "short")}
+                          </span>
+                        </div>
                       </div>
                       {/* STATS ROW: Track counts and sync status */}
                       <div className={styles.playlistStatsRow}>
@@ -448,12 +456,6 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                         <div className={styles.criteriaSection}>
                           <div className={styles.criteriaHeader}>
                             <h4 className={styles.criteriaTitle}>Filter Criteria</h4>
-                            {/* Last Sync Info */}
-                            <div className={styles.lastSyncInfo}>
-                              <span className={styles.lastSyncText}>
-                                Synced: {formatTimestamp(playlist.lastSyncAt)}
-                              </span>
-                            </div>
                           </div>
                           <div className={styles.criteriaList}>
                             {activeTagsText && (
