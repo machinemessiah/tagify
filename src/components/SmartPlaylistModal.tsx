@@ -18,16 +18,10 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
   onSyncPlaylist,
   onClose,
 }) => {
-  const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
-  const [playlistMetadata, setPlaylistMetadata] = useState<{
-    [id: string]: { name: string; description: string };
-  }>({});
-  const [isLoadingMetadata, setIsLoadingMetadata] = useState(true);
   const [syncingPlaylists, setSyncingPlaylists] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const syncPlaylistNames = async () => {
-      setIsLoadingMetadata(true);
 
       let hasUpdates = false;
       const updatedPlaylists = await Promise.all(
@@ -57,13 +51,11 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
         onUpdateSmartPlaylists(updatedPlaylists);
       }
 
-      setIsLoadingMetadata(false);
     };
 
     if (smartPlaylists.length > 0) {
       syncPlaylistNames();
     } else {
-      setIsLoadingMetadata(false);
     }
   }, []);
 
