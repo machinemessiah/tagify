@@ -23,6 +23,14 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
   const [syncingPlaylists, setSyncingPlaylists] = useState<Set<string>>(new Set());
   const [playlistTrackCounts, setPlaylistTrackCounts] = useState<Record<string, number>>({});
   const [isLoadingCounts, setIsLoadingCounts] = useState(false);
+  const getSyncStatus = (playlist: SmartPlaylistCriteria): "synced" | "needsSync" | "unknown" => {
+    const actualCount = playlistTrackCounts[playlist.playlistId];
+    const expectedCount = playlist.smartPlaylistTrackUris.length;
+
+    if (actualCount === undefined) return "unknown";
+    if (actualCount === expectedCount) return "synced";
+    return "needsSync";
+  };
 
   useEffect(() => {
     const syncPlaylistNames = async () => {
@@ -256,16 +264,42 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                         </div>
 
                         <div className={styles.playlistMeta}>
-                          <span className={styles.trackCount}>
-                            {isLoadingCounts ? (
-                              "Loading track counts..."
-                            ) : (
-                              <>
-                                {playlistTrackCounts[playlist.playlistId] || 0} tracks in playlist •{" "}
-                                {playlist.smartPlaylistTrackUris.length} matching criteria
-                              </>
+                          <div className={styles.trackCounts}>
+                            <div className={styles.trackCountRow}>
+                              <span className={styles.label}>In Playlist:</span>
+                              <span className={styles.count}>
+                                {isLoadingCounts
+                                  ? "..."
+                                  : playlistTrackCounts[playlist.playlistId] || 0}
+                              </span>
+                            </div>
+                            <div className={styles.trackCountRow}>
+                              <span className={styles.label}>Expected:</span>
+                              <span className={styles.count}>
+                                {playlist.smartPlaylistTrackUris.length}
+                              </span>
+                            </div>
+                            {/* Sync Status Indicator */}
+                            {!isLoadingCounts && (
+                              <div className={styles.syncStatus}>
+                                {getSyncStatus(playlist) === "synced" && (
+                                  <span className={styles.syncIndicator + " " + styles.synced}>
+                                    ✓ In Sync
+                                  </span>
+                                )}
+                                {getSyncStatus(playlist) === "needsSync" && (
+                                  <span className={styles.syncIndicator + " " + styles.needsSync}>
+                                    ⚠ Needs Sync
+                                  </span>
+                                )}
+                                {getSyncStatus(playlist) === "unknown" && (
+                                  <span className={styles.syncIndicator + " " + styles.unknown}>
+                                    ? Unknown
+                                  </span>
+                                )}
+                              </div>
                             )}
-                          </span>
+                          </div>
                           <span className={styles.lastSync}>
                             Synced: {formatTimestamp(playlist.lastSyncAt)}
                           </span>
@@ -330,9 +364,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                         </button>
                         {playlist.isActive && (
                           <button
-                            className={`${styles.actionButton} ${styles.manualSyncButton} ${
-                              syncingPlaylists.has(playlist.playlistId) ? styles.syncing : ""
-                            }`}
+                            className={`${styles.actionButton} ${styles.syncButton} ${
+                              getSyncStatus(playlist) === "needsSync" ? styles.syncButtonUrgent : ""
+                            } ${syncingPlaylists.has(playlist.playlistId) ? styles.syncing : ""}`}
                             onClick={() => handleManualSync(playlist)}
                             disabled={syncingPlaylists.has(playlist.playlistId)}
                           >
