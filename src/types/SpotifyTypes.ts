@@ -136,3 +136,12 @@ export interface SpotifyPlaylistTracksResponse {
   items: SpotifyPlaylistTrackItem[];
   total: number;
 }
+
+export interface SpotifyUserPlaylistsResponse {
+  items: SpotifyPlaylistItem[];
+  total: number;
+}
+
+export interface SpotifyPlaylistItem {
+  id: string;
+}
