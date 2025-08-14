@@ -20,6 +20,7 @@ import {
   SpotifyTrackResponse,
 } from "../types/SpotifyTypes";
 import SmartPlaylistModal from "./SmartPlaylistModal";
+import { formatTimestamp } from "../utils/formatters";
 
 export interface TrackData {
   rating: number;
@@ -142,19 +143,6 @@ const TrackList: React.FC<TrackListProps> = ({
       allBpmValues.add(track.bpm);
     }
   });
-
-  const formatTimestamp = (timestamp: number | undefined): string => {
-    if (!timestamp) return "Unknown";
-    const date = new Date(timestamp);
-
-    return date.toLocaleDateString([], {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   // Sort tags based on their position in the hierarchy
   const sortTags = (tags: { displayName: string; fullTagId: string }[]) => {

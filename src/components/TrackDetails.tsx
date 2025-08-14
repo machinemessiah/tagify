@@ -8,6 +8,7 @@ import {
   SpotifyImage,
   SpotifyArtist,
 } from "../types/SpotifyTypes";
+import { formatTimestamp } from "../utils/formatters";
 
 interface TrackDetailsProps {
   displayedTrack: SpotifyTrack; // The track displayed in TrackDetails
@@ -111,20 +112,6 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
     } catch (e) {
       return dateStr;
     }
-  };
-
-  const formatTimestamp = (timestamp: number | undefined): string => {
-    if (!timestamp) return "Unknown";
-    const date = new Date(timestamp);
-
-    return date.toLocaleDateString([], {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
   };
 
   const handleBpmClick = () => {
@@ -1004,7 +991,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                 >
                   <span className={styles.timestampLabel}>Tagged:</span>
                   <span className={styles.timestampValue}>
-                    {formatTimestamp(trackData.dateCreated)}
+                    {formatTimestamp(trackData.dateCreated, true)}
                   </span>
                 </div>
               )}
@@ -1015,7 +1002,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                 >
                   <span className={styles.timestampLabel}>Updated:</span>
                   <span className={styles.timestampValue}>
-                    {formatTimestamp(trackData.dateModified)}
+                    {formatTimestamp(trackData.dateModified, true)}
                   </span>
                 </div>
               )}
