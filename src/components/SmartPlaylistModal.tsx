@@ -306,7 +306,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
 
                       <div className={styles.playlistActions}>
                         <button
-                          className={styles.actionButton}
+                          className={`${styles.actionButton} ${styles.syncToggleButton} ${
+                            !playlist.isActive ? styles.inactive : ""
+                          }`}
                           onClick={() => toggleSmartPlaylistActive(playlist.playlistId)}
                           disabled={syncingPlaylists.has(playlist.playlistId)}
                         >
@@ -314,7 +316,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                         </button>
                         {playlist.isActive && (
                           <button
-                            className={styles.actionButton}
+                            className={`${styles.actionButton} ${styles.manualSyncButton} ${
+                              syncingPlaylists.has(playlist.playlistId) ? styles.syncing : ""
+                            }`}
                             onClick={() => handleManualSync(playlist)}
                             disabled={syncingPlaylists.has(playlist.playlistId)}
                           >

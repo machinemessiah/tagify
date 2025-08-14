@@ -257,9 +257,140 @@
   justify-content: flex-end;
 }
 
+.syncToggleButton {
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.15), rgba(30, 215, 96, 0.15));
+  color: white;
+  border: 1px solid rgba(29, 185, 84, 0.3);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.syncToggleButton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(29, 185, 84, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.syncToggleButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.25), rgba(30, 215, 96, 0.25));
+  border-color: rgba(29, 185, 84, 0.5);
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+  transform: translateY(-1px);
+}
+
+.syncToggleButton:hover::before {
+  left: 100%;
+}
+
+.syncToggleButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(29, 185, 84, 0.08);
+  border-color: rgba(29, 185, 84, 0.15);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Inactive state (when showing "Enable Sync") */
+.syncToggleButton.inactive {
+  background: linear-gradient(135deg, rgba(120, 120, 120, 0.15), rgba(140, 140, 140, 0.15));
+  border-color: rgba(120, 120, 120, 0.3);
+}
+
+.syncToggleButton.inactive::before {
+  background: linear-gradient(90deg, transparent, rgba(120, 120, 120, 0.2), transparent);
+}
+
+.syncToggleButton.inactive:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.2), rgba(30, 215, 96, 0.2));
+  border-color: rgba(29, 185, 84, 0.4);
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.2);
+}
+
+.manualSyncButton {
+  background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(13, 110, 253, 0.15));
+  color: white;
+  border: 1px solid rgba(79, 172, 254, 0.3);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.manualSyncButton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(79, 172, 254, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.manualSyncButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(79, 172, 254, 0.25), rgba(13, 110, 253, 0.25));
+  border-color: rgba(79, 172, 254, 0.5);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+  transform: translateY(-1px);
+}
+
+.manualSyncButton:hover::before {
+  left: 100%;
+}
+
+.manualSyncButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(79, 172, 254, 0.08);
+  border-color: rgba(79, 172, 254, 0.15);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Syncing state with animation */
+.manualSyncButton.syncing {
+  background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(13, 110, 253, 0.2));
+  border-color: rgba(79, 172, 254, 0.4);
+  position: relative;
+}
+
+.manualSyncButton.syncing::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  border: 2px solid transparent;
+  border-top: 2px solid rgba(79, 172, 254, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Adjust text when syncing to make room for spinner */
+.manualSyncButton.syncing {
+  padding-left: 28px;
+}
+
 .actionButton {
-  background: var(--spice-button);
-  color: var(--spice-text);
   border: 1px solid var(--spice-button-disabled);
   padding: 8px 16px;
   border-radius: 6px;
@@ -267,16 +398,6 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-}
-
-.actionButton:hover {
-  background: var(--spice-accent);
-  border-color: var(--spice-accent);
-  color: var(--spice-card);
-}
-
-.actionButton:active {
-  transform: translateY(1px);
 }
 
 .tags {
