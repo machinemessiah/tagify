@@ -601,59 +601,59 @@ export function useTagData() {
     let hasChanges = false;
 
     for (let i = 0; i < updatedPlaylists.length; i++) {
-      const autoPlaylist = updatedPlaylists[i];
+      const smartPlaylist = updatedPlaylists[i];
 
-      if (!autoPlaylist.isActive) {
-        console.log("⏸️ Skipping inactive playlist:", autoPlaylist.playlistName);
+      if (!smartPlaylist.isActive) {
+        console.log("⏸️ Skipping inactive playlist:", smartPlaylist.playlistName);
         continue;
       }
 
-      const matches = evaluateTrackMatchesCriteria(trackData, autoPlaylist.criteria);
-      const isCurrentlyTracked = autoPlaylist.smartPlaylistTrackUris.includes(trackUri);
+      const matches = evaluateTrackMatchesCriteria(trackData, smartPlaylist.criteria);
+      const isCurrentlyTracked = smartPlaylist.smartPlaylistTrackUris.includes(trackUri);
 
       console.log(
         `🎯 Track ${matches ? "matches" : "doesn't match"} playlist "${
-          autoPlaylist.playlistName
+          smartPlaylist.playlistName
         }" | Currently tracked: ${isCurrentlyTracked}`
       );
 
       if (matches && !isCurrentlyTracked) {
         // ADD TRACK
-        const result = await addTrackToSpotifyPlaylist(trackUri, autoPlaylist.playlistId);
+        const result = await addTrackToSpotifyPlaylist(trackUri, smartPlaylist.playlistId);
         if (result.success) {
-          console.log(`✅ Successfully added ${trackUri} to ${autoPlaylist.playlistName}`);
+          console.log(`✅ Successfully added ${trackUri} to ${smartPlaylist.playlistName}`);
           updatedPlaylists[i] = {
-            ...autoPlaylist,
-            smartPlaylistTrackUris: [...autoPlaylist.smartPlaylistTrackUris, trackUri],
+            ...smartPlaylist,
+            smartPlaylistTrackUris: [...smartPlaylist.smartPlaylistTrackUris, trackUri],
             lastSyncAt: Date.now(),
           };
           hasChanges = true;
 
           if (trackUri.startsWith("spotify:local:")) {
             Spicetify.showNotification(
-              `🎵 Local file matches "${autoPlaylist.playlistName}" criteria but must be added manually`,
+              `🎵 Local file matches "${smartPlaylist.playlistName}" criteria but must be added manually`,
               true,
               5000
             );
           } else if (result.wasAdded) {
             Spicetify.showNotification(
-              `✅ Added track to smart playlist "${autoPlaylist.playlistName}"`,
+              `✅ Added track to smart playlist "${smartPlaylist.playlistName}"`,
               false,
               5000
             );
           }
         } else {
-          console.error(`❌ Failed to add ${trackUri} to ${autoPlaylist.playlistName}`);
+          console.error(`❌ Failed to add ${trackUri} to ${smartPlaylist.playlistName}`);
         }
       } else if (!matches && isCurrentlyTracked) {
         // REMOVE TRACK
-        const success = await removeTrackFromSpotifyPlaylist(trackUri, autoPlaylist.playlistId);
+        const success = await removeTrackFromSpotifyPlaylist(trackUri, smartPlaylist.playlistId);
 
         if (success) {
-          console.log(`✅ Successfully removed ${trackUri} from ${autoPlaylist.playlistName}`);
+          console.log(`✅ Successfully removed ${trackUri} from ${smartPlaylist.playlistName}`);
           updatedPlaylists[i] = {
-            ...autoPlaylist,
-            smartPlaylistTrackUris: autoPlaylist.smartPlaylistTrackUris.filter(
+            ...smartPlaylist,
+            smartPlaylistTrackUris: smartPlaylist.smartPlaylistTrackUris.filter(
               (uri) => uri !== trackUri
             ),
             lastSyncAt: Date.now(),
@@ -661,13 +661,13 @@ export function useTagData() {
           hasChanges = true;
 
           Spicetify.showNotification(
-            `❌ Track removed from smart playlist "${autoPlaylist.playlistName}"`,
+            `❌ Track removed from smart playlist "${smartPlaylist.playlistName}"`,
             false,
             5000
           );
         } else {
           console.error(
-            `Failed to remove ${trackUri} from ${autoPlaylist.playlistName} - keeping in local tracking`
+            `Failed to remove ${trackUri} from ${smartPlaylist.playlistName} - keeping in local tracking`
           );
           // DON'T update local tracking if API call failed
         }
@@ -694,14 +694,19 @@ export function useTagData() {
         matchingTrackUris.push(trackUri);
       }
     });
+    console.log(`MATCHING TRACK URIS: ${matchingTrackUris}`);
 
     const tracksToAdd = matchingTrackUris.filter(
       (uri) => !playlist.smartPlaylistTrackUris.includes(uri)
     );
+    console.log(`TRACKSTOADD: ${tracksToAdd}`);
+
 
     const tracksToRemove = playlist.smartPlaylistTrackUris.filter(
       (uri) => !matchingTrackUris.includes(uri)
     );
+    console.log(`TRACKSTOREMOVE: ${tracksToRemove}`);
+
 
     let hasChanges = false;
     let addedCount = 0;
