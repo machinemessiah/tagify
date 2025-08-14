@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { TrackInfoCacheManager } from "../utils/TrackInfoCache";
-import { PlaylistTracksResponse } from "../types/SpotifyTypes";
+import { spotifyApiService } from "../services/SpotifyApiService";
 
 export interface Tag {
   name: string;
@@ -445,122 +445,6 @@ export function useTagData() {
     );
   };
 
-  const getAllTracksUrisInPlaylist = async (playlistId: string): Promise<string[]> => {
-    const trackUris: string[] = [];
-    try {
-      let offset = 0;
-      const limit = 100;
-
-      while (true) {
-        const response: PlaylistTracksResponse = await Spicetify.CosmosAsync.get(
-          `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=${offset}&limit=${limit}&fields=items(track(uri)),total`
-        );
-
-        if (!response?.items) {
-          break;
-        }
-
-        const batchUris = response.items
-          .filter((item) => item.track?.uri)
-          .map((item) => item.track!.uri);
-
-        trackUris.push(...batchUris);
-
-        if (response.items.length < limit || offset + limit >= response.total) {
-          break;
-        }
-
-        offset += limit;
-      }
-    } catch (error) {
-      console.error("Error fetching tracks in playlist:", error);
-      return [];
-    }
-    return trackUris;
-  };
-
-  const isTrackInPlaylist = async (trackUri: string, playlistId: string): Promise<boolean> => {
-    try {
-      let offset = 0;
-      const limit = 100;
-
-      while (true) {
-        const response = await Spicetify.CosmosAsync.get(
-          `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=${offset}&limit=${limit}&fields=items(track(uri)),total`
-        );
-
-        if (!response || !response.items) {
-          break;
-        }
-
-        // Check if our track is in this batch
-        const found = response.items.some((item: any) => item.track?.uri === trackUri);
-        if (found) {
-          return true;
-        }
-
-        if (response.items.length < limit || offset + limit >= response.total) {
-          break;
-        }
-
-        offset += limit;
-      }
-
-      return false;
-    } catch (error) {
-      console.error("Error checking if track is in playlist:", error);
-      // On error, assume track is not in playlist to allow the add attempt
-      return false;
-    }
-  };
-
-  const addTrackToSpotifyPlaylist = async (
-    trackUri: string,
-    playlistId: string
-  ): Promise<{ success: boolean; wasAdded: boolean }> => {
-    try {
-      if (trackUri.startsWith("spotify:local:")) {
-        return { success: true, wasAdded: false };
-      }
-
-      const isAlreadyInPlaylist = await isTrackInPlaylist(trackUri, playlistId);
-
-      if (isAlreadyInPlaylist) {
-        return { success: true, wasAdded: false };
-      }
-
-      await Spicetify.CosmosAsync.post(
-        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-        {
-          uris: [trackUri],
-        }
-      );
-
-      return { success: true, wasAdded: true };
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      return { success: false, wasAdded: false };
-    }
-  };
-
-  const removeTrackFromSpotifyPlaylist = async (
-    trackUri: string,
-    playlistId: string
-  ): Promise<boolean> => {
-    try {
-      await Spicetify.CosmosAsync.del(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-        tracks: [{ uri: trackUri }],
-      });
-
-      // Delay to let Spotify's cache sync
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return true;
-    } catch (error) {
-      console.error("❌ Error removing track:", error);
-      return false;
-    }
-  };
-
   const cleanupDeletedSmartPlaylists = async (): Promise<void> => {
     try {
       const allApiPlaylistIds: string[] = [];
@@ -620,7 +504,7 @@ export function useTagData() {
         if (!trackData) {
           // Track was deleted - remove from playlist
           if (originalTrackUris.includes(trackUri)) {
-            const success = await removeTrackFromSpotifyPlaylist(
+            const success = await spotifyApiService.removeTrackFromPlaylist(
               trackUri,
               smartPlaylist.playlistId
             );
@@ -641,7 +525,10 @@ export function useTagData() {
 
           if (matches && !isCurrentlyTracked) {
             // ADD TRACK
-            const result = await addTrackToSpotifyPlaylist(trackUri, smartPlaylist.playlistId);
+            const result = await spotifyApiService.addTrackToSpotifyPlaylist(
+              trackUri,
+              smartPlaylist.playlistId
+            );
             if (result.success) {
               // Only add if not already in the new list (avoid duplicates)
               if (!newTrackUris.includes(trackUri)) {
@@ -665,7 +552,7 @@ export function useTagData() {
             }
           } else if (!matches && isCurrentlyTracked) {
             // REMOVE TRACK
-            const success = await removeTrackFromSpotifyPlaylist(
+            const success = await spotifyApiService.removeTrackFromPlaylist(
               trackUri,
               smartPlaylist.playlistId
             );
@@ -710,7 +597,10 @@ export function useTagData() {
       for (let i = 0; i < updatedPlaylists.length; i++) {
         const smartPlaylist = updatedPlaylists[i];
         if (smartPlaylist.smartPlaylistTrackUris.includes(trackUri)) {
-          const success = await removeTrackFromSpotifyPlaylist(trackUri, smartPlaylist.playlistId);
+          const success = await spotifyApiService.removeTrackFromPlaylist(
+            trackUri,
+            smartPlaylist.playlistId
+          );
           if (success) {
             updatedPlaylists[i] = {
               ...smartPlaylist,
@@ -752,7 +642,10 @@ export function useTagData() {
 
       if (matches && !isCurrentlyTracked) {
         // ADD TRACK
-        const result = await addTrackToSpotifyPlaylist(trackUri, smartPlaylist.playlistId);
+        const result = await spotifyApiService.addTrackToSpotifyPlaylist(
+          trackUri,
+          smartPlaylist.playlistId
+        );
         if (result.success) {
           console.log(`✅ Successfully added ${trackUri} to ${smartPlaylist.playlistName}`);
           updatedPlaylists[i] = {
@@ -780,7 +673,10 @@ export function useTagData() {
         }
       } else if (!matches && isCurrentlyTracked) {
         // REMOVE TRACK
-        const success = await removeTrackFromSpotifyPlaylist(trackUri, smartPlaylist.playlistId);
+        const success = await spotifyApiService.removeTrackFromPlaylist(
+          trackUri,
+          smartPlaylist.playlistId
+        );
 
         if (success) {
           console.log(`✅ Successfully removed ${trackUri} from ${smartPlaylist.playlistName}`);
@@ -819,7 +715,9 @@ export function useTagData() {
       return;
     }
 
-    const allTrackUrisInPlaylist = await getAllTracksUrisInPlaylist(playlist.playlistId);
+    const allTrackUrisInPlaylist = await spotifyApiService.getAllTrackUrisInPlaylist(
+      playlist.playlistId
+    );
 
     const matchingTrackUris: string[] = [];
 
@@ -838,14 +736,20 @@ export function useTagData() {
     let removedCount = 0;
 
     for (const trackUri of tracksToRemove) {
-      const success = await removeTrackFromSpotifyPlaylist(trackUri, playlist.playlistId);
+      const success = await spotifyApiService.removeTrackFromPlaylist(
+        trackUri,
+        playlist.playlistId
+      );
       if (success) {
         removedCount++;
       }
     }
 
     for (const trackUri of tracksToAdd) {
-      const result = await addTrackToSpotifyPlaylist(trackUri, playlist.playlistId);
+      const result = await spotifyApiService.addTrackToSpotifyPlaylist(
+        trackUri,
+        playlist.playlistId
+      );
       if (result.success && result.wasAdded) {
         addedCount++;
       }
@@ -1117,56 +1021,9 @@ export function useTagData() {
     return tagData;
   };
 
-  const updateTrackWithTimestamp = (trackUri: string, updates: Partial<TrackData>) => {
-    const currentData = getOrCreateTrackData(trackUri);
-    const existingTrack = currentData.tracks[trackUri];
-
-    const updatedTrack = {
-      ...existingTrack,
-      ...updates,
-      dateModified: Date.now(),
-      dateCreated: existingTrack.dateCreated || Date.now(),
-    };
-
-    setTagData({
-      ...currentData,
-      tracks: {
-        ...currentData.tracks,
-        [trackUri]: updatedTrack,
-      },
-    });
-  };
-
-  const fetchBpm = async (trackUri: string): Promise<number | null> => {
-    try {
-      // Skip local files
-      if (trackUri.startsWith("spotify:local:")) {
-        return null;
-      }
-
-      // Extract track ID
-      const trackId = trackUri.split(":").pop();
-      if (!trackId) return null;
-
-      // Fetch audio features from Spotify API
-      const audioFeatures = await Spicetify.CosmosAsync.get(
-        `https://api.spotify.com/v1/audio-features/${trackId}`
-      );
-
-      // Return rounded BPM value
-      if (audioFeatures && audioFeatures.tempo) {
-        return Math.round(audioFeatures.tempo);
-      }
-      return null;
-    } catch (error) {
-      console.error("Error fetching BPM:", error);
-      return null;
-    }
-  };
-
   const updateBpm = async (trackUri: string): Promise<number | null> => {
     try {
-      const bpm = await fetchBpm(trackUri);
+      const bpm = await spotifyApiService.fetchBpm(trackUri);
       if (bpm !== null) {
         setBpm(trackUri, bpm);
       }
@@ -1287,7 +1144,8 @@ export function useTagData() {
 
       // Schedule adding to TAGGED playlist if this makes the track non-empty
       if (updatedTags.length === 1 && trackData.rating === 0 && trackData.energy === 0) {
-        fetchBpm(trackUri)
+        spotifyApiService
+          .fetchBpm(trackUri)
           .then((bpm) => {
             if (bpm !== null) {
               setTagData((prevState) => {
@@ -1457,7 +1315,8 @@ export function useTagData() {
       trackData.energy === 0 &&
       trackData.tags.length === 0
     ) {
-      fetchBpm(trackUri)
+      spotifyApiService
+        .fetchBpm(trackUri)
         .then((bpm) => {
           if (bpm !== null) {
             setTagData((prevState) => {
@@ -1533,7 +1392,8 @@ export function useTagData() {
       trackData.energy === 0 &&
       trackData.tags.length === 0
     ) {
-      fetchBpm(trackUri)
+      spotifyApiService
+        .fetchBpm(trackUri)
         .then((bpm) => {
           if (bpm !== null) {
             setTagData((prevState) => {
