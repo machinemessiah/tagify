@@ -464,7 +464,6 @@ export function useTagData() {
           return true;
         }
 
-        // Check if we've seen all tracks
         if (response.items.length < limit || offset + limit >= response.total) {
           break;
         }
@@ -529,13 +528,28 @@ export function useTagData() {
 
   const cleanupDeletedSmartPlaylists = async (): Promise<void> => {
     try {
-      const allPlaylistsApi = await Spicetify.CosmosAsync.get(
-        `https://api.spotify.com/v1/me/playlists/`
-      );
-      const apiPlaylistIds = allPlaylistsApi.items.map((p: { id: string }) => p.id);
+      const allApiPlaylistIds: string[] = [];
+      let offset = 0;
+      const limit = 50;
+      while (true) {
+        const response = await Spicetify.CosmosAsync.get(
+          `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}&fields=items(id),total`
+        );
+
+        if (!response?.items?.length) break;
+
+        const batchIds = response.items.map((p: { id: string }) => p.id);
+        allApiPlaylistIds.push(...batchIds);
+
+        if (response.items.length < limit || offset + limit >= response.total) {
+          break;
+        }
+
+        offset += limit;
+      }
 
       const validPlaylists: SmartPlaylistCriteria[] = smartPlaylists.filter(
-        (sp: SmartPlaylistCriteria) => apiPlaylistIds.includes(sp.playlistId)
+        (sp: SmartPlaylistCriteria) => allApiPlaylistIds.includes(sp.playlistId)
       );
 
       if (validPlaylists.length !== smartPlaylists.length) {
@@ -675,7 +689,7 @@ export function useTagData() {
     const matchingTrackUris: string[] = [];
 
     Object.entries(tagData.tracks).forEach(([trackUri, trackData]) => {
-      const matches = evaluateTrackMatchesCriteria(trackData, playlist.criteria);
+      const matches: boolean = evaluateTrackMatchesCriteria(trackData, playlist.criteria);
       if (matches) {
         matchingTrackUris.push(trackUri);
       }
