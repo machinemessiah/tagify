@@ -841,14 +841,14 @@ export function useTagData() {
     return saved;
   };
 
-  const exportBackup = () => {
-    const jsonData = JSON.stringify(tagData, null, 2);
+  const exportSmartPlaylists = () => {
+    const jsonData = JSON.stringify(smartPlaylists, null, 2);
     const blob = new Blob([jsonData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = `tagify-backup-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `tagify-smart-playlists-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
 
     URL.revokeObjectURL(url);
@@ -856,7 +856,26 @@ export function useTagData() {
     Spicetify.showNotification("Backup saved in 'Downloads' folder");
   };
 
-  const importBackup = (backupData: TagDataStructure) => {
+  const exportTagData = () => {
+    const jsonData = JSON.stringify(tagData, null, 2);
+    const blob = new Blob([jsonData], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `tagify-tags-${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+    Spicetify.showNotification("Backup saved in 'Downloads' folder");
+  };
+
+  const importSmartPlaylists = (backupData: SmartPlaylistCriteria[]) => {
+    setSmartPlaylists(backupData);
+  };
+
+  const importTagData = (backupData: TagDataStructure) => {
     setTagData(backupData);
     saveTagData(backupData);
   };
@@ -1680,7 +1699,9 @@ export function useTagData() {
 
     // Import/Export
     exportData,
-    exportBackup,
-    importBackup,
+    exportSmartPlaylists,
+    exportTagData,
+    importTagData,
+    importSmartPlaylists,
   };
 }

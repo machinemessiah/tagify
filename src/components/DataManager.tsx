@@ -9,15 +9,15 @@ import MainSettingsModal from "./MainSettingsModal";
 import InfoModal from "./InfoModal";
 
 interface DataManagerProps {
-  onExportBackup: () => void;
-  onImportBackup: (data: TagDataStructure) => void;
+  onExportTagData: () => void;
+  onImportTagData: (data: TagDataStructure) => void;
   onExportRekordbox: () => void;
   lastSaved: Date | null;
 }
 
 const DataManager: React.FC<DataManagerProps> = ({
-  onExportBackup,
-  onImportBackup,
+  onExportTagData,
+  onImportTagData,
   onExportRekordbox,
   lastSaved,
 }) => {
@@ -50,7 +50,7 @@ const DataManager: React.FC<DataManagerProps> = ({
           data.tracks &&
           typeof data.tracks === "object"
         ) {
-          onImportBackup(data);
+          onImportTagData(data);
           Spicetify.showNotification("Data imported successfully!");
         } else {
           console.error("Invalid backup structure:", data);
@@ -80,8 +80,8 @@ const DataManager: React.FC<DataManagerProps> = ({
         <div className={styles.primaryPill}>
           <button
             className={`${styles.pillButton} ${styles.exportButton}`}
-            onClick={onExportBackup}
-            title="Export your tag data"
+            onClick={onExportTagData}
+            title="Backup your tag data"
           >
             📤 Export
           </button>

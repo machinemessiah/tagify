@@ -38,8 +38,10 @@ function App() {
     setBpm,
     toggleTagForMultipleTracks,
     replaceCategories,
-    exportBackup,
-    importBackup,
+    exportTagData,
+    importTagData,
+    exportSmartPlaylists,
+    importSmartPlaylists,
     findCommonTags,
     updateBpm,
     applyBatchTagUpdates,
@@ -237,6 +239,8 @@ function App() {
           onSetSmartPlaylists={setSmartPlaylists}
           onSyncPlaylist={syncSmartPlaylistFull}
           cleanupDeletedSmartPlaylists={cleanupDeletedSmartPlaylists}
+          onExportSmartPlaylists={exportSmartPlaylists}
+          onImportSmartPlaylists={importSmartPlaylists}
         />
       </div>
     );
@@ -361,8 +365,8 @@ function App() {
       </div>
 
       <DataManager
-        onExportBackup={exportBackup}
-        onImportBackup={importBackup}
+        onExportTagData={exportTagData}
+        onImportTagData={importTagData}
         onExportRekordbox={() => setShowExport(true)}
         lastSaved={lastSaved}
       />
