@@ -10,7 +10,7 @@ export const SORT_OPTIONS = {
 export const SORT_ORDERS = {
   ASC: "asc",
   DESC: "desc",
-};
+} as const;
 
 export type SortOption = (typeof SORT_OPTIONS)[keyof typeof SORT_OPTIONS];
 

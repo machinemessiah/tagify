@@ -844,7 +844,7 @@ const TrackList: React.FC<TrackListProps> = ({
         </div>
       </div>
 
-      {/* FILTER CONTROLS - CSS GRID*/}
+      {/* FILTER CONTROLS */}
       <div className={styles.filterControlsGrid}>
         {/* Left zone - Filter toggle */}
         <div className={styles.filterControlsLeftGrid}>
@@ -861,7 +861,7 @@ const TrackList: React.FC<TrackListProps> = ({
           </button>
         </div>
 
-        {/* Center zone - Absolutely centered */}
+        {/* Center zone - ALL/ANY */}
         {activeFilterCount > 0 && (
           <div className={styles.filterControlsCenterGrid}>
             <div className={styles.filterModeToggle}>
@@ -892,33 +892,20 @@ const TrackList: React.FC<TrackListProps> = ({
           </div>
         )}
 
-        {/* Right zone - Action buttons */}
-
-        {/* Sort Controls */}
-        {/* <div className={styles.sortControls}> */}
+        {/* Right zone - Sort controls */}
         <div className={styles.filterControlsRightGrid}>
           <label className={"form-label"}>Sort by:</label>
           <select
             value={sortBy}
-            onChange={(e) =>
-              setSortBy(
-                e.target.value as
-                  | "alphabetical"
-                  | "rating"
-                  | "energy"
-                  | "bpm"
-                  | "dateCreated"
-                  | "dateModified"
-              )
-            }
+            onChange={(e) => setSortBy(e.target.value as SortOption)}
             className={"form-select"}
           >
-            <option value="dateModified">Last updated</option>
-            <option value="dateCreated">Date created</option>
-            <option value="alphabetical">Name</option>
-            <option value="rating">Rating</option>
-            <option value="energy">Energy</option>
-            <option value="bpm">BPM</option>
+            <option value={SORT_OPTIONS.DATE_MODIFIED}>Last updated</option>
+            <option value={SORT_OPTIONS.DATE_CREATED}>Date created</option>
+            <option value={SORT_OPTIONS.ALPHABETICAL}>Name</option>
+            <option value={SORT_OPTIONS.RATING}>Rating</option>
+            <option value={SORT_OPTIONS.ENERGY}>Energy</option>
+            <option value={SORT_OPTIONS.BPM}>BPM</option>
           </select>
 
           <button
