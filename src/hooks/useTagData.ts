@@ -961,7 +961,6 @@ export function useTagData() {
     return (
       trackData.rating === 0 &&
       trackData.energy === 0 &&
-      trackData.bpm === null &&
       trackData.tags.length === 0
     );
   };
@@ -992,7 +991,6 @@ export function useTagData() {
       // Add tag if it doesn't exist
       updatedTags = [...trackData.tags, { categoryId, subcategoryId, tagId }];
 
-      // Schedule adding to TAGGED playlist if this makes the track non-empty
       if (updatedTags.length === 1 && trackData.rating === 0 && trackData.energy === 0) {
         spotifyApiService
           .fetchBpm(trackUri)
@@ -1047,7 +1045,6 @@ export function useTagData() {
         tracks: remainingTracks,
       });
       finalTrackData = null;
-      console.log("TRACK EMPTY");
     } else {
       // Update state with modified track
       setTagData({
@@ -1058,7 +1055,6 @@ export function useTagData() {
         },
       });
       finalTrackData = updatedTrackData;
-      console.log(`FINAL TRACK DATA: ${finalTrackData}`);
     }
     setTimeout(() => syncTrackWithSmartPlaylists(trackUri, finalTrackData), 100);
   };
