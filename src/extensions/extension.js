@@ -16,7 +16,6 @@
     taggedTracks: {},
     observer: null,
     nowPlayingWidgetTagInfo: null,
-    lastTrackUri: null,
     playlistCacheMemory: null,
     activeExtensions: {
       tracklistEnhancer: true,
@@ -1143,10 +1142,6 @@
           return;
         }
 
-        // Skip if URI hasn't changed and element exists
-        if (trackUri === state.lastTrackUri && state.nowPlayingWidgetTagInfo) return;
-        state.lastTrackUri = trackUri;
-
         // Get or create our tag info element
         if (!state.nowPlayingWidgetTagInfo) {
           state.nowPlayingWidgetTagInfo = document.createElement("div");
@@ -1221,7 +1216,6 @@
         state.nowPlayingWidgetTagInfo = null;
       }
 
-      state.lastTrackUri = null;
       state.initialized.playbarEnhancer = false;
     },
   };
