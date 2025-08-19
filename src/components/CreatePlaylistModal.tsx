@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./CreatePlaylistModal.module.css";
 import Portal from "../utils/Portal";
 
@@ -38,7 +38,9 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
   onClose,
   onCreatePlaylist,
 }) => {
-  const defaultPlaylistName = (() => {
+  const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
+
+  const getDefaultPlaylistName = () => {
     const filterParts = [];
 
     if (activeTagDisplayNames.length > 0) {
@@ -73,10 +75,12 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
       }
     }
 
+    const prefix = isSmartPlaylist ? "Smart " : "";
+
     let name =
       filterParts.length > 0
-        ? `Tagify - ${filterParts.join(" ")}`
-        : `Tagify Playlist ${new Date().toLocaleDateString()}`;
+        ? `${prefix}Tagify - ${filterParts.join(" ")}`
+        : `${prefix}Tagify Playlist ${new Date().toLocaleDateString()}`;
 
     // Truncate if too long
     if (name.length > 100) {
@@ -84,12 +88,16 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
     }
 
     return name;
-  })();
+  };
 
-  const defaultPlaylistDescription = (() => {
+  const getDefaultPlaylistDescription = () => {
     const filterParts = [];
 
     const filterMode = isOrFilterMode ? "ANY" : "ALL";
+
+    if (isSmartPlaylist) {
+      filterParts.push(`SMART PLAYLIST`);
+    }
 
     if (activeTagDisplayNames.length > 0) {
       filterParts.push(`Tags (${filterMode}): ${activeTagDisplayNames.join(", ")}`);
@@ -139,21 +147,28 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
     }
 
     return description;
-  })();
+  };
 
-  const [playlistName, setPlaylistName] = useState(defaultPlaylistName);
-  const [playlistDescription, setPlaylistDescription] = useState(defaultPlaylistDescription);
+  const [playlistName, setPlaylistName] = useState(() => getDefaultPlaylistName());
+  const [playlistDescription, setPlaylistDescription] = useState(() =>
+    getDefaultPlaylistDescription()
+  );
   const [isPublic, setIsPublic] = useState(false);
-  const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
+  // const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
 
   const hasActiveSearchTerm = currentSearchTerm && currentSearchTerm.trim() !== "";
   const showSearchTermWarning = isSmartPlaylist && hasActiveSearchTerm;
 
+  useEffect(() => {
+    setPlaylistName(getDefaultPlaylistName());
+    setPlaylistDescription(getDefaultPlaylistDescription());
+  }, [isSmartPlaylist]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onCreatePlaylist(
-      playlistName.trim() || defaultPlaylistName,
-      playlistDescription.trim() || defaultPlaylistDescription,
+      playlistName.trim() || getDefaultPlaylistName(),
+      playlistDescription.trim() || getDefaultPlaylistDescription(),
       isPublic,
       isSmartPlaylist
     );
