@@ -87,7 +87,7 @@ const LocalTracksModal: React.FC<LocalTracksModalProps> = ({
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <div className={styles.modalHeader}>
             <h2 className={styles.modalTitle}>Add Local Tracks</h2>
-            <button className={styles.closeButton} onClick={onClose}>
+            <button className="modal-close-button" onClick={onClose}>
               ×
             </button>
           </div>
