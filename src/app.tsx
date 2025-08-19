@@ -115,10 +115,6 @@ function App() {
   //   });
   // }, []);
 
-  const handleUpdateDismiss = (permanently: boolean = false) => {
-    dismissUpdate(permanently);
-  };
-
   useEffect(() => {
     cleanupDeletedSmartPlaylists().catch((error) => {
       console.error("Error during smart playlist cleanup:", error);
@@ -253,9 +249,7 @@ function App() {
         </div>
       </div>
 
-      {updateInfo?.hasUpdate && (
-        <UpdateBanner updateInfo={updateInfo} onDismiss={handleUpdateDismiss} />
-      )}
+      {updateInfo?.hasUpdate && <UpdateBanner updateInfo={updateInfo} onDismiss={dismissUpdate} />}
 
       <DataManager
         onExportTagData={exportTagData}
