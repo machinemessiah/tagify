@@ -380,19 +380,6 @@
   color: var(--spice-text);
 }
 
-.closeButton {
-  /* Using modal-close-button pattern */
-  background: transparent;
-  border: none;
-  color: var(--spice-text);
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .modalBody {
   /* Using modal-body pattern */
   padding: 24px;

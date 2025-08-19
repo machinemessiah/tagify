@@ -103,46 +103,6 @@
   border-color: rgba(59, 130, 246, 0.5);
 }
 
-/* Close button updates to fit with new header layout */
-.closeButton {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--spice-subtext);
-  font-size: 20px;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  height: 32px;
-}
-
-.closeButton:hover {
-  background: var(--spice-button-disabled);
-  color: var(--spice-text);
-  border-color: var(--spice-button-disabled);
-}
-
-/* .closeButton {
-  background: transparent;
-  border: none;
-  color: var(--spice-text);
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.closeButton:hover {
-  background-color: var(--spice-button-disabled);
-  color: var(--spice-text);
-} */
-
 .modalBody {
   padding: 24px;
   overflow-y: auto;

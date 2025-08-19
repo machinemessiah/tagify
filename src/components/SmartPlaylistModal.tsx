@@ -371,7 +371,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                   ↙ Import
                 </button>
 
-                <button className={styles.closeButton} onClick={onClose}>
+                <button className="modal-close-button" onClick={onClose}>
                   ×
                 </button>
               </div>

@@ -63,12 +63,12 @@
 
 .closeButton {
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: var(--spice-text);
   font-size: 28px;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 6px;
+  border-radius: 6px;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -78,8 +78,9 @@
 }
 
 .closeButton:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(1.1);
+  background: var(--spice-button-disabled);
+  color: var(--spice-text);
+  border-color: var(--spice-button-disabled);
 }
 
 .modalContent {

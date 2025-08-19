@@ -31,7 +31,7 @@ const MainSettingsModal: React.FC<MainSettingsModalProps> = ({ onClose }) => {
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <div className={styles.modalHeader}>
             <h2 className={styles.modalTitle}>Settings</h2>
-            <button className={styles.closeButton} onClick={onClose}>
+            <button className="modal-close-button" onClick={onClose}>
               ×
             </button>
           </div>

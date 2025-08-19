@@ -194,7 +194,7 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, onClose }) => {
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <div className={styles.modalHeader}>
             <h2 className={styles.modalTitle}>Statistics</h2>
-            <button className={styles.closeButton} onClick={onClose}>
+            <button className="modal-close-button" onClick={onClose}>
               ×
             </button>
           </div>

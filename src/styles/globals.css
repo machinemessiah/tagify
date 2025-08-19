@@ -58,18 +58,6 @@
   gap: 16px;
 }
 
-.modal-close-button {
-  background: transparent;
-  border: none;
-  color: var(--spice-text);
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -77,6 +65,28 @@
   padding: 16px 24px;
   border-top: 1px solid var(--spice-button-disabled);
   margin-top: auto;
+}
+
+.modal-close-button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--spice-subtext);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+}
+
+.modal-close-button:hover {
+  background: var(--spice-button-disabled);
+  color: var(--spice-text);
+  border-color: var(--spice-button-disabled);
 }
 
 /* ===== BUTTON SYSTEM ===== */
