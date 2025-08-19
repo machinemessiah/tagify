@@ -8,13 +8,15 @@ interface InfoModalProps {
 }
 
 const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
-  const [activeSection, setActiveSection] = useState("overview");
+  const [activeSection, setActiveSection] = useState("whats-new");
 
   const sections = [
+    { id: "whats-new", title: "What's New", icon: "👀" },
     { id: "overview", title: "Overview", icon: "📖" },
-    { id: "getting-started", title: "Getting Started", icon: "🚀" },
+    { id: "getting-started", title: "Getting Started", icon: "👶" },
     { id: "tagging", title: "Tagging System", icon: "🏷️" },
     { id: "features", title: "Features", icon: "⭐" },
+    { id: "roadmap", title: "What's Coming", icon: "🚀" },
   ];
 
   return (
@@ -40,11 +42,12 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     key={section.id}
                     className={`${styles.navButton} ${
                       activeSection === section.id ? styles.navButtonActive : ""
-                    }`}
+                    } ${section.id === "whats-new" ? styles.whatsNewButton : ""}`}
                     onClick={() => setActiveSection(section.id)}
                   >
                     <span className={styles.navIcon}>{section.icon}</span>
                     <span className={styles.navText}>{section.title}</span>
+                    {section.id === "whats-new" && <span className={styles.newIndicator}>NEW</span>}
                   </button>
                 ))}
               </nav>
@@ -67,7 +70,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   <div className={styles.featureGrid}>
                     <div className={styles.featureCard}>
                       <div className={styles.featureIcon}>🏷️</div>
-                      <h4>Smart Tagging</h4>
+                      <h4>Custom Tagging</h4>
                       <p>
                         Organize tracks with custom categories like mood, genre, energy, and context
                       </p>
@@ -83,18 +86,146 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <p>Find the perfect tracks using multiple filters and smart search</p>
                     </div>
                     <div className={styles.featureCard}>
-                      <div className={styles.featureIcon}>📱</div>
-                      <h4>Seamless Integration</h4>
-                      <p>Works directly in Spotify with playlist creation and playback controls</p>
+                      <div className={styles.featureIcon}>🧠</div>
+                      <h4>Smart Playlists</h4>
+                      <p>Automatically sync tracks to playlists based on your tags and criteria</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeSection === "whats-new" && (
+                <div className={styles.section}>
+                  <div className={styles.whatsNewHeader}>
+                    <h3 className={styles.sectionTitle}>What's New in Tagify 2.0.0</h3>
+                    <div className={styles.versionBadge}>v{packageJson.version}</div>
+                  </div>
+
+                  {/* Smart Playlists Feature */}
+                  <div className={styles.featureGroup}>
+                    <div className={styles.featureHeader}>
+                      <span className={styles.featureIcon}>🧠</span>
+                      <h4 className={styles.featureTitle}>Smart Playlists</h4>
+                      <span className={styles.newBadge}>NEW</span>
+                    </div>
+                    <p className={styles.featureDescription}>
+                      Create playlists that automatically stay up-to-date. Set your criteria once,
+                      and every track you tag that matches will be <strong>instantly added</strong>{" "}
+                      - no manual playlist management ever again.
+                    </p>
+
+                    {/* Visual Tutorial */}
+                    <div className={styles.visualTutorial}>
+                      <h5 className={styles.tutorialSubheading}>See It In Action:</h5>
+
+                      {/* Step 1: Creating Smart Playlist */}
+                      <div className={styles.tutorialStep}>
+                        <div className={styles.stepInfo}>
+                          <div className={styles.stepBadge}>Step 1</div>
+                          <div className={styles.stepDetails}>
+                            <h6 className={styles.stepTitle}>Define Your Smart Playlist</h6>
+                            <p className={styles.stepDesc}>
+                              Choose your filters: star ratings, custom tags, energy levels, or BPM
+                              ranges. <br />
+                              This example uses <strong>5 star</strong> tracks tagged{" "}
+                              <strong>Disco</strong>.
+                            </p>
+                          </div>
+                        </div>
+                        <div className={styles.gifContainer}>
+                          <img
+                            src="https://raw.githubusercontent.com/alexk218/tagify/main/src/assets/CREATING_SMART_PLAYLIST.gif"
+                            alt="Creating a smart playlist with 5 star rating and Disco tag criteria"
+                            className={styles.tutorialGif}
+                            loading="lazy"
+                          />
+                          <div className={styles.gifCaption}>
+                            Defining the rules for automatic playlist management
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Step 2: Automatic Addition */}
+                      <div className={styles.tutorialStep}>
+                        <div className={styles.stepInfo}>
+                          <div className={styles.stepBadge}>Step 2</div>
+                          <div className={styles.stepDetails}>
+                            <h6 className={styles.stepTitle}>Watch the Magic Happen</h6>
+                            <p className={styles.stepDesc}>
+                              Now, when tagging any track with <strong>5 stars</strong> and the{" "}
+                              <strong>Disco</strong> tag - it jumps into your playlist
+                              automatically. No manual work required!
+                            </p>
+                          </div>
+                        </div>
+                        <div className={styles.gifContainer}>
+                          <img
+                            src="https://raw.githubusercontent.com/alexk218/tagify/main/src/assets/SATISFYING_SMART_CRITERIA.gif"
+                            alt="Tagging a track that automatically gets added to the smart playlist"
+                            className={styles.tutorialGif}
+                            loading="lazy"
+                          />
+                          <div className={styles.gifCaption}>
+                            Track automatically added when criteria are satisfied
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className={styles.callout}>
-                    <div className={styles.calloutIcon}>💡</div>
-                    <div>
-                      <strong>New to Tagify?</strong> Start with the "Getting Started" section to
-                      learn the basics, then explore the tagging system to begin organizing your
-                      music!
+                  {/* Bug Fixes */}
+                  <div className={styles.featureGroup}>
+                    <div className={styles.featureHeader}>
+                      <span className={styles.featureIcon}>🐛</span>
+                      <h4 className={styles.featureTitle}>Bug Fixes</h4>
+                    </div>
+                    <div className={styles.bugFixList}>
+                      <div className={styles.bugFix}>
+                        <span className={styles.bugFixIcon}>🔒</span>
+                        <div>
+                          <strong>Lock state persistence:</strong> Fixed issue where lock state
+                          didn't persist after exiting the app
+                        </div>
+                      </div>
+                      <div className={styles.bugFix}>
+                        <span className={styles.bugFixIcon}>⚡</span>
+                        <div>
+                          <strong>Instant tag application:</strong> Tags are now applied immediately
+                          - no more waiting or losing changes when quickly leaving the app
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Improvements */}
+                  <div className={styles.featureGroup}>
+                    <div className={styles.featureHeader}>
+                      <span className={styles.featureIcon}>✨</span>
+                      <h4 className={styles.featureTitle}>Improvements</h4>
+                    </div>
+                    <div className={styles.improvementList}>
+                      <div className={styles.improvement}>
+                        <span className={styles.improvementIcon}>💅</span>
+                        <div>
+                          <strong>Visual enhancements:</strong> Tagify is prettier
+                        </div>
+                      </div>
+                      <div className={styles.improvement}>
+                        <span className={styles.improvementIcon}>📊</span>
+                        <div>
+                          <strong>Real-time tracklist updates:</strong> Fixed persistent orange
+                          bullets for empty tracks. The tracklist column extension now shows
+                          accurate, up-to-date tag data
+                        </div>
+                      </div>
+                      <div className={styles.improvement}>
+                        <span className={styles.improvementIcon}>🎵</span>
+                        <div>
+                          <strong>Live playbar updates:</strong> Playbar enhancer now updates in
+                          real-time based on track tags, ratings, and energy. No more page refreshes
+                          needed!
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -358,6 +489,87 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                           You can disable both tracklist & playbar indicators in settings.
                         </p>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeSection === "roadmap" && (
+                <div className={styles.section}>
+                  <h3 className={styles.sectionTitle}>What's Coming Next...</h3>
+                  <p className={styles.text}>Here's what's planned for future releases:</p>
+
+                  {/* Upcoming Features */}
+                  <div className={styles.roadmapList}>
+                    <div className={styles.roadmapItem}>
+                      <div className={styles.roadmapHeader}>
+                        <span className={styles.roadmapIcon}>⭐</span>
+                        <h4 className={styles.roadmapTitle}>Bulk Ratings & Energy</h4>
+                        <span className={styles.comingSoonBadge}>Coming Soon</span>
+                      </div>
+                      <p className={styles.roadmapDescription}>
+                        Apply star ratings and energy ratings in bulk within the bulk tagging menu.
+                        Perfect for quickly organizing large collections of tracks.
+                      </p>
+                    </div>
+
+                    <div className={styles.roadmapItem}>
+                      <div className={styles.roadmapHeader}>
+                        <span className={styles.roadmapIcon}>🎧</span>
+                        <h4 className={styles.roadmapTitle}>Rekordbox Integration</h4>
+                        <span className={styles.plannedBadge}>Planned</span>
+                      </div>
+                      <p className={styles.roadmapDescription}>
+                        Sync your tags and star ratings between rekordbox and Tagify.
+                      </p>
+                    </div>
+
+                    <div className={styles.roadmapItem}>
+                      <div className={styles.roadmapHeader}>
+                        <span className={styles.roadmapIcon}>⬇️</span>
+                        <h4 className={styles.roadmapTitle}>Download Tracks</h4>
+                        <span className={styles.plannedBadge}>Planned</span>
+                      </div>
+                      <p className={styles.roadmapDescription}>
+                        Download tracks directly within Spotify for offline organization!
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Community Section */}
+                  <div className={styles.communitySection}>
+                    <div className={styles.communityHeader}>
+                      <span className={styles.communityIcon}>💬</span>
+                      <h4 className={styles.communityTitle}>Join the Community</h4>
+                    </div>
+                    <p className={styles.communityDescription}>
+                      Want to influence Tagify's development? Join our GitHub Discussions to:
+                    </p>
+                    <div className={styles.communityFeatures}>
+                      <div className={styles.communityFeature}>
+                        <span className={styles.featureCheckmark}>✓</span>
+                        <span>See the detailed roadmap</span>
+                      </div>
+                      <div className={styles.communityFeature}>
+                        <span className={styles.featureCheckmark}>✓</span>
+                        <span>Post ideas & feature requests</span>
+                      </div>
+                      <div className={styles.communityFeature}>
+                        <span className={styles.featureCheckmark}>✓</span>
+                        <span>Vote on which features you want most</span>
+                      </div>
+                    </div>
+                    <div className={styles.communityAction}>
+                      <a
+                        href="https://github.com/alexk218/tagify/discussions"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.discussionsLink}
+                      >
+                        <span className={styles.discussionsIcon}>🗨️</span>
+                        Visit GitHub Discussions
+                        <span className={styles.externalLinkIcon}>↗</span>
+                      </a>
                     </div>
                   </div>
                 </div>

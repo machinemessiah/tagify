@@ -939,3 +939,458 @@
     padding: 12px;
   }
 }
+
+/* Add these styles to your existing InfoModal.module.css */
+
+/* What's New Section Styles */
+.whatsNewHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.versionBadge {
+  background: linear-gradient(135deg, #1db954, #1ed760);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.featureGroup {
+  margin-bottom: 32px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.featureHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.featureIcon {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.featureTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--spice-text);
+  flex: 1;
+}
+
+.newBadge {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.featureDescription {
+  color: var(--spice-subtext);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.mediaPlaceholder {
+  background: rgba(29, 185, 84, 0.1);
+  border: 1px dashed rgba(29, 185, 84, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  color: var(--spice-text);
+}
+
+.mediaPlaceholderText {
+  font-size: 14px;
+}
+
+/* Bug Fixes & Improvements */
+.bugFixList,
+.improvementList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bugFix,
+.improvement {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+}
+
+.bugFixIcon,
+.improvementIcon {
+  font-size: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bugFixIcon {
+  color: #fbbf24;
+}
+
+.improvementIcon {
+  color: #10b981;
+}
+
+/* Roadmap Section Styles */
+.roadmapList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.roadmapItem {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.roadmapHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.roadmapIcon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.roadmapTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--spice-text);
+  flex: 1;
+}
+
+.comingSoonBadge {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.plannedBadge {
+  background: linear-gradient(135deg, #64748b, #94a3b8);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.roadmapDescription {
+  color: var(--spice-subtext);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Community Section */
+.communitySection {
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.1), rgba(30, 215, 96, 0.05));
+  border-radius: 16px;
+  border: 1px solid rgba(29, 185, 84, 0.2);
+}
+
+.communityHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.communityIcon {
+  font-size: 24px;
+  color: var(--spice-accent);
+}
+
+.communityTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--spice-text);
+}
+
+.communityDescription {
+  color: var(--spice-subtext);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.communityFeatures {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.communityFeature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--spice-subtext);
+}
+
+.featureCheckmark {
+  color: var(--spice-accent);
+  font-weight: 600;
+}
+
+.communityAction {
+  display: flex;
+  justify-content: center;
+}
+
+.discussionsLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--spice-accent), #1ed760);
+  color: white;
+  text-decoration: none;
+  border-radius: 24px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.discussionsLink:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(29, 185, 84, 0.3);
+}
+
+.discussionsIcon {
+  font-size: 16px;
+}
+
+.externalLinkIcon {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .featureGroup,
+  .roadmapItem,
+  .communitySection {
+    padding: 16px;
+  }
+
+  .featureHeader,
+  .roadmapHeader {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .whatsNewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* Special styling for What's New navigation button */
+.whatsNewButton {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 107, 0.15),
+    rgba(255, 142, 83, 0.15)
+  ) !important;
+  border: 1px solid rgba(255, 107, 107, 0.3) !important;
+  box-shadow: 0 0 20px rgba(255, 107, 107, 0.15);
+  animation: whatsNewGlow 2s ease-in-out infinite alternate;
+}
+
+.whatsNewButton:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 107, 0.25),
+    rgba(255, 142, 83, 0.25)
+  ) !important;
+  border-color: rgba(255, 107, 107, 0.5) !important;
+  box-shadow: 0 0 25px rgba(255, 107, 107, 0.25);
+  transform: translateX(2px);
+}
+
+.whatsNewButton.navButtonActive {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(255, 142, 83, 0.3)) !important;
+  border-color: rgba(255, 107, 107, 0.6) !important;
+  box-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+}
+
+.newIndicator {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes whatsNewGlow {
+  0% {
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.15);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(255, 107, 107, 0.25);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* Ensure the button has proper positioning for the indicator */
+.whatsNewButton {
+  overflow: visible !important;
+}
+
+/* Visual Tutorial Styles for Smart Playlists */
+.visualTutorial {
+  margin: 24px 0;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tutorialSubheading {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--spice-text);
+  text-align: center;
+}
+
+.tutorialStep {
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stepInfo {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.stepBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--spice-accent), #1ed760);
+  color: white;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.stepDetails {
+  flex: 1;
+}
+
+.stepTitle {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--spice-text);
+}
+
+.stepDesc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--spice-subtext);
+  line-height: 1.5;
+}
+
+.gifContainer {
+  position: relative;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.tutorialGif {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  transition: opacity 0.3s ease;
+}
+
+.gifCaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  color: white;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+}
