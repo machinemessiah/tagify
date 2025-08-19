@@ -157,9 +157,10 @@ export interface SmartPlaylistCriteria {
   smartPlaylistTrackUris: string[];
 }
 
-const STORAGE_KEY = "tagify:tagData";
+const TAG_DATA_KEY = "tagify:tagData";
 const SMART_PLAYLIST_KEY = "tagify:smartPlaylists";
 const MIGRATIONS_KEY = "tagify:migrations";
+const DATA_UPDATED_EVENT = "tagify:dataUpdated";
 
 export function useTagData() {
   const [tagData, setTagData] = useState<TagDataStructure>(defaultTagData);
@@ -742,9 +743,9 @@ export function useTagData() {
 
   const saveToLocalStorage = (data: TagDataStructure) => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      localStorage.setItem(TAG_DATA_KEY, JSON.stringify(data));
       // Dispatch custom event to notify extensions
-      const event = new CustomEvent("tagify:dataUpdated", {
+      const event = new CustomEvent(DATA_UPDATED_EVENT, {
         detail: { type: "save" },
       });
       window.dispatchEvent(event);
@@ -757,7 +758,7 @@ export function useTagData() {
 
   const loadFromLocalStorage = (): TagDataStructure | null => {
     try {
-      const savedData = localStorage.getItem(STORAGE_KEY);
+      const savedData = localStorage.getItem(TAG_DATA_KEY);
       if (savedData) {
         return JSON.parse(savedData);
       }
