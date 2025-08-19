@@ -474,19 +474,26 @@
 }
 
 .tagFilter {
-  background: #1e90ff;
+  background: #1e40af;
+  color: white;
+  font-weight: 550;
 }
 
 .tagFilter:hover {
-  background: #1a7ee0;
+  background: #1e3a8a;
+  opacity: 0.95;
 }
 
 .tagItem.tagExcluded {
-  background: #ff4c4c;
+  background-color: #b91c1c;
+  color: white !important;
+  font-weight: 600 !important;
+  text-decoration: line-through;
 }
 
 .tagItem.tagExcluded:hover {
-  background: #e64444;
+  background-color: #991b1b;
+  opacity: 0.95 !important;
 }
 
 /* Playlists section */
@@ -662,7 +669,7 @@
 }
 
 .lockButton.locked {
-  background-color: #5aa9e6;
+  background-color: #1e7cc5;
 }
 
 .lockButton.unlocked {

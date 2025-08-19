@@ -162,14 +162,16 @@
 }
 
 .tagApplied {
-  background: #1e90ff;
-  border-color: #1e90ff;
+  background: #1e40af;
+  border-color: #1e40af;
+  color: white;
   font-weight: 600;
 }
 
 .tagApplied:hover {
-  background: #1a7ee0;
-  border-color: #1a7ee0;
+  background: #1e3a8a;
+  border-color: #1e3a8a;
+  opacity: 0.95;
 }
 
 .controls {
