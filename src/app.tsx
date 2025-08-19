@@ -18,6 +18,9 @@ import { trackService } from "./services/TrackService";
 import { useSpicetifyHistory } from "./hooks/useSpicetifyHistory";
 import { SpotifyTrack } from "./types/SpotifyTypes";
 import ExportPanel from "./components/ExportPanel";
+import packageJson from "../package.json";
+import { useUpdateChecker } from "./hooks/useUpdateChecker";
+import UpdateBanner from "./components/UpdateBanner";
 
 function App() {
   const [showTagManager, setShowTagManager] = useState<boolean>(false);
@@ -95,6 +98,15 @@ function App() {
     setLockedMultiTrackUri,
   });
 
+  const { updateInfo, dismissUpdate } = useUpdateChecker({
+    // currentVersion: packageJson.version,
+    currentVersion: "1.0.1",
+    repoOwner: "alexk218",
+    repoName: "tagify",
+    checkOnMount: true,
+    delayMs: 2000,
+  });
+
   useFontAwesome();
 
   // Check playlist cache on mount
@@ -103,6 +115,10 @@ function App() {
   //     console.error("Error checking/updating playlist cache:", error);
   //   });
   // }, []);
+
+  const handleUpdateDismiss = (permanently: boolean = false) => {
+    dismissUpdate(permanently);
+  };
 
   useEffect(() => {
     cleanupDeletedSmartPlaylists().catch((error) => {
@@ -363,6 +379,10 @@ function App() {
           <h1 className={styles.title}>Tagify</h1>
         </div>
       </div>
+
+      {updateInfo?.hasUpdate && (
+        <UpdateBanner updateInfo={updateInfo} onDismiss={handleUpdateDismiss} />
+      )}
 
       <DataManager
         onExportTagData={exportTagData}
