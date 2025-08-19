@@ -1,23 +1,45 @@
 {
   "name": "tagify",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "build": "spicetify-creator",
     "build-local": "spicetify-creator --out=dist --minify",
-    "watch": "spicetify-creator --watch"
+    "watch": "spicetify-creator --watch",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:verbose": "vitest --reporter=verbose",
+    "test:debug": "vitest --reporter=verbose --no-coverage",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest run --coverage",
+    "test:single": "vitest --reporter=verbose --run",
+    "test:failed": "vitest --reporter=verbose --run --bail=1",
+    "test:smart-playlist": "vitest run src/test/hooks/useTagData.test.ts",
+    "test:components": "vitest run src/test/components/ --reporter=verbose",
+    "test:services": "vitest run src/test/services/ --reporter=verbose"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
+    "@testing-library/jest-dom": "^6.7.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^24.2.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^5.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.6.1",
     "eslint": "^9.26.0",
     "eslint-plugin-css-modules": "^2.12.0",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.1.0",
+    "happy-dom": "^12.10.3",
+    "jsdom": "^26.1.0",
     "spicetify-creator": "^1.0.17",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.32.1"
+    "typescript-eslint": "^8.32.1",
+    "vitest": "^1.6.1"
   },
   "dependencies": {
     "prop-types": "^15.8.1",
