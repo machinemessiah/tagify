@@ -145,3 +145,21 @@ export interface SpotifyUserPlaylistsResponse {
 export interface SpotifyPlaylistItem {
   id: string;
 }
+
+export interface SpotifyPlaylistTracksCountResponse {
+  total: number;
+}
+
+export interface SpotifyTrackAudioFeaturesResponse {
+  acousticness: number;
+  danceability: number;
+  duration_ms: number;
+  energy: number;
+  instrumentalness: number;
+  key: number;
+  mode: number;
+  speechiness: number;
+  tempo: number;
+  type: string;
+  valence: number;
+}

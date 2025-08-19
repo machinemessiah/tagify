@@ -1,4 +1,9 @@
-import { SpotifyPlaylistTracksResponse, SpotifyUserPlaylistsResponse } from "../types/SpotifyTypes";
+import {
+  SpotifyPlaylistTracksCountResponse,
+  SpotifyPlaylistTracksResponse,
+  SpotifyTrackAudioFeaturesResponse,
+  SpotifyUserPlaylistsResponse,
+} from "../types/SpotifyTypes";
 
 class SpotifyApiService {
   constructor(private baseUrl: string = "https://api.spotify.com/v1") {}
@@ -99,7 +104,7 @@ class SpotifyApiService {
     await Promise.all(
       playlistIds.map(async (playlistId) => {
         try {
-          const response = await Spicetify.CosmosAsync.get(
+          const response: SpotifyPlaylistTracksCountResponse = await Spicetify.CosmosAsync.get(
             `${this.baseUrl}/playlists/${playlistId}/tracks?limit=1&fields=total`
           );
           counts[playlistId] = response?.total || 0;
@@ -118,7 +123,7 @@ class SpotifyApiService {
    */
   getAudioFeatures = async (trackId: string): Promise<{ tempo: number } | null> => {
     try {
-      const audioFeatures = await Spicetify.CosmosAsync.get(
+      const audioFeatures: SpotifyTrackAudioFeaturesResponse = await Spicetify.CosmosAsync.get(
         `${this.baseUrl}/audio-features/${trackId}`
       );
       return audioFeatures?.tempo ? { tempo: audioFeatures.tempo } : null;
