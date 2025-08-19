@@ -99,8 +99,7 @@ function App() {
   });
 
   const { updateInfo, dismissUpdate } = useUpdateChecker({
-    // currentVersion: packageJson.version,
-    currentVersion: "1.0.1",
+    currentVersion: packageJson.version,
     repoOwner: "alexk218",
     repoName: "tagify",
     checkOnMount: true,
