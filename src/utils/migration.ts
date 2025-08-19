@@ -1,8 +1,9 @@
 import { TrackData, TagDataStructure } from "../hooks/useTagData";
 import { TrackInfoCacheManager } from "./TrackInfoCache";
+import packageJson from "../../package.json"
 
 const MIGRATION_KEY = "tagify:migrations";
-const CURRENT_VERSION = "2.0.0";
+const CURRENT_VERSION = packageJson.version;
 
 interface MigrationState {
   version: string;
