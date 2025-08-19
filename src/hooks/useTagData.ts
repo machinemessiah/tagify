@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { TrackInfoCacheManager } from "../utils/TrackInfoCache";
 import { spotifyApiService } from "../services/SpotifyApiService";
 import { defaultTagData } from "../constants/defaultTagData";
+import { needsMigrations, runMigrations } from "../utils/migration";
 
 export interface Tag {
   name: string;
@@ -185,6 +186,34 @@ export function useTagData() {
       console.error("Error saving smart playlist data:", error);
     }
   }, [smartPlaylists]);
+
+  // RUN MIGRATIONS
+  useEffect(() => {
+    const categoriesLoaded = tagData.categories.length > 0;
+    const tracksExist = Object.keys(tagData.tracks).length > 0;
+    const needsMigration = needsMigrations();
+
+    // Check if user has tracks with actual meaningful data
+    const tracksWithData = Object.values(tagData.tracks).filter(
+      (track) => track.rating > 0 || track.energy > 0 || (track.tags && track.tags.length > 0)
+    ).length;
+
+    if (categoriesLoaded && tracksExist && tracksWithData > 0 && needsMigration) {
+      console.log(`Running data migrations for ${tracksWithData} meaningful tracks...`);
+      const timeoutId = setTimeout(() => {
+        runMigrations(tagData, setTagData);
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    } else if (categoriesLoaded && tracksExist && tracksWithData === 0) {
+      console.log("User has tracks but no meaningful data - marking migration as complete");
+      // Mark migration as done for new users or users with no real data
+      const migrationState = {
+        version: "2.0.0",
+        migrations: { cleanupEmptyTracks: true },
+      };
+      localStorage.setItem("tagify:migrations", JSON.stringify(migrationState));
+    }
+  }, [tagData.categories.length, Object.keys(tagData.tracks).length]);
 
   const storeSmartPlaylist = (criteria: SmartPlaylistCriteria) => {
     setSmartPlaylists((prev) => {
@@ -958,11 +987,7 @@ export function useTagData() {
   };
 
   const isTrackEmpty = (trackData: TrackData): boolean => {
-    return (
-      trackData.rating === 0 &&
-      trackData.energy === 0 &&
-      trackData.tags.length === 0
-    );
+    return trackData.rating === 0 && trackData.energy === 0 && trackData.tags.length === 0;
   };
 
   const toggleTagForTrack = (
