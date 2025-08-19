@@ -277,16 +277,16 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       </p>
                     </div>
 
-                    {/* 5. Mass tagging */}
+                    {/* 5. Bulk tagging */}
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
                         <span className={styles.featureIcon}>📦</span>
-                        <h4>5. Batch Tagging</h4>
+                        <h4>5. Bulk Tagging</h4>
                       </div>
                       <p>
                         Select multiple tracks in any Spotify playlist (Ctrl+A for all),
                         right-click, and choose
-                        <strong>"Tag with Tagify"</strong> to tag them simultaneously.
+                        <strong>"Bulk Tag"</strong> to tag them simultaneously.
                       </p>
                     </div>
 

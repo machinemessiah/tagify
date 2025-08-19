@@ -720,26 +720,6 @@
   border-left: 3px solid rgba(30, 144, 255, 0.3);
 }
 
-/* Mass tagging steps */
-.massTaggingSteps {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 16px 0;
-}
-
-.massTaggingStep {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
-  color: var(--spice-text);
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 .stepIcon {
   font-size: 16px;
   flex-shrink: 0;
@@ -789,13 +769,6 @@
     padding: 12px;
   }
 
-  .massTaggingStep {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    text-align: left;
-  }
-
   .proTip {
     flex-direction: column;
     gap: 12px;
@@ -806,8 +779,6 @@
     align-self: flex-start;
   }
 }
-
-/* Add these styles to your InfoModal.module.css file */
 
 /* Compact features layout */
 .featuresCompact {

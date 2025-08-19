@@ -38,11 +38,11 @@ Create playlists by filtering by any combination of tags, ratings, energy, and B
 
 ![Filtering and Playlists](src/assets/FILTERS_PLAYLIST.gif)
 
-### **Mass Tagging Multiple Tracks**
+### **Bulk Tagging Multiple Tracks**
 
 Select multiple tracks and apply tags in bulk.
 
-![Mass Track Tagging](src/assets/MULTI_TRACK_TAGGING.gif)
+![Bulk Track Tagging](src/assets/MULTI_TRACK_TAGGING.gif)
 
 ---
 
