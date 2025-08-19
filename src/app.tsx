@@ -167,132 +167,6 @@ function App() {
     });
   };
 
-  // Render appropriate UI based on state
-  const renderContent = () => {
-    if (isLoading) {
-      return (
-        <div className={styles.loadingContainer}>
-          <p className={styles.loadingText}>Loading tag data...</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className={styles.content}>
-        {isMultiTagging && multiTagTracks.length > 0 ? (
-          <MultiTrackDetails
-            tracks={multiTagTracks}
-            trackTagsMap={Object.fromEntries(
-              multiTagTracks.map((track) => [track.uri, tagData.tracks[track.uri]?.tags || []])
-            )}
-            categories={tagData.categories}
-            onTagAllTracks={handleTagAllTracks}
-            onTagSingleTrack={toggleTagForSingleTrack}
-            onCancelTagging={() => {
-              setMultiTrackDraftTags(null);
-              cancelMultiTagging();
-            }}
-            onPlayTrack={playTrackViaQueue}
-            lockedTrackUri={lockedMultiTrackUri}
-            onLockTrack={setLockedMultiTrackUri}
-            draftTags={multiTrackDraftTags}
-            onDraftTagsChange={setMultiTrackDraftTags}
-            onBatchUpdate={applyBatchTagUpdates}
-          />
-        ) : (
-          activeTrack && (
-            <TrackDetails
-              displayedTrack={activeTrack}
-              nowPlayingTrack={currentTrack}
-              trackData={
-                tagData.tracks[activeTrack.uri] || {
-                  rating: 0,
-                  energy: 0,
-                  bpm: null,
-                  tags: [],
-                }
-              }
-              categories={tagData.categories}
-              activeTagFilters={activeTagFilters}
-              excludedTagFilters={excludedTagFilters}
-              onSetRating={(rating) => setRating(activeTrack.uri, rating)}
-              onSetEnergy={(energy) => setEnergy(activeTrack.uri, energy)}
-              onSetBpm={(bpm) => setBpm(activeTrack.uri, bpm)}
-              onRemoveTag={(categoryId, subcategoryId, tagId) =>
-                toggleTagForTrack(activeTrack.uri, categoryId, subcategoryId, tagId)
-              }
-              onFilterByTagOnOff={onFilterByTagOnOff}
-              onPlayTrack={playTrackViaQueue}
-              isLocked={isLocked}
-              onToggleLock={toggleLock}
-              onSwitchToCurrentTrack={setLockedTrack}
-              onUpdateBpm={updateBpm}
-              createTagId={createTagId}
-            />
-          )
-        )}
-
-        {renderTagSelector()}
-
-        <TrackList
-          tracks={getTracksWithResolvedTags()}
-          categories={tagData.categories}
-          activeTagFilters={activeTagFilters}
-          excludedTagFilters={excludedTagFilters}
-          activeTrackUri={activeTrack?.uri || null}
-          onRemoveFilter={handleRemoveFilter}
-          onToggleFilterType={handleToggleFilterType}
-          onFilterByTag={onFilterByTag}
-          onTrackListTagClick={onFilterByTagOnOff}
-          onClearTagFilters={clearTagFilters}
-          onPlayTrack={playTrackViaQueue}
-          onTagTrack={handleTagTrack}
-          onCreatePlaylist={createPlaylistFromFilters}
-          onStoreSmartPlaylist={storeSmartPlaylist}
-          parseTagId={parseTagId}
-          smartPlaylists={smartPlaylists}
-          onSetSmartPlaylists={setSmartPlaylists}
-          onSyncPlaylist={syncSmartPlaylistFull}
-          cleanupDeletedSmartPlaylists={cleanupDeletedSmartPlaylists}
-          onExportSmartPlaylists={exportSmartPlaylists}
-          onImportSmartPlaylists={importSmartPlaylists}
-        />
-      </div>
-    );
-  };
-
-  const renderTagSelector = () => {
-    if (!activeTrack && !(isMultiTagging && multiTagTracks.length > 0)) {
-      return null;
-    }
-
-    return (
-      <TagSelector
-        track={
-          isMultiTagging && lockedMultiTrackUri
-            ? multiTagTracks.find((t) => t.uri === lockedMultiTrackUri) || multiTagTracks[0]
-            : activeTrack || multiTagTracks[0]
-        }
-        categories={tagData.categories}
-        trackTags={
-          isMultiTagging && multiTrackDraftTags
-            ? lockedMultiTrackUri
-              ? multiTrackDraftTags[lockedMultiTrackUri] || []
-              : findCommonTagsFromDraft(multiTrackDraftTags, multiTagTracks)
-            : isMultiTagging
-            ? lockedMultiTrackUri
-              ? tagData.tracks[lockedMultiTrackUri]?.tags || []
-              : findCommonTags(multiTagTracks.map((track) => track.uri))
-            : tagData.tracks[activeTrack?.uri || ""]?.tags || []
-        }
-        onToggleTag={handleToggleTag}
-        onOpenTagManager={() => setShowTagManager(true)}
-        isMultiTagging={isMultiTagging}
-        isLockedTrack={!!lockedMultiTrackUri}
-      />
-    );
-  };
-
   const handleToggleTag = (categoryId: string, subcategoryId: string, tagId: string) => {
     if (isMultiTagging && multiTrackDraftTags) {
       // When in multi-tagging mode with draft state, update the draft instead
@@ -390,8 +264,115 @@ function App() {
         lastSaved={lastSaved}
       />
 
-      {renderContent()}
+      {isLoading ? (
+        <div className={styles.loadingContainer}>
+          <p className={styles.loadingText}>Loading tag data...</p>
+        </div>
+      ) : (
+        <div className={styles.content}>
+          {isMultiTagging && multiTagTracks.length > 0 ? (
+            <MultiTrackDetails
+              tracks={multiTagTracks}
+              trackTagsMap={Object.fromEntries(
+                multiTagTracks.map((track) => [track.uri, tagData.tracks[track.uri]?.tags || []])
+              )}
+              categories={tagData.categories}
+              onTagAllTracks={handleTagAllTracks}
+              onTagSingleTrack={toggleTagForSingleTrack}
+              onCancelTagging={() => {
+                setMultiTrackDraftTags(null);
+                cancelMultiTagging();
+              }}
+              onPlayTrack={playTrackViaQueue}
+              lockedTrackUri={lockedMultiTrackUri}
+              onLockTrack={setLockedMultiTrackUri}
+              draftTags={multiTrackDraftTags}
+              onDraftTagsChange={setMultiTrackDraftTags}
+              onBatchUpdate={applyBatchTagUpdates}
+            />
+          ) : (
+            activeTrack && (
+              <TrackDetails
+                displayedTrack={activeTrack}
+                nowPlayingTrack={currentTrack}
+                trackData={
+                  tagData.tracks[activeTrack.uri] || {
+                    rating: 0,
+                    energy: 0,
+                    bpm: null,
+                    tags: [],
+                  }
+                }
+                categories={tagData.categories}
+                activeTagFilters={activeTagFilters}
+                excludedTagFilters={excludedTagFilters}
+                onSetRating={(rating) => setRating(activeTrack.uri, rating)}
+                onSetEnergy={(energy) => setEnergy(activeTrack.uri, energy)}
+                onSetBpm={(bpm) => setBpm(activeTrack.uri, bpm)}
+                onRemoveTag={(categoryId, subcategoryId, tagId) =>
+                  toggleTagForTrack(activeTrack.uri, categoryId, subcategoryId, tagId)
+                }
+                onFilterByTagOnOff={onFilterByTagOnOff}
+                onPlayTrack={playTrackViaQueue}
+                isLocked={isLocked}
+                onToggleLock={toggleLock}
+                onSwitchToCurrentTrack={setLockedTrack}
+                onUpdateBpm={updateBpm}
+                createTagId={createTagId}
+              />
+            )
+          )}
 
+          {(activeTrack || (isMultiTagging && multiTagTracks.length > 0)) && (
+            <TagSelector
+              track={
+                isMultiTagging && lockedMultiTrackUri
+                  ? multiTagTracks.find((t) => t.uri === lockedMultiTrackUri) || multiTagTracks[0]
+                  : activeTrack || multiTagTracks[0]
+              }
+              categories={tagData.categories}
+              trackTags={
+                isMultiTagging && multiTrackDraftTags
+                  ? lockedMultiTrackUri
+                    ? multiTrackDraftTags[lockedMultiTrackUri] || []
+                    : findCommonTagsFromDraft(multiTrackDraftTags, multiTagTracks)
+                  : isMultiTagging
+                  ? lockedMultiTrackUri
+                    ? tagData.tracks[lockedMultiTrackUri]?.tags || []
+                    : findCommonTags(multiTagTracks.map((track) => track.uri))
+                  : tagData.tracks[activeTrack?.uri || ""]?.tags || []
+              }
+              onToggleTag={handleToggleTag}
+              onOpenTagManager={() => setShowTagManager(true)}
+              isMultiTagging={isMultiTagging}
+              isLockedTrack={!!lockedMultiTrackUri}
+            />
+          )}
+          <TrackList
+            tracks={getTracksWithResolvedTags()}
+            categories={tagData.categories}
+            activeTagFilters={activeTagFilters}
+            excludedTagFilters={excludedTagFilters}
+            activeTrackUri={activeTrack?.uri || null}
+            onRemoveFilter={handleRemoveFilter}
+            onToggleFilterType={handleToggleFilterType}
+            onFilterByTag={onFilterByTag}
+            onTrackListTagClick={onFilterByTagOnOff}
+            onClearTagFilters={clearTagFilters}
+            onPlayTrack={playTrackViaQueue}
+            onTagTrack={handleTagTrack}
+            onCreatePlaylist={createPlaylistFromFilters}
+            onStoreSmartPlaylist={storeSmartPlaylist}
+            parseTagId={parseTagId}
+            smartPlaylists={smartPlaylists}
+            onSetSmartPlaylists={setSmartPlaylists}
+            onSyncPlaylist={syncSmartPlaylistFull}
+            cleanupDeletedSmartPlaylists={cleanupDeletedSmartPlaylists}
+            onExportSmartPlaylists={exportSmartPlaylists}
+            onImportSmartPlaylists={importSmartPlaylists}
+          />
+        </div>
+      )}
       {showTagManager && (
         <TagManager
           categories={tagData.categories}
