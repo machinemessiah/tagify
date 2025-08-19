@@ -574,76 +574,169 @@ export function useTagData() {
   };
 
   const syncSmartPlaylistFull = async (playlist: SmartPlaylistCriteria): Promise<void> => {
-    await cleanupDeletedSmartPlaylists();
-    if (!playlist.isActive) {
-      return;
-    }
-
-    const allTrackUrisInPlaylist = await spotifyApiService.getAllTrackUrisInPlaylist(
-      playlist.playlistId
-    );
-
-    const matchingTrackUris: string[] = [];
-
-    Object.entries(tagData.tracks).forEach(([trackUri, trackData]) => {
-      const matches: boolean = evaluateTrackMatchesCriteria(trackData, playlist.criteria);
-      if (matches) {
-        matchingTrackUris.push(trackUri);
+    try {
+      await cleanupDeletedSmartPlaylists();
+      if (!playlist.isActive) {
+        return;
       }
-    });
 
-    const tracksToAdd = matchingTrackUris.filter((uri) => !allTrackUrisInPlaylist.includes(uri));
-
-    const tracksToRemove = allTrackUrisInPlaylist.filter((uri) => !matchingTrackUris.includes(uri));
-
-    let addedCount = 0;
-    let removedCount = 0;
-
-    for (const trackUri of tracksToRemove) {
-      const success = await spotifyApiService.removeTrackFromPlaylist(
-        trackUri,
+      const allTrackUrisInPlaylist = await spotifyApiService.getAllTrackUrisInPlaylist(
         playlist.playlistId
       );
-      if (success) {
-        removedCount++;
-      }
-    }
 
-    for (const trackUri of tracksToAdd) {
-      const result = await spotifyApiService.addTrackToSpotifyPlaylist(
-        trackUri,
-        playlist.playlistId
+      const trackOccurrences = new Map<string, number>();
+      const duplicateUris = new Set<string>();
+
+      allTrackUrisInPlaylist.forEach((trackUri) => {
+        const count = trackOccurrences.get(trackUri) || 0;
+        trackOccurrences.set(trackUri, count + 1);
+
+        if (count > 0) {
+          duplicateUris.add(trackUri);
+        }
+      });
+
+      // DEDUPLICATION PROCESS
+      let duplicatesRemovedCount = 0;
+      for (const trackUri of duplicateUris) {
+        const originalCount = trackOccurrences.get(trackUri) || 0;
+
+        try {
+          // Remove ALL instances
+          const removeSuccess = await spotifyApiService.removeTrackFromPlaylist(
+            trackUri,
+            playlist.playlistId
+          );
+
+          if (removeSuccess) {
+            try {
+              // Re-add exactly ONE instance
+              const addResult = await spotifyApiService.addTrackToSpotifyPlaylist(
+                trackUri,
+                playlist.playlistId
+              );
+
+              if (addResult.success && addResult.wasAdded) {
+                // We removed (originalCount) and added back 1, so net removal is (originalCount - 1)
+                duplicatesRemovedCount += originalCount - 1;
+              } else {
+                console.error(`Failed to re-add deduplicated track: ${trackUri}`);
+                Spicetify.showNotification(
+                  `⚠️ Track lost during deduplication: ${trackUri}`,
+                  true,
+                  5000
+                );
+              }
+            } catch (addError) {
+              console.error(`API error re-adding track ${trackUri}:`, addError);
+              Spicetify.showNotification(
+                `⚠️ Failed to restore track after deduplication`,
+                true,
+                5000
+              );
+            }
+          }
+        } catch (removeError) {
+          console.error(`API error removing duplicates for ${trackUri}:`, removeError);
+          // Continue with other tracks
+        }
+      }
+
+      // GET FRESH PLAYLIST STATE after deduplication
+      let currentTrackUrisInPlaylist: string[] = [];
+      try {
+        currentTrackUrisInPlaylist = await spotifyApiService.getAllTrackUrisInPlaylist(
+          playlist.playlistId
+        );
+      } catch (error) {
+        console.error(`Failed to fetch playlist state after deduplication:`, error);
+        Spicetify.showNotification(`⚠️ Error syncing "${playlist.playlistName}"`, true, 5000);
+        return;
+      }
+
+      // SMART PLAYLIST SYNC LOGIC
+      const matchingTrackUris: string[] = [];
+      Object.entries(tagData.tracks).forEach(([trackUri, trackData]) => {
+        const matches: boolean = evaluateTrackMatchesCriteria(trackData, playlist.criteria);
+        if (matches) {
+          matchingTrackUris.push(trackUri);
+        }
+      });
+
+      // Use FRESH state for sync calculations
+      const tracksToAdd = matchingTrackUris.filter(
+        (uri) => !currentTrackUrisInPlaylist.includes(uri)
       );
-      if (result.success && result.wasAdded) {
-        addedCount++;
-      }
-    }
-
-    // Update local state with the final expected state
-    const updatedPlaylists = smartPlaylists.map((p) => {
-      if (p.playlistId === playlist.playlistId) {
-        return {
-          ...playlist,
-          smartPlaylistTrackUris: matchingTrackUris,
-          lastSyncAt: Date.now(),
-        };
-      }
-      return p;
-    });
-
-    setSmartPlaylists(updatedPlaylists);
-
-    if (addedCount > 0 || removedCount > 0) {
-      Spicetify.showNotification(
-        `✅ Synced "${playlist.playlistName}": +${addedCount} tracks, -${removedCount} tracks`,
-        false,
-        10000
+      const tracksToRemove = currentTrackUrisInPlaylist.filter(
+        (uri) => !matchingTrackUris.includes(uri)
       );
-    } else {
-      Spicetify.showNotification(`✅ "${playlist.playlistName}" is already in sync`, false, 5000);
-    }
 
-    console.log(`Full sync completed for playlist: ${playlist.playlistName}`);
+      let addedCount = 0;
+      let removedCount = 0;
+
+      // Remove tracks that no longer match criteria
+      for (const trackUri of tracksToRemove) {
+        try {
+          const success = await spotifyApiService.removeTrackFromPlaylist(
+            trackUri,
+            playlist.playlistId
+          );
+          if (success) {
+            removedCount++;
+          }
+        } catch (error) {
+          console.error(`Failed to remove track ${trackUri}:`, error);
+        }
+      }
+
+      // Add tracks that now match criteria
+      for (const trackUri of tracksToAdd) {
+        try {
+          const result = await spotifyApiService.addTrackToSpotifyPlaylist(
+            trackUri,
+            playlist.playlistId
+          );
+          if (result.success && result.wasAdded) {
+            addedCount++;
+          }
+        } catch (error) {
+          console.error(`Failed to add track ${trackUri}:`, error);
+        }
+      }
+
+      // Update local state
+      const updatedPlaylists = smartPlaylists.map((p) => {
+        if (p.playlistId === playlist.playlistId) {
+          return {
+            ...playlist,
+            smartPlaylistTrackUris: matchingTrackUris,
+            lastSyncAt: Date.now(),
+          };
+        }
+        return p;
+      });
+
+      setSmartPlaylists(updatedPlaylists);
+
+      // User notification
+      if (duplicatesRemovedCount > 0 || addedCount > 0 || removedCount > 0) {
+        const messageParts: string[] = [];
+
+        if (addedCount > 0) messageParts.push(`+${addedCount} tracks`);
+        if (removedCount > 0) messageParts.push(`-${removedCount} tracks`);
+        if (duplicatesRemovedCount > 0) messageParts.push(`-${duplicatesRemovedCount} duplicates`);
+
+        const message = `✅ Synced "${playlist.playlistName}": ${messageParts.join(", ")}`;
+        Spicetify.showNotification(message, false, 10000);
+      } else {
+        Spicetify.showNotification(`✅ "${playlist.playlistName}" is already in sync`, false, 5000);
+      }
+
+      console.log(`Full sync completed for playlist: ${playlist.playlistName}`);
+    } catch (error) {
+      console.error(`Critical error in syncSmartPlaylistFull for ${playlist.playlistName}:`, error);
+      Spicetify.showNotification(`❌ Failed to sync "${playlist.playlistName}"`, true, 5000);
+    }
   };
 
   const saveToLocalStorage = (data: TagDataStructure) => {
