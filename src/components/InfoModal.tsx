@@ -111,12 +111,12 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     <p className={styles.featureDescription}>
                       Create playlists that automatically stay up-to-date. Set your criteria once,
                       and every track you tag that matches will be <strong>instantly added</strong>{" "}
-                      - no manual playlist management ever again.
+                      - no manual playlist management needed!.
                     </p>
 
                     {/* Visual Tutorial */}
                     <div className={styles.visualTutorial}>
-                      <h5 className={styles.tutorialSubheading}>See It In Action:</h5>
+                      <h5 className={styles.tutorialSubheading}>CHECK IT 😎</h5>
 
                       {/* Step 1: Creating Smart Playlist */}
                       <div className={styles.tutorialStep}>
@@ -140,7 +140,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                             loading="lazy"
                           />
                           <div className={styles.gifCaption}>
-                            Defining the rules for automatic playlist management
+                            Defining the rules for automatic playlist creation
                           </div>
                         </div>
                       </div>
@@ -154,7 +154,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                             <p className={styles.stepDesc}>
                               Now, when tagging any track with <strong>5 stars</strong> and the{" "}
                               <strong>Disco</strong> tag - it jumps into your playlist
-                              automatically. No manual work required!
+                              automatically.
                             </p>
                           </div>
                         </div>
@@ -166,7 +166,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                             loading="lazy"
                           />
                           <div className={styles.gifCaption}>
-                            Track automatically added when criteria are satisfied
+                            Track automatically added to playlist when criteria are satisfied
                           </div>
                         </div>
                       </div>
@@ -286,6 +286,22 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <h4>Create Custom Tags</h4>
                         <p>Press "Manage Tags" to create your own custom tags!</p>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.step}>
+                    <div className={styles.stepNumber}>6</div>
+                    <div className={styles.stepContent}>
+                      <h4>Protect Your Work - Backup Regularly</h4>
+                      <p>
+                        Your tags and smart playlists are stored locally in your browser. While this
+                        is normally very reliable, it's smart to periodically backup your data to
+                        ensure you never lose your hard work. <br />
+                        Backup your <strong>tag data</strong> using the 📤 Export button in the main
+                        menu. <br />
+                        Backup your <strong>smart playlist data</strong> using the ↗ Export button
+                        in the Smart Playlist menu.
+                      </p>
                     </div>
                   </div>
 
@@ -425,17 +441,24 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
                         <span className={styles.featureIcon}>💾</span>
-                        <h4>6. Import & Export Data</h4>
+                        <h4>6. Backup your data!</h4>
                       </div>
                       <p>
-                        <strong>Export:</strong> Download your complete tag library as JSON backup.
+                        <strong>Tag Data Export/Import:</strong> Download your complete tag library
+                        as JSON backup. Import to restore all tags, ratings, and metadata across
+                        devices.
                         <br />
-                        <strong>Import:</strong> Click import button and select your backup file to
-                        restore all tags, ratings, and metadata. Perfect for sharing libraries or
-                        device migration.
+                        <strong>Smart Playlist Export/Import:</strong> Backup your smart playlist
+                        configurations (criteria, filters, settings) separately from the Smart
+                        Playlists panel.
                         <br />
-                        Tip: Backup your data before doing any major operation - like deleting
-                        entire tag categories, etc.
+                        <strong>Why backup both?</strong> Tag data contains your music ratings and
+                        tags, while smart playlist data contains your automation rules. Both are
+                        essential for a complete restore (in case something goes wrong...). Also
+                        allows you to share data between devices!
+                        <br />
+                        💡 <strong>Best Practice:</strong> Export both monthly and before major
+                        changes like deleting tag categories or modifying smart playlist criteria.
                       </p>
                     </div>
 

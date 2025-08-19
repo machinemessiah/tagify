@@ -251,7 +251,7 @@
 }
 
 .stepNumber {
-  background: linear-gradient(135deg, #1e90ff, #8a2be2);
+  background: linear-gradient(135deg, #656565, #302f2c);
   color: white;
   width: 32px;
   height: 32px;
@@ -389,12 +389,6 @@
   border-radius: 8px;
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.tipIcon {
-  font-size: 24px;
-  flex-shrink: 0;
-  margin-top: 4px;
 }
 
 .tipItem h4 {
@@ -899,12 +893,6 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-}
-
-.tipIcon {
-  font-size: 20px;
-  flex-shrink: 0;
-  margin-top: 2px;
 }
 
 .featureTip div {
