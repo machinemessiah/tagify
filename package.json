@@ -17,7 +17,8 @@
     "test:failed": "vitest --reporter=verbose --run --bail=1",
     "test:smart-playlist": "vitest run src/test/hooks/useTagData.test.ts",
     "test:components": "vitest run src/test/components/ --reporter=verbose",
-    "test:services": "vitest run src/test/services/ --reporter=verbose"
+    "test:services": "vitest run src/test/services/ --reporter=verbose",
+    "test:version": "vitest run src/services/__tests__/VersionCheckerService.test.js --reporter=verbose"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
