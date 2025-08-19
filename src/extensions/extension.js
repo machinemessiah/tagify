@@ -5,11 +5,12 @@
   }
   const APP_NAME = "tagify";
 
-  const STORAGE_KEY = "tagify:tagData";
+  const TAG_DATA_KEY = "tagify:tagData";
   const PLAYLIST_CACHE_KEY = "tagify:playlistCache";
   const PLAYLIST_SETTINGS_KEY = "tagify:playlistSettings";
   const EXTENSION_SETTINGS_KEY = "tagify:extensionSettings";
   const SETTINGS_CHANGED_EVENT = "tagify:settingsChanged";
+  const DATA_UPDATED_EVENT = "tagify:dataUpdated";
 
   // Shared state
   const state = {
@@ -101,7 +102,7 @@
      */
     loadTaggedTracks() {
       try {
-        const savedData = localStorage.getItem(STORAGE_KEY);
+        const savedData = localStorage.getItem(TAG_DATA_KEY);
         if (savedData) {
           const data = JSON.parse(savedData);
           if (data && data.tracks) {
@@ -982,7 +983,7 @@
         // Get category data from localStorage if available
         let categories = [];
         try {
-          const tagDataString = localStorage.getItem("tagify:tagData");
+          const tagDataString = localStorage.getItem(TAG_DATA_KEY);
           if (tagDataString) {
             const tagData = JSON.parse(tagDataString);
             if (tagData && tagData.categories) {
@@ -1242,7 +1243,7 @@
       }
     };
 
-    window.addEventListener("tagify:dataUpdated", dataUpdateListener);
+    window.addEventListener(DATA_UPDATED_EVENT, dataUpdateListener);
   };
 
   // Start initialization
