@@ -483,18 +483,11 @@ export function useTagData() {
       const smartPlaylist = updatedPlaylists[i];
 
       if (!smartPlaylist.isActive) {
-        console.log("⏸️ Skipping inactive playlist:", smartPlaylist.playlistName);
         continue;
       }
 
       const matches = evaluateTrackMatchesCriteria(trackData, smartPlaylist.criteria);
       const isCurrentlyTracked = smartPlaylist.smartPlaylistTrackUris.includes(trackUri);
-
-      console.log(
-        `🎯 Track ${matches ? "matches" : "doesn't match"} playlist "${
-          smartPlaylist.playlistName
-        }" | Currently tracked: ${isCurrentlyTracked}`
-      );
 
       if (matches && !isCurrentlyTracked) {
         // ADD TRACK
@@ -583,7 +576,6 @@ export function useTagData() {
   const syncSmartPlaylistFull = async (playlist: SmartPlaylistCriteria): Promise<void> => {
     await cleanupDeletedSmartPlaylists();
     if (!playlist.isActive) {
-      console.log("⏸️ Skipping sync for inactive playlist:", playlist.playlistName);
       return;
     }
 
@@ -651,7 +643,7 @@ export function useTagData() {
       Spicetify.showNotification(`✅ "${playlist.playlistName}" is already in sync`, false, 5000);
     }
 
-    console.log(`🏁 Full sync completed for playlist: ${playlist.playlistName}`);
+    console.log(`Full sync completed for playlist: ${playlist.playlistName}`);
   };
 
   const saveToLocalStorage = (data: TagDataStructure) => {
@@ -882,8 +874,6 @@ export function useTagData() {
 
     // Sync all affected tracks after batch update is complete
     setTimeout(() => {
-      console.log("🔄 Syncing batch updated tracks:", Object.keys(finalTrackDataMap));
-
       syncMultipleTracksWithSmartPlaylists(finalTrackDataMap);
     }, 100);
   };
