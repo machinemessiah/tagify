@@ -28,7 +28,7 @@ interface MultiTrackDetailsProps {
   onLockTrack?: (uri: string | null) => void;
   draftTags?: DraftTagState | null;
   onDraftTagsChange?: (draftTags: DraftTagState) => void;
-  onBatchUpdate?: (
+  onBatchUpdate: (
     updates: Array<{
       trackUri: string;
       toAdd: TrackTag[];
@@ -327,43 +327,19 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       return;
     }
 
-    // Use batch update if available, otherwise fall back to individual updates
-    if (onBatchUpdate) {
-      // Apply all changes in a single batch
-      onBatchUpdate(changes);
+    // Apply all changes in a single batch
+    onBatchUpdate(changes);
 
-      // Update the draft state to match what we just saved
-      // This ensures the UI reflects the saved state immediately
-      const newDraft: DraftTagState = {};
-      tracks.forEach((track) => {
-        newDraft[track.uri] = draftTags[track.uri] || [];
-      });
-      setDraftTags(newDraft);
+    // Update the draft state to match what we just saved
+    // This ensures the UI reflects the saved state immediately
+    const newDraft: DraftTagState = {};
+    tracks.forEach((track) => {
+      newDraft[track.uri] = draftTags[track.uri] || [];
+    });
+    setDraftTags(newDraft);
 
-      setHasUnsavedChanges(false);
-      Spicetify.showNotification(`Saved changes to ${changes.length} tracks`);
-    } else {
-      // Fallback to original behavior if batch update not available
-      console.warn("Batch update not available, falling back to individual updates");
-
-      // Apply changes one by one (this is the problematic approach)
-      changes.forEach(({ trackUri, toAdd, toRemove }) => {
-        toRemove.forEach((tag) => {
-          if (onTagSingleTrack) {
-            onTagSingleTrack(trackUri, tag.categoryId, tag.subcategoryId, tag.tagId);
-          }
-        });
-
-        toAdd.forEach((tag) => {
-          if (onTagSingleTrack) {
-            onTagSingleTrack(trackUri, tag.categoryId, tag.subcategoryId, tag.tagId);
-          }
-        });
-      });
-
-      setHasUnsavedChanges(false);
-      Spicetify.showNotification(`Saved changes to ${changes.length} tracks`);
-    }
+    setHasUnsavedChanges(false);
+    Spicetify.showNotification(`Saved changes to ${changes.length} tracks`);
   };
 
   // Cancel changes - reset to original state
@@ -390,7 +366,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Mass Tagging</h2>
+        <h2 className={styles.title}>Bulk Tagging</h2>
         <div className={styles.summary}>
           <span className={styles.trackCount}>{tracks.length} tracks selected</span>
           {hasUnsavedChanges && <span className={styles.unsavedIndicator}>• Unsaved changes</span>}
@@ -410,7 +386,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
               Discard
             </button>
             <button className={styles.cancelButton} onClick={handleCancelTagging}>
-              {"Cancel Mass Tagging"}
+              {"Cancel Bulk Tagging"}
             </button>
           </div>
         </div>
@@ -420,7 +396,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
         <div className={styles.lockingBanner}>
           <span className={styles.lockingIcon}>🔒</span>
           <span className={styles.lockingText}>
-            Tags will be applied to the locked track only. Click the track again to revert to mass
+            Tags will be applied to the locked track only. Click the track again to revert to bulk
             tagging.
           </span>
         </div>

@@ -159,6 +159,7 @@ export interface SmartPlaylistCriteria {
 
 const STORAGE_KEY = "tagify:tagData";
 const SMART_PLAYLIST_KEY = "tagify:smartPlaylists";
+const MIGRATIONS_KEY = "tagify:migrations";
 
 export function useTagData() {
   const [tagData, setTagData] = useState<TagDataStructure>(defaultTagData);
@@ -223,7 +224,7 @@ export function useTagData() {
         version: packageJson.version,
         migrations: { cleanupEmptyTracks: true },
       };
-      localStorage.setItem("tagify:migrations", JSON.stringify(migrationState));
+      localStorage.setItem(MIGRATIONS_KEY, JSON.stringify(migrationState));
     }
   }, [tagData.categories.length, Object.keys(tagData.tracks).length]);
 
