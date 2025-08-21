@@ -59,10 +59,10 @@ function App() {
   const {
     activeTagFilters,
     excludedTagFilters,
-    handleRemoveFilter,
-    handleToggleFilterType,
-    onFilterByTag,
-    onFilterByTagOnOff,
+    removeTagFilter,
+    toggleTagIncludeExclude,
+    toggleTagIncludeExcludeOff,
+    toggleTagIncludeOff,
     clearTagFilters,
     createTagId,
     parseTagId,
@@ -306,7 +306,7 @@ function App() {
                 onRemoveTag={(categoryId, subcategoryId, tagId) =>
                   toggleTagForTrack(activeTrack.uri, categoryId, subcategoryId, tagId)
                 }
-                onFilterByTagOnOff={onFilterByTagOnOff}
+                onToggleTagIncludeOff={toggleTagIncludeOff}
                 onPlayTrack={playTrackViaQueue}
                 isLocked={isLocked}
                 onToggleLock={toggleLock}
@@ -348,10 +348,10 @@ function App() {
             activeTagFilters={activeTagFilters}
             excludedTagFilters={excludedTagFilters}
             activeTrackUri={activeTrack?.uri || null}
-            onRemoveFilter={handleRemoveFilter}
-            onToggleFilterType={handleToggleFilterType}
-            onFilterByTag={onFilterByTag}
-            onTrackListTagClick={onFilterByTagOnOff}
+            onRemoveTagFilter={removeTagFilter}
+            onToggleTagIncludeExclude={toggleTagIncludeExclude}
+            onToggleTagIncludeExcludeOff={toggleTagIncludeExcludeOff} // ON OFF EXCLUDE
+            onToggleTagIncludeOff={toggleTagIncludeOff} // ON OFF
             onClearTagFilters={clearTagFilters}
             onPlayTrack={playTrackViaQueue}
             onTagTrack={handleTagTrack}

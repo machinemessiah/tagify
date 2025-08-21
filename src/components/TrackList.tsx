@@ -45,15 +45,10 @@ interface TrackListProps {
   activeTagFilters: string[];
   excludedTagFilters: string[];
   activeTrackUri: string | null;
-  onFilterByTag: (categoryId: string, subcategoryId: string, tagId: string) => void;
-  onRemoveFilter: (categoryId: string, subcategoryId: string, tagId: string) => void;
-  onToggleFilterType?: (
-    categoryId: string,
-    subcategoryId: string,
-    tagId: string,
-    isExcluded: boolean
-  ) => void;
-  onTrackListTagClick: (categoryId: string, subcategoryId: string, tagId: string) => void;
+  onRemoveTagFilter: (fullTagId: string) => void;
+  onToggleTagIncludeExcludeOff: (fullTagId: string) => void;
+  onToggleTagIncludeExclude: (fullTagId: string, isExcluded: boolean) => void;
+  onToggleTagIncludeOff: (fullTagId: string) => void;
   onPlayTrack: (uri: string) => void;
   onTagTrack: (uri: string) => void;
   onClearTagFilters?: () => void;
@@ -82,10 +77,10 @@ const TrackList: React.FC<TrackListProps> = ({
   activeTagFilters,
   excludedTagFilters,
   activeTrackUri,
-  onFilterByTag,
-  onRemoveFilter,
-  onToggleFilterType,
-  onTrackListTagClick,
+  onToggleTagIncludeExcludeOff,
+  onRemoveTagFilter,
+  onToggleTagIncludeExclude,
+  onToggleTagIncludeOff,
   onPlayTrack,
   onTagTrack,
   onClearTagFilters,
@@ -356,20 +351,6 @@ const TrackList: React.FC<TrackListProps> = ({
     return tagName.toLowerCase().includes(tagSearchTerm.toLowerCase());
   };
 
-  const handleFilterTagClick = (fullTagId: string, isExcluded: boolean) => {
-    const parsed = parseTagId(fullTagId);
-    if (!parsed || !onToggleFilterType) return;
-
-    onToggleFilterType(parsed.categoryId, parsed.subcategoryId, parsed.tagId, isExcluded);
-  };
-
-  const handleRemoveFilter = (fullTagId: string) => {
-    const parsed = parseTagId(fullTagId);
-    if (!parsed || !onRemoveFilter) return;
-
-    onRemoveFilter(parsed.categoryId, parsed.subcategoryId, parsed.tagId);
-  };
-
   // Filter tracks based on all applied filters
   const filteredTracks: [uri: string, trackData: TrackData][] = Object.entries(tracks).filter(
     ([uri, trackData]) => {
@@ -529,13 +510,6 @@ const TrackList: React.FC<TrackListProps> = ({
     };
   }, [sortedTracksVisible.length, filteredTracks.length]);
 
-  const handleTrackItemTagClick = (fullTagId: string) => {
-    const parsed = parseTagId(fullTagId);
-    if (!parsed) return;
-
-    onTrackListTagClick(parsed.categoryId, parsed.subcategoryId, parsed.tagId);
-  };
-
   const hasIncompleteTags = (trackData: TrackData): boolean => {
     if (!trackData) return true;
 
@@ -635,7 +609,7 @@ const TrackList: React.FC<TrackListProps> = ({
     playlistName: string,
     trackUris: string[]
   ): SmartPlaylistCriteria => {
-    const mapTagFiltersToHierarchy = (tagIds: string[]): TrackTag[] =>
+    const parseTagIds = (tagIds: string[]): TrackTag[] =>
       tagIds
         .map((tagId) => {
           const parsed = parseTagId(tagId);
@@ -653,8 +627,8 @@ const TrackList: React.FC<TrackListProps> = ({
       playlistId,
       playlistName,
       criteria: {
-        activeTagFilters: mapTagFiltersToHierarchy(activeTagFilters),
-        excludedTagFilters: mapTagFiltersToHierarchy(excludedTagFilters),
+        activeTagFilters: parseTagIds(activeTagFilters),
+        excludedTagFilters: parseTagIds(excludedTagFilters),
         ratingFilters,
         energyMinFilter,
         energyMaxFilter,
@@ -1070,10 +1044,7 @@ const TrackList: React.FC<TrackListProps> = ({
                           activeTagFilters.includes(fullTagId) ? styles.active : ""
                         } ${excludedTagFilters.includes(fullTagId) ? styles.excluded : ""}`}
                         onClick={() => {
-                          const parsed = parseTagId(fullTagId);
-                          if (parsed) {
-                            onFilterByTag(parsed.categoryId, parsed.subcategoryId, parsed.tagId);
-                          }
+                          onToggleTagIncludeExcludeOff(fullTagId);
                         }}
                         title={
                           activeTagFilters.includes(fullTagId)
@@ -1112,13 +1083,13 @@ const TrackList: React.FC<TrackListProps> = ({
                   key={fullTagId}
                   className={styles.activeFilterTag}
                   title={`Click to exclude "${displayName}"`}
-                  onClick={() => handleFilterTagClick(fullTagId, false)}
+                  onClick={() => onToggleTagIncludeExclude(fullTagId, false)}
                 >
                   {displayName}{" "}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleRemoveFilter(fullTagId);
+                      onRemoveTagFilter(fullTagId);
                     }}
                     className={styles.removeFilterButton}
                     title="Remove filter"
@@ -1136,13 +1107,13 @@ const TrackList: React.FC<TrackListProps> = ({
                   key={fullTagId}
                   className={styles.excludedFilterTag}
                   title={`Click to include "${displayName}"`}
-                  onClick={() => handleFilterTagClick(fullTagId, true)}
+                  onClick={() => onToggleTagIncludeExclude(fullTagId, true)}
                 >
                   {displayName}{" "}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleRemoveFilter(fullTagId);
+                      onRemoveTagFilter(fullTagId);
                     }}
                     className={styles.removeFilterButton}
                     title="Remove filter"
@@ -1360,7 +1331,7 @@ const TrackList: React.FC<TrackListProps> = ({
                           }`}
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent track item click
-                            handleTrackItemTagClick(tag.fullTagId);
+                            onToggleTagIncludeOff(tag.fullTagId);
                           }}
                           title={
                             activeTagFilters.includes(tag.fullTagId)

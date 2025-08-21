@@ -28,7 +28,7 @@ interface TrackDetailsProps {
   onRemoveTag: (categoryId: string, subcategoryId: string, tagId: string) => void;
   activeTagFilters: string[];
   excludedTagFilters: string[];
-  onFilterByTagOnOff: (categoryId: string, subcategoryId: string, tagId: string) => void;
+  onToggleTagIncludeOff: (fullTagId: string) => void;
   onPlayTrack?: (uri: string) => void;
   isLocked?: boolean;
   onToggleLock?: () => void;
@@ -57,7 +57,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   onSetEnergy,
   onSetBpm,
   onRemoveTag,
-  onFilterByTagOnOff,
+  onToggleTagIncludeOff,
   onPlayTrack,
   isLocked = false,
   onToggleLock,
@@ -419,11 +419,6 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
       return null;
     }
   }
-
-  const handleTagClick = (categoryId: string, subcategoryId: string, tagId: string) => {
-    // This toggle tags ON/OFF in TrackDetails (no EXCLUDE)
-    onFilterByTagOnOff(categoryId, subcategoryId, tagId);
-  };
 
   const handlePlayTrack = () => {
     if (onPlayTrack && displayedTrack.uri) {
@@ -1050,7 +1045,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                                 } ${
                                   excludedTagFilters.includes(fullTagId) ? styles.tagExcluded : ""
                                 }`}
-                                onClick={() => handleTagClick(categoryId, subcategoryId, tag.id)}
+                                onClick={() => onToggleTagIncludeOff(fullTagId)}
                                 title={
                                   activeTagFilters.includes(fullTagId)
                                     ? `Click to remove filter for "${tag.name}"`

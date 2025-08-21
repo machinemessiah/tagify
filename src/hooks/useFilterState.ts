@@ -5,22 +5,6 @@ export function useFilterState() {
   const [activeTagFilters, setActiveTagFilters] = useState<string[]>([]);
   const [excludedTagFilters, setExcludedTagFilters] = useState<string[]>([]);
 
-  const createTagId = (categoryId: string, subcategoryId: string, tagId: string): string => {
-    return `${categoryId}:${subcategoryId}:${tagId}`;
-  };
-
-  const parseTagId = (
-    fullTagId: string
-  ): { categoryId: string; subcategoryId: string; tagId: string } | null => {
-    const parts = fullTagId.split(":");
-    if (parts.length !== 3) return null;
-    return {
-      categoryId: parts[0],
-      subcategoryId: parts[1],
-      tagId: parts[2],
-    };
-  };
-
   // Load saved filters on mount
   useEffect(() => {
     try {
@@ -56,9 +40,23 @@ export function useFilterState() {
     }
   }, [activeTagFilters, excludedTagFilters]);
 
-  const handleRemoveFilter = (categoryId: string, subcategoryId: string, tagId: string) => {
-    const fullTagId = createTagId(categoryId, subcategoryId, tagId);
+  const createTagId = (categoryId: string, subcategoryId: string, tagId: string): string => {
+    return `${categoryId}:${subcategoryId}:${tagId}`;
+  };
 
+  const parseTagId = (
+    fullTagId: string
+  ): { categoryId: string; subcategoryId: string; tagId: string } | null => {
+    const parts = fullTagId.split(":");
+    if (parts.length !== 3) return null;
+    return {
+      categoryId: parts[0],
+      subcategoryId: parts[1],
+      tagId: parts[2],
+    };
+  };
+
+  const removeTagFilter = (fullTagId: string) => {
     if (activeTagFilters.includes(fullTagId)) {
       setActiveTagFilters((prev) => prev.filter((t) => t !== fullTagId));
     } else if (excludedTagFilters.includes(fullTagId)) {
@@ -66,14 +64,8 @@ export function useFilterState() {
     }
   };
 
-  const handleToggleFilterType = (
-    categoryId: string,
-    subcategoryId: string,
-    tagId: string,
-    isExcluded: boolean
-  ) => {
-    const fullTagId = createTagId(categoryId, subcategoryId, tagId);
-
+  // toggles between ON/EXCLUDE
+  const toggleTagIncludeExclude = (fullTagId: string, isExcluded: boolean) => {
     if (isExcluded) {
       setExcludedTagFilters((prev) => prev.filter((t) => t !== fullTagId));
       setActiveTagFilters((prev) => [...prev, fullTagId]);
@@ -83,9 +75,8 @@ export function useFilterState() {
     }
   };
 
-  const onFilterByTag = (categoryId: string, subcategoryId: string, tagId: string) => {
-    const fullTagId = createTagId(categoryId, subcategoryId, tagId);
-
+  // toggles between all states INCLUDE/EXCLUDE/OFF
+  const toggleTagIncludeExcludeOff = (fullTagId: string) => {
     if (activeTagFilters.includes(fullTagId)) {
       // Move from INCLUDE to EXCLUDE
       setActiveTagFilters((prev) => prev.filter((t) => t !== fullTagId));
@@ -99,10 +90,8 @@ export function useFilterState() {
     }
   };
 
-  // Toggle tags between ON/OFF - no EXCLUDE
-  const onFilterByTagOnOff = (categoryId: string, subcategoryId: string, tagId: string) => {
-    const fullTagId = createTagId(categoryId, subcategoryId, tagId);
-
+  // toggles between INCLUDE/OFF - no EXCLUDE
+  const toggleTagIncludeOff = (fullTagId: string) => {
     if (activeTagFilters.includes(fullTagId)) {
       // Remove from active filters (turn OFF)
       setActiveTagFilters((prev) => prev.filter((t) => t !== fullTagId));
@@ -135,10 +124,10 @@ export function useFilterState() {
   return {
     activeTagFilters,
     excludedTagFilters,
-    handleRemoveFilter,
-    handleToggleFilterType,
-    onFilterByTag,
-    onFilterByTagOnOff,
+    removeTagFilter,
+    toggleTagIncludeExclude,
+    toggleTagIncludeExcludeOff,
+    toggleTagIncludeOff,
     clearTagFilters,
     createTagId,
     parseTagId,
