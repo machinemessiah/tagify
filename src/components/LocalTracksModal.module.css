@@ -84,17 +84,6 @@
   line-height: 1.5;
 }
 
-.instructionsToggle {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.1);
-  border: none;
-  padding: 4px 0;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
 .instructions {
   margin-top: 16px;
   padding: 16px;
@@ -107,11 +96,6 @@
   font-size: 16px;
   font-weight: 600;
   color: var(--spice-text);
-}
-
-.instructions ol {
-  margin: 0;
-  padding-left: 24px;
 }
 
 .instructions li {

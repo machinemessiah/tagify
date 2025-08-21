@@ -250,14 +250,6 @@
   animation: modalSlideIn 0.2s ease-out;
 }
 
-/* Toggle switches in MainSettingsModal */
-.settingsSection {
-  background: var(--spice-card);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 16px;
-}
-
 .sectionTitle {
   font-size: 18px;
   font-weight: 600;

@@ -141,4 +141,6 @@ out
 # SvelteKit build / generate output
 .svelte-kit
 
+cleaned-css
+
 # End of https://www.toptal.com/developers/gitignore/api/node
