@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
+import { act } from "react";
 import { useTagData, SmartPlaylistCriteria, TrackData } from "../../hooks/useTagData";
 import { spotifyApiService } from "../../services/SpotifyApiService";
 
@@ -13,6 +14,7 @@ vi.mock("../../services/SpotifyApiService", () => ({
     getAudioFeatures: vi.fn(),
     extractTrackId: vi.fn(),
     isTrackInPlaylist: vi.fn(),
+    getAllUserPlaylists: vi.fn(),
   },
 }));
 
@@ -55,7 +57,7 @@ describe("Smart Playlist Integration Flow", () => {
       };
 
       // Store the smart playlist
-      await act(async () => {
+      act(() => {
         result.current.storeSmartPlaylist(smartPlaylistCriteria);
       });
 

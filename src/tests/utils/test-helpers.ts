@@ -15,12 +15,12 @@ export const createMockTrackData = (overrides: Partial<TrackData> = {}): TrackDa
 export const createMockSmartPlaylist = (
   overrides: Partial<SmartPlaylistCriteria> = {}
 ): SmartPlaylistCriteria => ({
-  playlistId: "test-playlist-id",
+  playlistId: `test-playlist-${Date.now()}`,
   playlistName: "Test Playlist",
   isActive: true,
-  createdAt: 0,
   smartPlaylistTrackUris: [],
   lastSyncAt: Date.now(),
+  createdAt: Date.now(),
   criteria: {
     activeTagFilters: [],
     excludedTagFilters: [],

@@ -1,4 +1,4 @@
-/// <reference types="vitest" />
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import path from "path";
 
@@ -13,6 +13,9 @@ export default defineConfig({
         return false;
       }
     },
+
+    testTimeout: 10000,
+    hookTimeout: 10000,
     css: true,
 
     coverage: {

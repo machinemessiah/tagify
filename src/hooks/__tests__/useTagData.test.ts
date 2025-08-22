@@ -9,6 +9,7 @@ vi.mock("../../services/SpotifyApiService", () => ({
     addTrackToSpotifyPlaylist: vi.fn(),
     removeTrackFromPlaylist: vi.fn(),
     getAllTrackUrisInPlaylist: vi.fn(),
+    getAllUserPlaylists: vi.fn(),
   },
 }));
 
@@ -17,6 +18,231 @@ describe("useTagData - Smart Playlist Logic", () => {
     // Clear localStorage
     localStorage.clear();
     vi.clearAllMocks();
+
+    // Reset localStorage mock implementations to their defaults
+    const localStorageMock = {
+      getItem: vi.fn(() => null),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
+    };
+
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+      writable: true,
+    });
+  });
+
+  describe("Smart Playlist Cleanup", () => {
+    it("should remove smart playlists that no longer exist in Spotify", async () => {
+      // Mock the getAllUserPlaylists API call
+      vi.mocked(spotifyApiService.getAllUserPlaylists).mockResolvedValue([
+        "existing-playlist-1",
+        "existing-playlist-2",
+        // Note: "deleted-playlist" is NOT in this list
+      ]);
+
+      const { result } = renderHook(() => useTagData());
+
+      // Set up initial state with both existing and non-existing playlists
+      const initialPlaylists: SmartPlaylistCriteria[] = [
+        {
+          playlistId: "existing-playlist-1",
+          playlistName: "Still Exists",
+          isActive: true,
+          smartPlaylistTrackUris: [],
+          lastSyncAt: Date.now(),
+          createdAt: Date.now(),
+          criteria: {
+            activeTagFilters: [],
+            excludedTagFilters: [],
+            ratingFilters: [],
+            energyMinFilter: null,
+            energyMaxFilter: null,
+            bpmMinFilter: null,
+            bpmMaxFilter: null,
+            isOrFilterMode: false,
+          },
+        },
+        {
+          playlistId: "deleted-playlist",
+          playlistName: "Was Deleted",
+          isActive: true,
+          smartPlaylistTrackUris: [],
+          lastSyncAt: Date.now(),
+          createdAt: Date.now(),
+          criteria: {
+            activeTagFilters: [],
+            excludedTagFilters: [],
+            ratingFilters: [],
+            energyMinFilter: null,
+            energyMaxFilter: null,
+            bpmMinFilter: null,
+            bpmMaxFilter: null,
+            isOrFilterMode: false,
+          },
+        },
+      ];
+
+      // Set up the initial state
+      act(() => {
+        result.current.setSmartPlaylists(initialPlaylists);
+      });
+
+      // Verify we start with 2 playlists
+      expect(result.current.smartPlaylists).toHaveLength(2);
+
+      // Run the cleanup
+      await act(async () => {
+        await result.current.cleanupDeletedSmartPlaylists();
+      });
+
+      // Verify the API was called
+      expect(spotifyApiService.getAllUserPlaylists).toHaveBeenCalledTimes(1);
+
+      // Verify only the existing playlist remains
+      expect(result.current.smartPlaylists).toHaveLength(1);
+      expect(result.current.smartPlaylists[0].playlistId).toBe("existing-playlist-1");
+      expect(result.current.smartPlaylists[0].playlistName).toBe("Still Exists");
+
+      // Verify localStorage was updated (should be called twice: initial set + cleanup)
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        "tagify:smartPlaylists",
+        expect.stringContaining("existing-playlist-1")
+      );
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        "tagify:smartPlaylists",
+        expect.not.stringContaining("deleted-playlist")
+      );
+    });
+
+    it("should handle empty smart playlists list gracefully", async () => {
+      vi.mocked(spotifyApiService.getAllUserPlaylists).mockResolvedValue([
+        "some-playlist-1",
+        "some-playlist-2",
+      ]);
+
+      const { result } = renderHook(() => useTagData());
+
+      // Start with no smart playlists
+      expect(result.current.smartPlaylists).toHaveLength(0);
+
+      // Run cleanup on empty list
+      await act(async () => {
+        await result.current.cleanupDeletedSmartPlaylists();
+      });
+
+      // Should still be empty and not crash
+      expect(result.current.smartPlaylists).toHaveLength(0);
+      expect(spotifyApiService.getAllUserPlaylists).toHaveBeenCalledTimes(1);
+    });
+
+    it("should handle API errors during cleanup gracefully", async () => {
+      // Mock API to throw error
+      vi.mocked(spotifyApiService.getAllUserPlaylists).mockRejectedValue(
+        new Error("Spotify API unavailable")
+      );
+
+      const { result } = renderHook(() => useTagData());
+
+      const initialPlaylists: SmartPlaylistCriteria[] = [
+        {
+          playlistId: "test-playlist",
+          playlistName: "Test Playlist",
+          isActive: true,
+          smartPlaylistTrackUris: [],
+          lastSyncAt: Date.now(),
+          createdAt: Date.now(),
+          criteria: {
+            activeTagFilters: [],
+            excludedTagFilters: [],
+            ratingFilters: [],
+            energyMinFilter: null,
+            energyMaxFilter: null,
+            bpmMinFilter: null,
+            bpmMaxFilter: null,
+            isOrFilterMode: false,
+          },
+        },
+      ];
+
+      act(() => {
+        result.current.setSmartPlaylists(initialPlaylists);
+      });
+
+      // Should not throw error despite API failure
+      await act(async () => {
+        await result.current.cleanupDeletedSmartPlaylists();
+      });
+
+      // Playlists should remain unchanged since API failed
+      expect(result.current.smartPlaylists).toHaveLength(1);
+      expect(result.current.smartPlaylists[0].playlistId).toBe("test-playlist");
+    });
+
+    it("should preserve all playlists when all still exist", async () => {
+      vi.mocked(spotifyApiService.getAllUserPlaylists).mockResolvedValue([
+        "playlist-1",
+        "playlist-2",
+        "playlist-3",
+      ]);
+
+      const { result } = renderHook(() => useTagData());
+
+      const initialPlaylists: SmartPlaylistCriteria[] = [
+        {
+          playlistId: "playlist-1",
+          playlistName: "First Playlist",
+          isActive: true,
+          smartPlaylistTrackUris: [],
+          lastSyncAt: Date.now(),
+          createdAt: Date.now(),
+          criteria: {
+            activeTagFilters: [],
+            excludedTagFilters: [],
+            ratingFilters: [],
+            energyMinFilter: null,
+            energyMaxFilter: null,
+            bpmMinFilter: null,
+            bpmMaxFilter: null,
+            isOrFilterMode: false,
+          },
+        },
+        {
+          playlistId: "playlist-2",
+          playlistName: "Second Playlist",
+          isActive: true,
+          smartPlaylistTrackUris: [],
+          lastSyncAt: Date.now(),
+          createdAt: Date.now(),
+          criteria: {
+            activeTagFilters: [],
+            excludedTagFilters: [],
+            ratingFilters: [],
+            energyMinFilter: null,
+            energyMaxFilter: null,
+            bpmMinFilter: null,
+            bpmMaxFilter: null,
+            isOrFilterMode: false,
+          },
+        },
+      ];
+
+      act(() => {
+        result.current.setSmartPlaylists(initialPlaylists);
+      });
+
+      await act(async () => {
+        await result.current.cleanupDeletedSmartPlaylists();
+      });
+
+      // All playlists should remain since they all exist
+      expect(result.current.smartPlaylists).toHaveLength(2);
+      expect(result.current.smartPlaylists.map((p) => p.playlistId)).toEqual([
+        "playlist-1",
+        "playlist-2",
+      ]);
+    });
   });
 
   describe("Smart Playlist Criteria Evaluation", () => {
@@ -429,13 +655,15 @@ describe("useTagData - Smart Playlist Logic", () => {
 
   describe("Error Handling", () => {
     it("should handle API errors gracefully during sync", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      // Verify we start with clean state
+      expect(result.current.smartPlaylists).toHaveLength(0);
+
       // Mock API to throw error
       vi.mocked(spotifyApiService.addTrackToSpotifyPlaylist).mockRejectedValue(
         new Error("Spotify API Error")
       );
-
-      const { result } = renderHook(() => useTagData());
-
       const smartPlaylist: SmartPlaylistCriteria = {
         playlistId: "test-playlist",
         playlistName: "Test Playlist",

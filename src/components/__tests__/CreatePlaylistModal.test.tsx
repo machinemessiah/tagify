@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react"; // Only import React once
+import React from "react";
 import CreatePlaylistModal from "../../components/CreatePlaylistModal";
+import styles from "../../components/CreatePlaylistModal.module.css";
 
 describe("CreatePlaylistModal", () => {
   const mockProps = {
@@ -137,7 +138,7 @@ describe("CreatePlaylistModal", () => {
   });
 
   describe("Form Submission", () => {
-    it("should call onCreatePlaylist with correct parameters", async () => {
+    it("should call onCreatePlaylist with auto-generated values for smart playlists", async () => {
       const user = userEvent.setup();
       renderModal();
 
@@ -146,15 +147,43 @@ describe("CreatePlaylistModal", () => {
       const publicCheckbox = screen.getByLabelText(/public playlist/i);
       const smartCheckbox = screen.getByLabelText(/smart playlist/i);
 
-      // Fill out the form
+      // First set custom values
       await user.clear(nameInput);
       await user.type(nameInput, "Test Playlist");
       await user.clear(descriptionInput);
       await user.type(descriptionInput, "Test Description");
       await user.click(publicCheckbox);
+
+      // When we enable smart playlist, it should auto-generate values
       await user.click(smartCheckbox);
 
-      // Submit the form
+      const submitButton = screen.getByRole("button", { name: /create playlist/i });
+      await user.click(submitButton);
+
+      // Test the actual auto-generated values
+      expect(mockProps.onCreatePlaylist).toHaveBeenCalledWith(
+        "Smart Tagify - House, Uplifting 4,5★ E≥6 120-130BPM",
+        "SMART PLAYLIST | Tags (ALL): House, Uplifting | Excluded: Chill | Rating: 4, 5 ★ | Energy: ≥6 | BPM: 120 - 130",
+        true,
+        true
+      );
+    });
+
+    it("should call onCreatePlaylist with user values for regular playlists", async () => {
+      const user = userEvent.setup();
+      renderModal();
+
+      const nameInput = screen.getByLabelText(/playlist name/i);
+      const descriptionInput = screen.getByLabelText(/description/i);
+      const publicCheckbox = screen.getByLabelText(/public playlist/i);
+
+      // Fill out the form WITHOUT enabling smart playlist
+      await user.clear(nameInput);
+      await user.type(nameInput, "Test Playlist");
+      await user.clear(descriptionInput);
+      await user.type(descriptionInput, "Test Description");
+      await user.click(publicCheckbox);
+
       const submitButton = screen.getByRole("button", { name: /create playlist/i });
       await user.click(submitButton);
 
@@ -162,11 +191,29 @@ describe("CreatePlaylistModal", () => {
         "Test Playlist",
         "Test Description",
         true,
+        false // smart playlist is false
+      );
+    });
+
+    it("should auto-generate values when smart playlist is enabled", async () => {
+      const user = userEvent.setup();
+      renderModal();
+
+      const smartCheckbox = screen.getByLabelText(/smart playlist/i);
+      await user.click(smartCheckbox);
+
+      const submitButton = screen.getByRole("button", { name: /create playlist/i });
+      await user.click(submitButton);
+
+      expect(mockProps.onCreatePlaylist).toHaveBeenCalledWith(
+        "Smart Tagify - House, Uplifting 4,5★ E≥6 120-130BPM",
+        "SMART PLAYLIST | Tags (ALL): House, Uplifting | Excluded: Chill | Rating: 4, 5 ★ | Energy: ≥6 | BPM: 120 - 130",
+        false,
         true
       );
     });
 
-    it("should use default values when inputs are empty", async () => {
+    it("should use auto-generated default values when inputs are empty", async () => {
       const user = userEvent.setup();
       renderModal();
 
@@ -180,8 +227,8 @@ describe("CreatePlaylistModal", () => {
       await user.click(submitButton);
 
       expect(mockProps.onCreatePlaylist).toHaveBeenCalledWith(
-        expect.stringMatching(/playlist/i), // Should use default name
-        expect.stringMatching(/tagify/i), // Should use default description
+        "Tagify - House, Uplifting 4,5★ E≥6 120-130BPM", // Auto-generated based on filters
+        "Tags (ALL): House, Uplifting | Excluded: Chill | Rating: 4, 5 ★ | Energy: ≥6 | BPM: 120 - 130",
         false,
         false
       );
@@ -229,9 +276,8 @@ describe("CreatePlaylistModal", () => {
       const user = userEvent.setup();
       const { container } = renderModal();
 
-      // Click on the modal content itself
-      const modalContent =
-        container.querySelector('[class*="modal"]') || screen.getByRole("dialog");
+      // Click on the modal content using the class selector
+      const modalContent = container.querySelector(`.${styles.modal}`);
 
       if (modalContent) {
         await user.click(modalContent);
@@ -242,21 +288,21 @@ describe("CreatePlaylistModal", () => {
 
   // Only use act() when absolutely necessary for state updates
   describe("Advanced State Management", () => {
-    it("should handle complex state updates", async () => {
+    it("should handle input value changes correctly", async () => {
       const user = userEvent.setup();
       renderModal();
 
-      // For complex operations that might need act(), use it sparingly
       const nameInput = screen.getByLabelText(/playlist name/i);
       const smartCheckbox = screen.getByLabelText(/smart playlist/i);
 
-      // Most user interactions don't need act()
+      // Test regular input without smart playlist
       await user.clear(nameInput);
       await user.type(nameInput, "Complex Test");
-      await user.click(smartCheckbox);
-
-      // Verify the state changes
       expect(nameInput).toHaveValue("Complex Test");
+
+      // Test that smart playlist overrides the input
+      await user.click(smartCheckbox);
+      expect(nameInput).toHaveValue("Smart Tagify - House, Uplifting 4,5★ E≥6 120-130BPM");
       expect(smartCheckbox).toBeChecked();
     });
   });
