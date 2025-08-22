@@ -1,0 +1,591 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useTagData, SmartPlaylistCriteria, TrackData } from "../../hooks/useTagData";
+import { spotifyApiService } from "../../services/SpotifyApiService";
+import {
+  createMockSmartPlaylist,
+  createMockTrackData,
+  simulateNetworkError,
+  simulateRateLimitError,
+} from "../utils/test-helpers";
+
+vi.mock("../../services/SpotifyApiService", () => ({
+  spotifyApiService: {
+    addTrackToSpotifyPlaylist: vi.fn(),
+    removeTrackFromPlaylist: vi.fn(),
+    getAllTrackUrisInPlaylist: vi.fn(),
+  },
+}));
+
+describe("Smart Playlist Edge Cases", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+
+    // Default successful mocks
+    vi.mocked(spotifyApiService.addTrackToSpotifyPlaylist).mockResolvedValue({
+      success: true,
+      wasAdded: true,
+    });
+    vi.mocked(spotifyApiService.removeTrackFromPlaylist).mockResolvedValue(true);
+    vi.mocked(spotifyApiService.getAllTrackUrisInPlaylist).mockResolvedValue([]);
+  });
+
+  describe("Local File Handling", () => {
+    it("should handle local files correctly in smart playlists", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const smartPlaylist = createMockSmartPlaylist({
+        criteria: {
+          activeTagFilters: [{ categoryId: "genre", subcategoryId: "electronic", tagId: "house" }],
+          excludedTagFilters: [],
+          ratingFilters: [],
+          energyMinFilter: null,
+          energyMaxFilter: null,
+          bpmMinFilter: null,
+          bpmMaxFilter: null,
+          isOrFilterMode: false,
+        },
+      });
+
+      act(() => {
+        result.current.storeSmartPlaylist(smartPlaylist);
+      });
+
+      // Create local file track data that matches criteria
+      const localTrackData: TrackData = {
+        rating: 5,
+        energy: 8,
+        bpm: null, // Local files typically don't have BPM
+        tags: [{ categoryId: "genre", subcategoryId: "electronic", tagId: "house" }],
+        dateCreated: Date.now(),
+        dateModified: Date.now(),
+      };
+
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists(
+          "spotify:local:Artist:Album:Track:Duration",
+          localTrackData
+        );
+      });
+
+      // Should attempt to add local file (even though it might not work in Spotify)
+      expect(spotifyApiService.addTrackToSpotifyPlaylist).toHaveBeenCalledWith(
+        "spotify:local:Artist:Album:Track:Duration",
+        smartPlaylist.playlistId
+      );
+
+      // Should show appropriate notification for local files
+      expect(global.Spicetify.showNotification).toHaveBeenCalledWith(
+        expect.stringContaining("Local file"),
+        true,
+        5000
+      );
+    });
+
+    it("should handle mixed local and regular tracks in batch operations", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const smartPlaylist = createMockSmartPlaylist();
+      act(() => {
+        result.current.storeSmartPlaylist(smartPlaylist);
+      });
+
+      const trackUpdates: Record<string, TrackData> = {
+        "spotify:track:regular1": createMockTrackData(),
+        "spotify:local:Artist:Album:Track:Duration": createMockTrackData({ bpm: null }),
+        "spotify:track:regular2": createMockTrackData(),
+      };
+
+      await act(async () => {
+        await result.current.syncMultipleTracksWithSmartPlaylists(trackUpdates);
+      });
+
+      // Should handle both regular and local tracks
+      expect(spotifyApiService.addTrackToSpotifyPlaylist).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe("Network and API Error Handling", () => {
+    it("should gracefully handle network timeouts", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      // Simulate network timeout
+      vi.mocked(spotifyApiService.addTrackToSpotifyPlaylist).mockImplementation(
+        () =>
+          new Promise((_, reject) => {
+            setTimeout(() => reject(new Error("Network timeout")), 100);
+          })
+      );
+
+      const smartPlaylist = createMockSmartPlaylist();
+      act(() => {
+        result.current.storeSmartPlaylist(smartPlaylist);
+      });
+
+      const trackData = createMockTrackData();
+
+      // Should not crash on network timeout
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists("spotify:track:timeout", trackData);
+      });
+
+      expect(result.current.smartPlaylists).toHaveLength(1);
+    });
+
+    it("should handle Spotify API service unavailable", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      simulateNetworkError();
+
+      const smartPlaylist = createMockSmartPlaylist();
+      act(() => {
+        result.current.storeSmartPlaylist(smartPlaylist);
+      });
+
+      const trackData = createMockTrackData();
+
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists(
+          "spotify:track:service-down",
+          trackData
+        );
+      });
+
+      // Should maintain smart playlist state even when API is down
+      expect(result.current.smartPlaylists).toHaveLength(1);
+      expect(result.current.smartPlaylists[0].isActive).toBe(true);
+    });
+
+    it("should handle rate limiting with exponential backoff simulation", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      let callCount = 0;
+      vi.mocked(spotifyApiService.addTrackToSpotifyPlaylist).mockImplementation(async () => {
+        callCount++;
+        if (callCount <= 2) {
+          throw new Error("Rate limit exceeded. Try again in 60 seconds.");
+        }
+        return { success: true, wasAdded: true };
+      });
+
+      const smartPlaylist = createMockSmartPlaylist();
+      act(() => {
+        result.current.storeSmartPlaylist(smartPlaylist);
+      });
+
+      const trackData = createMockTrackData();
+
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists(
+          "spotify:track:rate-limited",
+          trackData
+        );
+      });
+
+      // Should eventually succeed after rate limit errors
+      expect(callCount).toBeGreaterThan(2);
+    });
+
+    it("should handle invalid playlist IDs gracefully", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      vi.mocked(spotifyApiService.addTrackToSpotifyPlaylist).mockRejectedValue(
+        new Error("Invalid playlist ID")
+      );
+
+      const smartPlaylist = createMockSmartPlaylist({
+        playlistId: "invalid-playlist-id",
+        playlistName: "Invalid Playlist",
+      });
+
+      act(() => {
+        result.current.storeSmartPlaylist(smartPlaylist);
+      });
+
+      const trackData = createMockTrackData();
+
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists("spotify:track:test", trackData);
+      });
+
+      // Should handle invalid playlist ID without crashing
+      expect(result.current.smartPlaylists).toHaveLength(1);
+    });
+  });
+
+  describe("Data Corruption and Recovery", () => {
+    it("should handle corrupted localStorage data", () => {
+      // Corrupt localStorage with invalid JSON
+      localStorage.setItem("tagify:smartPlaylists", "invalid json {");
+
+      const { result } = renderHook(() => useTagData());
+
+      // Should initialize with empty array despite corrupted data
+      expect(result.current.smartPlaylists).toEqual([]);
+    });
+
+    it("should handle missing required fields in smart playlist data", () => {
+      // Create playlist data missing required fields
+      const corruptedPlaylist = {
+        playlistId: "test-id",
+        // Missing playlistName, isActive, criteria, etc.
+      };
+
+      localStorage.setItem("tagify:smartPlaylists", JSON.stringify([corruptedPlaylist]));
+
+      const { result } = renderHook(() => useTagData());
+
+      // Should filter out corrupted playlists
+      expect(result.current.smartPlaylists).toEqual([]);
+    });
+
+    it("should recover from partial data corruption", () => {
+      const validPlaylist = createMockSmartPlaylist({ playlistId: "valid-1" });
+      const corruptedPlaylist = { playlistId: "corrupt", invalid: true };
+      const anotherValidPlaylist = createMockSmartPlaylist({ playlistId: "valid-2" });
+
+      localStorage.setItem(
+        "tagify:smartPlaylists",
+        JSON.stringify([validPlaylist, corruptedPlaylist, anotherValidPlaylist])
+      );
+
+      const { result } = renderHook(() => useTagData());
+
+      // Should recover valid playlists and ignore corrupted ones
+      expect(result.current.smartPlaylists).toHaveLength(2);
+      expect(result.current.smartPlaylists.map((p) => p.playlistId)).toEqual([
+        "valid-1",
+        "valid-2",
+      ]);
+    });
+
+    it("should handle extremely large localStorage data", () => {
+      // Create extremely large playlist data
+      const largePlaylist = createMockSmartPlaylist({
+        criteria: {
+          activeTagFilters: Array.from({ length: 10000 }, (_, i) => ({
+            categoryId: `category-${i}`,
+            subcategoryId: `subcategory-${i}`,
+            tagId: `tag-${i}`,
+          })),
+          excludedTagFilters: [],
+          ratingFilters: [],
+          energyMinFilter: null,
+          energyMaxFilter: null,
+          bpmMinFilter: null,
+          bpmMaxFilter: null,
+          isOrFilterMode: false,
+        },
+      });
+
+      // Should handle large data without crashing
+      expect(() => {
+        const { result } = renderHook(() => useTagData());
+        act(() => {
+          result.current.storeSmartPlaylist(largePlaylist);
+        });
+      }).not.toThrow();
+    });
+  });
+
+  describe("Concurrent Operations and Race Conditions", () => {
+    it("should handle concurrent playlist creation", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const playlist1 = createMockSmartPlaylist({ playlistId: "concurrent-1" });
+      const playlist2 = createMockSmartPlaylist({ playlistId: "concurrent-2" });
+      const playlist3 = createMockSmartPlaylist({ playlistId: "concurrent-3" });
+
+      // Simulate concurrent playlist creation
+      await act(async () => {
+        await Promise.all([
+          Promise.resolve(result.current.storeSmartPlaylist(playlist1)),
+          Promise.resolve(result.current.storeSmartPlaylist(playlist2)),
+          Promise.resolve(result.current.storeSmartPlaylist(playlist3)),
+        ]);
+      });
+
+      expect(result.current.smartPlaylists).toHaveLength(3);
+    });
+
+    it("should handle concurrent track sync operations", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const smartPlaylist = createMockSmartPlaylist();
+      act(() => {
+        result.current.storeSmartPlaylist(smartPlaylist);
+      });
+
+      const trackData = createMockTrackData();
+
+      // Simulate multiple concurrent sync operations for the same track
+      const concurrentSyncs = Array.from({ length: 5 }, (_, i) =>
+        act(async () => {
+          await result.current.syncTrackWithSmartPlaylists(
+            `spotify:track:concurrent-${i}`,
+            trackData
+          );
+        })
+      );
+
+      await Promise.all(concurrentSyncs);
+
+      // Should handle all operations without data corruption
+      expect(result.current.smartPlaylists).toHaveLength(1);
+    });
+
+    it("should handle playlist deletion during sync", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const smartPlaylist = createMockSmartPlaylist();
+      act(() => {
+        result.current.storeSmartPlaylist(smartPlaylist);
+      });
+
+      const trackData = createMockTrackData();
+
+      // Start sync operation
+      const syncPromise = act(async () => {
+        await result.current.syncTrackWithSmartPlaylists("spotify:track:test", trackData);
+      });
+
+      // Immediately delete playlist
+      act(() => {
+        result.current.setSmartPlaylists([]);
+      });
+
+      // Should complete without error
+      await syncPromise;
+
+      expect(result.current.smartPlaylists).toHaveLength(0);
+    });
+  });
+
+  describe("Boundary Value Testing", () => {
+    it("should handle minimum and maximum rating values", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const minRatingPlaylist = createMockSmartPlaylist({
+        criteria: {
+          activeTagFilters: [],
+          excludedTagFilters: [],
+          ratingFilters: [1], // Minimum rating
+          energyMinFilter: null,
+          energyMaxFilter: null,
+          bpmMinFilter: null,
+          bpmMaxFilter: null,
+          isOrFilterMode: false,
+        },
+      });
+
+      const maxRatingPlaylist = createMockSmartPlaylist({
+        playlistId: "max-rating-playlist",
+        criteria: {
+          activeTagFilters: [],
+          excludedTagFilters: [],
+          ratingFilters: [5], // Maximum rating
+          energyMinFilter: null,
+          energyMaxFilter: null,
+          bpmMinFilter: null,
+          bpmMaxFilter: null,
+          isOrFilterMode: false,
+        },
+      });
+
+      act(() => {
+        result.current.storeSmartPlaylist(minRatingPlaylist);
+        result.current.storeSmartPlaylist(maxRatingPlaylist);
+      });
+
+      // Test with minimum rating track
+      const minRatingTrack = createMockTrackData({ rating: 1 });
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists(
+          "spotify:track:min-rating",
+          minRatingTrack
+        );
+      });
+
+      // Test with maximum rating track
+      const maxRatingTrack = createMockTrackData({ rating: 5 });
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists(
+          "spotify:track:max-rating",
+          maxRatingTrack
+        );
+      });
+
+      expect(spotifyApiService.addTrackToSpotifyPlaylist).toHaveBeenCalledTimes(2);
+    });
+
+    it("should handle zero and negative values gracefully", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const smartPlaylist = createMockSmartPlaylist();
+      act(() => {
+        result.current.storeSmartPlaylist(smartPlaylist);
+      });
+
+      // Test with zero/negative values
+      const edgeTrackData: TrackData = {
+        rating: 0,
+        energy: -1, // Invalid negative energy
+        bpm: 0,
+        tags: [],
+        dateCreated: 0,
+        dateModified: -1000, // Negative timestamp
+      };
+
+      // Should handle invalid values without crashing
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists(
+          "spotify:track:edge-values",
+          edgeTrackData
+        );
+      });
+
+      expect(result.current.smartPlaylists).toHaveLength(1);
+    });
+
+    it("should handle extremely high BPM and energy values", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const highValuePlaylist = createMockSmartPlaylist({
+        criteria: {
+          activeTagFilters: [],
+          excludedTagFilters: [],
+          ratingFilters: [],
+          energyMinFilter: 999,
+          energyMaxFilter: 1000,
+          bpmMinFilter: 9999,
+          bpmMaxFilter: 10000,
+          isOrFilterMode: false,
+        },
+      });
+
+      act(() => {
+        result.current.storeSmartPlaylist(highValuePlaylist);
+      });
+
+      const extremeTrack = createMockTrackData({
+        energy: 1000,
+        bpm: 10000,
+      });
+
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists(
+          "spotify:track:extreme",
+          extremeTrack
+        );
+      });
+
+      expect(spotifyApiService.addTrackToSpotifyPlaylist).toHaveBeenCalled();
+    });
+  });
+
+  describe("Unicode and Special Characters", () => {
+    it("should handle unicode characters in playlist names and tags", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const unicodePlaylist = createMockSmartPlaylist({
+        playlistName: "🎵 Electronic Music 音楽 🎧",
+        criteria: {
+          activeTagFilters: [
+            { categoryId: "genre", subcategoryId: "electronic", tagId: "house-музыка" },
+          ],
+          excludedTagFilters: [],
+          ratingFilters: [],
+          energyMinFilter: null,
+          energyMaxFilter: null,
+          bpmMinFilter: null,
+          bpmMaxFilter: null,
+          isOrFilterMode: false,
+        },
+      });
+
+      act(() => {
+        result.current.storeSmartPlaylist(unicodePlaylist);
+      });
+
+      const unicodeTrackData = createMockTrackData({
+        tags: [{ categoryId: "genre", subcategoryId: "electronic", tagId: "house-музыка" }],
+      });
+
+      await act(async () => {
+        await result.current.syncTrackWithSmartPlaylists(
+          "spotify:track:unicode",
+          unicodeTrackData
+        );
+      });
+
+      expect(result.current.smartPlaylists[0].playlistName).toBe("🎵 Electronic Music 音楽 🎧");
+      expect(spotifyApiService.addTrackToSpotifyPlaylist).toHaveBeenCalled();
+    });
+
+    it("should handle very long playlist names and descriptions", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      const longName = "A".repeat(1000); // Very long name
+      const longPlaylist = createMockSmartPlaylist({
+        playlistName: longName,
+      });
+
+      act(() => {
+        result.current.storeSmartPlaylist(longPlaylist);
+      });
+
+      expect(result.current.smartPlaylists[0].playlistName).toBe(longName);
+    });
+  });
+
+  describe("Memory and Resource Management", () => {
+    it("should handle cleanup of deleted playlists", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      // Mock API to return that playlist no longer exists
+      vi.mocked(spotifyApiService.getAllTrackUrisInPlaylist).mockRejectedValue(
+        new Error("Playlist not found")
+      );
+
+      const deletedPlaylist = createMockSmartPlaylist({
+        playlistId: "deleted-playlist",
+      });
+
+      act(() => {
+        result.current.storeSmartPlaylist(deletedPlaylist);
+      });
+
+      // Trigger cleanup by attempting sync
+      await act(async () => {
+        await result.current.cleanupDeletedSmartPlaylists?.();
+      });
+
+      // Should remove deleted playlists from state
+      expect(result.current.smartPlaylists).toHaveLength(0);
+    });
+
+    it("should handle memory pressure scenarios", async () => {
+      const { result } = renderHook(() => useTagData());
+
+      // Create many playlists to simulate memory pressure
+      const manyPlaylists = Array.from({ length: 1000 }, (_, i) =>
+        createMockSmartPlaylist({
+          playlistId: `playlist-${i}`,
+          playlistName: `Playlist ${i}`,
+        })
+      );
+
+      // Should handle large number of playlists without crashing
+      expect(() => {
+        manyPlaylists.forEach((playlist) => {
+          act(() => {
+            result.current.storeSmartPlaylist(playlist);
+          });
+        });
+      }).not.toThrow();
+
+      expect(result.current.smartPlaylists).toHaveLength(1000);
+    });
+  });
+});
