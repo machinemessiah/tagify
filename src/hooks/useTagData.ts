@@ -176,10 +176,25 @@ export function useTagData() {
       const savedSmartPlaylists = localStorage.getItem(SMART_PLAYLIST_KEY);
       if (savedSmartPlaylists) {
         const parsed = JSON.parse(savedSmartPlaylists);
-        setSmartPlaylists(Array.isArray(parsed) ? parsed : []);
+
+        // Filter out corrupted playlists
+        const validPlaylists = Array.isArray(parsed)
+          ? parsed.filter(
+              (playlist) =>
+                playlist &&
+                typeof playlist.playlistId === "string" &&
+                typeof playlist.playlistName === "string" &&
+                typeof playlist.isActive === "boolean" &&
+                playlist.criteria &&
+                Array.isArray(playlist.criteria.activeTagFilters)
+            )
+          : [];
+
+        setSmartPlaylists(validPlaylists);
       }
     } catch (error) {
       console.error("Error loading smart playlists:", error);
+      setSmartPlaylists([]); // Reset to empty on error
     }
   }, []);
 
