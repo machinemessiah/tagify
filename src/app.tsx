@@ -121,7 +121,7 @@ function App() {
     });
   }, []);
 
-  const playTrackViaQueue = trackService.playTrackViaQueue;
+  const playTrack = trackService.playTrack;
   const getTracksWithResolvedTags = () => trackService.getTracksWithResolvedTags(tagData);
 
   // Hide topbar when app mounts - restore when app unmounts
@@ -277,7 +277,7 @@ function App() {
                 setMultiTrackDraftTags(null);
                 cancelMultiTagging();
               }}
-              onPlayTrack={playTrackViaQueue}
+              onPlayTrack={playTrack}
               lockedTrackUri={lockedMultiTrackUri}
               onLockTrack={setLockedMultiTrackUri}
               draftTags={multiTrackDraftTags}
@@ -307,7 +307,7 @@ function App() {
                   toggleTagForTrack(activeTrack.uri, categoryId, subcategoryId, tagId)
                 }
                 onToggleTagIncludeOff={toggleTagIncludeOff}
-                onPlayTrack={playTrackViaQueue}
+                onPlayTrack={playTrack}
                 isLocked={isLocked}
                 onToggleLock={toggleLock}
                 onSwitchToCurrentTrack={setLockedTrack}
@@ -353,7 +353,7 @@ function App() {
             onToggleTagIncludeExcludeOff={toggleTagIncludeExcludeOff} // ON OFF EXCLUDE
             onToggleTagIncludeOff={toggleTagIncludeOff} // ON OFF
             onClearTagFilters={clearTagFilters}
-            onPlayTrack={playTrackViaQueue}
+            onPlayTrack={playTrack}
             onTagTrack={handleTagTrack}
             onCreatePlaylist={createPlaylistFromFilters}
             onStoreSmartPlaylist={storeSmartPlaylist}
