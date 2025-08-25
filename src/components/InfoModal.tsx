@@ -19,6 +19,10 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
     { id: "roadmap", title: "What's Coming", icon: "🚀" },
   ];
 
+  const getReleaseUrl = (version: string) => {
+    return `https://github.com/alexk218/tagify/releases/tag/v${version}`;
+  }
+
   return (
     <Portal>
       <div className={styles.modalOverlay} onClick={onClose}>
@@ -40,9 +44,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                 {sections.map((section) => (
                   <button
                     key={section.id}
-                    className={`${styles.navButton} ${
-                      activeSection === section.id ? styles.navButtonActive : ""
-                    } ${section.id === "whats-new" ? styles.whatsNewButton : ""}`}
+                    className={`${styles.navButton} ${activeSection === section.id ? styles.navButtonActive : ""
+                      } ${section.id === "whats-new" ? styles.whatsNewButton : ""}`}
                     onClick={() => setActiveSection(section.id)}
                   >
                     <span className={styles.navIcon}>{section.icon}</span>
@@ -97,8 +100,12 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
               {activeSection === "whats-new" && (
                 <div className={styles.section}>
                   <div className={styles.whatsNewHeader}>
-                    <h3 className={styles.sectionTitle}>What's New in Tagify 2.0.0</h3>
-                    <div className={styles.versionBadge}>v{packageJson.version}</div>
+                    <h3 className={styles.sectionTitle}>
+                      <a href={getReleaseUrl("2.0.0")} target="_blank" rel="noopener noreferrer">
+                        What's New in Tagify 2.0.0
+                      </a>
+                    </h3>
+                    {/* <div className={styles.versionBadge}>v{packageJson.version}</div> */}
                   </div>
 
                   {/* Smart Playlists Feature */}
@@ -226,6 +233,41 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                           needed!
                         </div>
                       </div>
+                    </div>
+                  </div>
+                  <div className={styles.communitySection}>
+                    <div className={styles.communityHeader}>
+                      <span className={styles.communityIcon}>💬</span>
+                      <h4 className={styles.communityTitle}>Join the Community</h4>
+                    </div>
+                    <p className={styles.communityDescription}>
+                      Want to influence Tagify's development? Join our GitHub Discussions to:
+                    </p>
+                    <div className={styles.communityFeatures}>
+                      <div className={styles.communityFeature}>
+                        <span className={styles.featureCheckmark}>✓</span>
+                        <span>See the detailed roadmap</span>
+                      </div>
+                      <div className={styles.communityFeature}>
+                        <span className={styles.featureCheckmark}>✓</span>
+                        <span>Post ideas & feature requests</span>
+                      </div>
+                      <div className={styles.communityFeature}>
+                        <span className={styles.featureCheckmark}>✓</span>
+                        <span>Vote on which features you want most</span>
+                      </div>
+                    </div>
+                    <div className={styles.communityAction}>
+                      <a
+                        href="https://github.com/alexk218/tagify/discussions"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.discussionsLink}
+                      >
+                        <span className={styles.discussionsIcon}>🗨️</span>
+                        Visit GitHub Discussions
+                        <span className={styles.externalLinkIcon}>↗</span>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -609,7 +651,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   href="https://github.com/alexk218/tagify"
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="Give it a star :)"
+                  title="Give Tagify a star :). More support = more development!"
                   className={styles.githubLink}
                 >
                   <svg
