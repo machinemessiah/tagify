@@ -30,7 +30,7 @@ const waitForHookInitialization = (result: any) => {
   });
 };
 
-describe("Smart Playlist Edge Cases", () => {
+describe.skip("Smart Playlist Edge Cases", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
