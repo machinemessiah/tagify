@@ -12,8 +12,8 @@ interface TagSelectorProps {
   trackTags: TrackTag[];
   onToggleTag: (categoryId: string, subcategoryId: string, tagId: string) => void;
   onOpenTagManager: () => void;
-  isMultiTagging?: boolean;
-  isLockedTrack?: boolean;
+  isMultiTagging: boolean;
+  isLockedTrack: boolean;
 }
 
 const TagSelector: React.FC<TagSelectorProps> = ({

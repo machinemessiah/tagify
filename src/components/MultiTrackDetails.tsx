@@ -15,7 +15,11 @@ interface MultiTrackDetailsProps {
   }>;
   trackTagsMap: Record<string, TrackTag[]>;
   categories: TagCategory[];
-  onTagAllTracks: (categoryId: string, subcategoryId: string, tagId: string) => void;
+  onTagAllTracks: (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => void;
   onTagSingleTrack?: (
     trackUri: string,
     categoryId: string,
@@ -23,11 +27,11 @@ interface MultiTrackDetailsProps {
     tagId: string
   ) => void;
   onCancelTagging: () => void;
-  onPlayTrack?: (uri: string) => void;
-  lockedTrackUri?: string | null;
-  onLockTrack?: (uri: string | null) => void;
-  draftTags?: DraftTagState | null;
-  onDraftTagsChange?: (draftTags: DraftTagState) => void;
+  onPlayTrack: (uri: string) => void;
+  lockedTrackUri: string | null;
+  onLockTrack: (uri: string | null) => void;
+  draftTags: DraftTagState | null;
+  onDraftTagsChange: (draftTags: DraftTagState) => void;
   onBatchUpdate: (
     updates: Array<{
       trackUri: string;
@@ -52,34 +56,27 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   onBatchUpdate,
 }) => {
   // Initialize draft state from current tags
-  const [internalDraftTags, setInternalDraftTags] = useState<DraftTagState>(() => {
-    const initial: DraftTagState = {};
-    tracks.forEach((track) => {
-      initial[track.uri] = [...(trackTagsMap[track.uri] || [])];
-    });
-    return initial;
-  });
+  const [internalDraftTags, setInternalDraftTags] = useState<DraftTagState>(
+    () => {
+      const initial: DraftTagState = {};
+      tracks.forEach((track) => {
+        initial[track.uri] = [...(trackTagsMap[track.uri] || [])];
+      });
+      return initial;
+    }
+  );
 
   // Use external draft tags if provided, otherwise use internal
   const draftTags = externalDraftTags || internalDraftTags;
   const setDraftTags = (
     updaterOrValue: DraftTagState | ((prev: DraftTagState) => DraftTagState)
   ) => {
-    if (onDraftTagsChange) {
-      // External handler - need to compute the new value
-      const newValue =
-        typeof updaterOrValue === "function"
-          ? updaterOrValue(externalDraftTags || {})
-          : updaterOrValue;
-      onDraftTagsChange(newValue);
-    } else {
-      // Internal state - can use the updater directly
-      if (typeof updaterOrValue === "function") {
-        setInternalDraftTags(updaterOrValue);
-      } else {
-        setInternalDraftTags(updaterOrValue);
-      }
-    }
+    // External handler - need to compute the new value
+    const newValue =
+      typeof updaterOrValue === "function"
+        ? updaterOrValue(externalDraftTags || {})
+        : updaterOrValue;
+    onDraftTagsChange(newValue);
   };
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -130,11 +127,17 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     setHasUnsavedChanges(hasAnyChanges);
   }, [draftTags, trackTagsMap, tracks]);
 
-  const getTagName = (categoryId: string, subcategoryId: string, tagId: string) => {
+  const getTagName = (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => {
     const category = categories.find((c) => c.id === categoryId);
     if (!category) return "Unknown";
 
-    const subcategory = category.subcategories.find((s) => s.id === subcategoryId);
+    const subcategory = category.subcategories.find(
+      (s) => s.id === subcategoryId
+    );
     if (!subcategory) return "Unknown";
 
     const tag = subcategory.tags.find((t) => t.id === tagId);
@@ -249,18 +252,20 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       return;
     }
 
-    if (onLockTrack) {
-      // If already locked on this track, unlock it
-      if (lockedTrackUri === uri) {
-        onLockTrack(null);
-      } else {
-        onLockTrack(uri);
-      }
+    // If already locked on this track, unlock it
+    if (lockedTrackUri === uri) {
+      onLockTrack(null);
+    } else {
+      onLockTrack(uri);
     }
   };
 
   // Handle individual track tag click in draft state
-  const handleTagClickDraft = (trackUri: string, tag: TrackTag, e: React.MouseEvent) => {
+  const handleTagClickDraft = (
+    trackUri: string,
+    tag: TrackTag,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation(); // Prevent track locking when clicking on tags
 
     // Toggle the tag for this specific track in draft state
@@ -355,7 +360,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   // Handle cancel with confirmation if there are unsaved changes
   const handleCancelTagging = () => {
     if (hasUnsavedChanges) {
-      if (confirm("You have unsaved changes. Are you sure you want to cancel?")) {
+      if (
+        confirm("You have unsaved changes. Are you sure you want to cancel?")
+      ) {
         onCancelTagging();
       }
     } else {
@@ -368,8 +375,12 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       <div className={styles.header}>
         <h2 className={styles.title}>Bulk Tagging</h2>
         <div className={styles.summary}>
-          <span className={styles.trackCount}>{tracks.length} tracks selected</span>
-          {hasUnsavedChanges && <span className={styles.unsavedIndicator}>• Unsaved changes</span>}
+          <span className={styles.trackCount}>
+            {tracks.length} tracks selected
+          </span>
+          {hasUnsavedChanges && (
+            <span className={styles.unsavedIndicator}>• Unsaved changes</span>
+          )}
           <div className={styles.actionButtons}>
             <button
               className={styles.saveButton}
@@ -385,7 +396,10 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
             >
               Discard
             </button>
-            <button className={styles.cancelButton} onClick={handleCancelTagging}>
+            <button
+              className={styles.cancelButton}
+              onClick={handleCancelTagging}
+            >
               {"Cancel Bulk Tagging"}
             </button>
           </div>
@@ -396,8 +410,8 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
         <div className={styles.lockingBanner}>
           <span className={styles.lockingIcon}>🔒</span>
           <span className={styles.lockingText}>
-            Tags will be applied to the locked track only. Click the track again to revert to bulk
-            tagging.
+            Tags will be applied to the locked track only. Click the track again
+            to revert to bulk tagging.
           </span>
         </div>
       ) : (
@@ -408,7 +422,8 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
             <span role="img" aria-label="pointer">
               👉
             </span>{" "}
-            <strong>Click on a track</strong> to lock tagging to that track only.
+            <strong>Click on a track</strong> to lock tagging to that track
+            only.
           </span>
         </div>
       )}
@@ -446,7 +461,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
               onClick={(e) => handleTrackClick(track.uri, e)}
             >
               <div className={styles.trackInfo}>
-                {lockedTrackUri === track.uri && <span className={styles.lockIcon}>🔒</span>}
+                {lockedTrackUri === track.uri && (
+                  <span className={styles.lockIcon}>🔒</span>
+                )}
                 <span className={styles.trackName}>{track.name}</span>
                 <span className={styles.trackArtist}>
                   {track.artists.map((artist) => artist.name).join(", ")}
@@ -458,8 +475,16 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                     {draftTags[track.uri]
                       .slice()
                       .sort((a, b) => {
-                        const nameA = getTagName(a.categoryId, a.subcategoryId, a.tagId);
-                        const nameB = getTagName(b.categoryId, b.subcategoryId, b.tagId);
+                        const nameA = getTagName(
+                          a.categoryId,
+                          a.subcategoryId,
+                          a.tagId
+                        );
+                        const nameB = getTagName(
+                          b.categoryId,
+                          b.subcategoryId,
+                          b.tagId
+                        );
                         return nameA.localeCompare(nameB);
                       })
                       .map((tag, index) => (
@@ -468,10 +493,16 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                           className={`${styles.tagItem} ${
                             isCommonTag(tag) ? styles.commonTagHighlight : ""
                           }`}
-                          onClick={(e) => handleTagClickDraft(track.uri, tag, e)}
+                          onClick={(e) =>
+                            handleTagClickDraft(track.uri, tag, e)
+                          }
                           title="Click to toggle this tag on this track"
                         >
-                          {getTagName(tag.categoryId, tag.subcategoryId, tag.tagId)}
+                          {getTagName(
+                            tag.categoryId,
+                            tag.subcategoryId,
+                            tag.tagId
+                          )}
                         </div>
                       ))}
                   </div>
@@ -483,7 +514,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                 className={styles.playButton}
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent event bubbling
-                  if (onPlayTrack) onPlayTrack(track.uri);
+                  onPlayTrack(track.uri);
                 }}
                 title={"Play this track"}
               >
@@ -496,8 +527,10 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
 
       <div className={styles.instructions}>
         <p>
-          Apply tags to {lockedTrackUri ? "the locked track" : "all selected tracks"} using the tag
-          selector below. {hasUnsavedChanges && "Remember to save your changes!"}
+          Apply tags to{" "}
+          {lockedTrackUri ? "the locked track" : "all selected tracks"} using
+          the tag selector below.{" "}
+          {hasUnsavedChanges && "Remember to save your changes!"}
         </p>
         <p>
           {lockedTrackUri

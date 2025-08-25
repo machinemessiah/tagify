@@ -12,7 +12,7 @@ import { formatTimestamp } from "../utils/formatters";
 
 interface TrackDetailsProps {
   displayedTrack: SpotifyTrack; // The track displayed in TrackDetails
-  nowPlayingTrack?: SpotifyTrack | null; // The currently playing track
+  nowPlayingTrack: SpotifyTrack | null; // The currently playing track
   trackData: {
     rating: number;
     energy: number;
@@ -25,16 +25,24 @@ interface TrackDetailsProps {
   onSetRating: (rating: number) => void;
   onSetEnergy: (energy: number) => void;
   onSetBpm: (bpm: number | null) => void;
-  onRemoveTag: (categoryId: string, subcategoryId: string, tagId: string) => void;
+  onRemoveTag: (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => void;
   activeTagFilters: string[];
   excludedTagFilters: string[];
   onToggleTagIncludeOff: (fullTagId: string) => void;
-  onPlayTrack?: (uri: string) => void;
-  isLocked?: boolean;
-  onToggleLock?: () => void;
-  onSwitchToCurrentTrack?: (track: SpotifyTrack | null) => void;
+  onPlayTrack: (uri: string) => void;
+  isLocked: boolean;
+  onToggleLock: () => void;
+  onSwitchToCurrentTrack: (track: SpotifyTrack | null) => void;
   onUpdateBpm: (trackUri: string) => Promise<number | null>;
-  createTagId: (categoryId: string, subcategoryId: string, tagId: string) => string;
+  createTagId: (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => string;
 }
 
 interface TrackMetadata {
@@ -83,12 +91,6 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   const [isEditingBpm, setIsEditingBpm] = useState(false);
   const [editBpmValue, setEditBpmValue] = useState<string>("");
   const [isRefreshingBpm, setIsRefreshingBpm] = useState(false);
-
-  const handleToggleLock = () => {
-    if (onToggleLock) {
-      onToggleLock();
-    }
-  };
 
   // Format milliseconds to mm:ss
   const formatDuration = (ms: number): string => {
@@ -246,7 +248,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                 } else if (contextType === "album") {
                   contextName = displayedTrack.album.name;
                 } else if (contextType === "artist") {
-                  contextName = artistNames ? artistNames.split(",")[0] : "Artist";
+                  contextName = artistNames
+                    ? artistNames.split(",")[0]
+                    : "Artist";
                 } else if (contextType === "user") {
                   contextName = "Liked Songs";
                 }
@@ -263,7 +267,11 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
         // Try to get artist genres
         let genres: string[] = [];
 
-        if (trackInfo?.artists && trackInfo.artists.length > 0 && trackInfo.artists[0]?.id) {
+        if (
+          trackInfo?.artists &&
+          trackInfo.artists.length > 0 &&
+          trackInfo.artists[0]?.id
+        ) {
           const artistId = trackInfo.artists[0].id;
           try {
             const artistInfo = await Spicetify.CosmosAsync.get(
@@ -346,8 +354,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
         ) {
           // Get medium size image (or the first available if medium doesn't exist)
           const image =
-            trackInfo.album.images.find((img: SpotifyImage) => img.height === 300) ||
-            trackInfo.album.images[0];
+            trackInfo.album.images.find(
+              (img: SpotifyImage) => img.height === 300
+            ) || trackInfo.album.images[0];
           setAlbumCover(image.url);
         } else {
           setAlbumCover(null);
@@ -404,7 +413,8 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
 
       // Find our track in the album and get its play count
       const trackItem = tracks.items.find(
-        (item: { track: { uri: string } }) => item.track && item.track.uri === trackUri
+        (item: { track: { uri: string } }) =>
+          item.track && item.track.uri === trackUri
       );
 
       if (!trackItem || !trackItem.track) {
@@ -421,17 +431,23 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   }
 
   const handlePlayTrack = () => {
-    if (onPlayTrack && displayedTrack.uri) {
+    if (displayedTrack.uri) {
       onPlayTrack(displayedTrack.uri);
     }
   };
 
   // Find tag name by ids
-  const findTagInfo = (categoryId: string, subcategoryId: string, tagId: string) => {
+  const findTagInfo = (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => {
     const category = categories.find((c) => c.id === categoryId);
     if (!category) return null;
 
-    const subcategory = category.subcategories.find((s) => s.id === subcategoryId);
+    const subcategory = category.subcategories.find(
+      (s) => s.id === subcategoryId
+    );
     if (!subcategory) return null;
 
     const tag = subcategory.tags.find((t) => t.id === tagId);
@@ -528,7 +544,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
         // Try to extract album ID from track URI and build album URI
         const trackId = displayedTrack.uri.split(":").pop();
         if (trackId) {
-          Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/tracks/${trackId}`)
+          Spicetify.CosmosAsync.get(
+            `https://api.spotify.com/v1/tracks/${trackId}`
+          )
             .then((response) => {
               if (response && response.album && response.album.id) {
                 const albumId = response.album.id;
@@ -563,16 +581,23 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
   const navigateToArtist = (artistName: string): void => {
     try {
       if (displayedTrack.uri.startsWith("spotify:local:")) {
-        Spicetify.showNotification("Cannot navigate to artist for local files", true);
+        Spicetify.showNotification(
+          "Cannot navigate to artist for local files",
+          true
+        );
         return;
       }
 
       const trackId = displayedTrack.uri.split(":").pop();
       if (trackId) {
-        Spicetify.CosmosAsync.get(`https://api.spotify.com/v1/tracks/${trackId}`)
+        Spicetify.CosmosAsync.get(
+          `https://api.spotify.com/v1/tracks/${trackId}`
+        )
           .then((response: SpotifyTrackResponse) => {
             if (response?.artists) {
-              const artist = response.artists.find((a: SpotifyArtist) => a.name === artistName);
+              const artist = response.artists.find(
+                (a: SpotifyArtist) => a.name === artistName
+              );
               if (artist?.id) {
                 Spicetify.Platform.History.push(`/artist/${artist.id}`);
                 return;
@@ -580,14 +605,20 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
             }
 
             // Fallback - search for the artist
-            Spicetify.Platform.History.push(`/search/${encodeURIComponent(artistName)}/artists`);
+            Spicetify.Platform.History.push(
+              `/search/${encodeURIComponent(artistName)}/artists`
+            );
           })
           .catch((error) => {
             console.error("Error finding artist:", error);
-            Spicetify.Platform.History.push(`/search/${encodeURIComponent(artistName)}/artists`);
+            Spicetify.Platform.History.push(
+              `/search/${encodeURIComponent(artistName)}/artists`
+            );
           });
       } else {
-        Spicetify.Platform.History.push(`/search/${encodeURIComponent(artistName)}/artists`);
+        Spicetify.Platform.History.push(
+          `/search/${encodeURIComponent(artistName)}/artists`
+        );
       }
     } catch (error) {
       console.error("Error navigating to artist:", error);
@@ -675,15 +706,14 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
 
   return (
     <div className={styles.container}>
-      {onToggleLock && (
-        <div className={styles.lockControlContainer}>
-          {isLocked && nowPlayingTrack && nowPlayingTrack.uri !== displayedTrack.uri && (
+      <div className={styles.lockControlContainer}>
+        {isLocked &&
+          nowPlayingTrack &&
+          nowPlayingTrack.uri !== displayedTrack.uri && (
             <button
               className={styles.switchTrackButton}
               onClick={() => {
-                if (onSwitchToCurrentTrack) {
-                  onSwitchToCurrentTrack(nowPlayingTrack);
-                }
+                onSwitchToCurrentTrack(nowPlayingTrack);
               }}
               title="Switch to currently playing track"
             >
@@ -692,15 +722,20 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
             </button>
           )}
 
-          <button
-            className={`${styles.lockButton} ${isLocked ? styles.locked : styles.unlocked}`}
-            onClick={handleToggleLock}
-            title={isLocked ? "Unlock to follow currently playing track" : "Lock to this track"}
-          >
-            {isLocked ? "🔒" : "🔓"}
-          </button>
-        </div>
-      )}
+        <button
+          className={`${styles.lockButton} ${
+            isLocked ? styles.locked : styles.unlocked
+          }`}
+          onClick={onToggleLock}
+          title={
+            isLocked
+              ? "Unlock to follow currently playing track"
+              : "Lock to this track"
+          }
+        >
+          {isLocked ? "🔒" : "🔓"}
+        </button>
+      </div>
       <div className={styles.contentLayout}>
         {/* Left side - Track info with album art */}
         <div className={styles.trackInfoContainer}>
@@ -754,7 +789,11 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
             >
               {displayedTrack.name || "Unknown Track"}
               {displayedTrack.uri?.startsWith("spotify:local:") && (
-                <span style={{ fontSize: "0.8em", opacity: 0.7, marginLeft: "6px" }}>(Local)</span>
+                <span
+                  style={{ fontSize: "0.8em", opacity: 0.7, marginLeft: "6px" }}
+                >
+                  (Local)
+                </span>
               )}
             </h2>
             <p className={styles.trackArtist}>
@@ -773,7 +812,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                   ))
                 : "Unknown Artist"}
             </p>
-            <p className={styles.trackAlbum}>{displayedTrack.album?.name || "Unknown Album"}</p>
+            <p className={styles.trackAlbum}>
+              {displayedTrack.album?.name || "Unknown Album"}
+            </p>
 
             {/* New Track Metadata Section */}
             <div className={styles.trackMetadata}>
@@ -785,14 +826,18 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                     {trackMetadata.releaseDate && (
                       <div className={styles.metadataItem}>
                         <span className={styles.metadataLabel}>Released:</span>
-                        <span className={styles.metadataValue}>{trackMetadata.releaseDate}</span>
+                        <span className={styles.metadataValue}>
+                          {trackMetadata.releaseDate}
+                        </span>
                       </div>
                     )}
 
                     {trackMetadata.trackLength && (
                       <div className={styles.metadataItem}>
                         <span className={styles.metadataLabel}>Length:</span>
-                        <span className={styles.metadataValue}>{trackMetadata.trackLength}</span>
+                        <span className={styles.metadataValue}>
+                          {trackMetadata.trackLength}
+                        </span>
                       </div>
                     )}
 
@@ -838,7 +883,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                               {trackData.bpm || trackMetadata.bpm || "Unknown"}
                             </span>
 
-                            {!displayedTrack.uri.startsWith("spotify:local:") && (
+                            {!displayedTrack.uri.startsWith(
+                              "spotify:local:"
+                            ) && (
                               <button
                                 className={styles.bpmRefreshButton}
                                 onClick={handleRefreshBpm}
@@ -846,7 +893,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                                 title="Fetch latest BPM from Spotify"
                               >
                                 {isRefreshingBpm ? (
-                                  <span className={styles.refreshSpinner}>⟳</span>
+                                  <span className={styles.refreshSpinner}>
+                                    ⟳
+                                  </span>
                                 ) : (
                                   "↻"
                                 )}
@@ -869,7 +918,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
 
                   {trackMetadata.sourceContext && (
                     <div className={styles.metadataContext}>
-                      <span className={styles.metadataLabel}>Playing from:</span>{" "}
+                      <span className={styles.metadataLabel}>
+                        Playing from:
+                      </span>{" "}
                       <span
                         className={`${styles.metadataValue} ${styles.contextLink}`}
                         onClick={() => navigateToContext()}
@@ -982,7 +1033,10 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
               {trackData.dateCreated && (
                 <div
                   className={styles.timestampItem}
-                  title={"Created: " + new Date(trackData.dateCreated).toLocaleString()}
+                  title={
+                    "Created: " +
+                    new Date(trackData.dateCreated).toLocaleString()
+                  }
                 >
                   <span className={styles.timestampLabel}>Tagged:</span>
                   <span className={styles.timestampValue}>
@@ -993,7 +1047,10 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
               {trackData.dateModified && (
                 <div
                   className={styles.timestampItem}
-                  title={"Last updated: " + new Date(trackData.dateModified).toLocaleString()}
+                  title={
+                    "Last updated: " +
+                    new Date(trackData.dateModified).toLocaleString()
+                  }
                 >
                   <span className={styles.timestampLabel}>Updated:</span>
                   <span className={styles.timestampValue}>
@@ -1023,27 +1080,44 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
               .sort(([, a], [, b]) => a.categoryOrder - b.categoryOrder)
               .map(([categoryId, category]) => (
                 <div key={categoryId} className={styles.tagCategory}>
-                  <h4 className={styles.categoryName}>{category.categoryName}</h4>
+                  <h4 className={styles.categoryName}>
+                    {category.categoryName}
+                  </h4>
 
                   {/* Only show subcategories that have tags */}
                   {Object.entries(category.subcategories)
                     .filter(([, subcategory]) => subcategory.tags.length > 0)
-                    .sort(([, a], [, b]) => a.subcategoryOrder - b.subcategoryOrder)
+                    .sort(
+                      ([, a], [, b]) => a.subcategoryOrder - b.subcategoryOrder
+                    )
                     .map(([subcategoryId, subcategory]) => (
-                      <div key={subcategoryId} className={styles.tagSubcategory}>
-                        <h5 className={styles.subcategoryName}>{subcategory.subcategoryName}</h5>
+                      <div
+                        key={subcategoryId}
+                        className={styles.tagSubcategory}
+                      >
+                        <h5 className={styles.subcategoryName}>
+                          {subcategory.subcategoryName}
+                        </h5>
 
                         <div className={styles.tagList}>
                           {subcategory.tags.map((tag) => {
-                            const fullTagId = createTagId(categoryId, subcategoryId, tag.id);
+                            const fullTagId = createTagId(
+                              categoryId,
+                              subcategoryId,
+                              tag.id
+                            );
 
                             return (
                               <div
                                 key={tag.id}
                                 className={`${styles.tagItem} ${
-                                  activeTagFilters.includes(fullTagId) ? styles.tagFilter : ""
+                                  activeTagFilters.includes(fullTagId)
+                                    ? styles.tagFilter
+                                    : ""
                                 } ${
-                                  excludedTagFilters.includes(fullTagId) ? styles.tagExcluded : ""
+                                  excludedTagFilters.includes(fullTagId)
+                                    ? styles.tagExcluded
+                                    : ""
                                 }`}
                                 onClick={() => onToggleTagIncludeOff(fullTagId)}
                                 title={
@@ -1054,13 +1128,19 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                                     : `Click to include "${tag.name}"`
                                 }
                               >
-                                <span className={styles.tagName}>{tag.name}</span>
+                                <span className={styles.tagName}>
+                                  {tag.name}
+                                </span>
                                 <button
                                   className={styles.removeTag}
                                   title={`Click to delete this tag`}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    onRemoveTag(categoryId, subcategoryId, tag.id);
+                                    onRemoveTag(
+                                      categoryId,
+                                      subcategoryId,
+                                      tag.id
+                                    );
                                   }}
                                   aria-label={`Remove tag ${tag.name}`}
                                 >
