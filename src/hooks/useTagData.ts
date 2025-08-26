@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { TrackInfoCacheManager } from "../utils/TrackInfoCache";
 import { spotifyApiService } from "../services/SpotifyApiService";
 import { defaultTagData } from "../constants/defaultTagData";
@@ -138,6 +138,12 @@ interface ExportDataResult {
   tag_analytics: TagAnalyticsData;
 }
 
+interface SyncOperation {
+  id: string;
+  type: "single" | "multiple";
+  execute: () => Promise<void>;
+}
+
 export interface SmartPlaylistCriteria {
   playlistId: string;
   playlistName: string;
@@ -178,7 +184,85 @@ export function useTagData() {
     []
   );
 
+  // Single queue processor promise to prevent race conditions
+  const queueProcessorRef = useRef<Promise<void> | null>(null);
+  const smartPlaylistsRef = useRef<SmartPlaylistCriteria[]>([]);
+  const syncQueueRef = useRef<SyncOperation[]>([]);
   const migrationRunRef = useRef(false);
+
+  // keep ref in sync with state
+  useEffect(() => {
+    smartPlaylistsRef.current = smartPlaylists;
+  }, [smartPlaylists]);
+
+  // Process sync operations sequentially
+  const processSyncQueue = useCallback(async () => {
+    // If processor is already running, wait for it to complete
+    if (queueProcessorRef.current) {
+      await queueProcessorRef.current;
+      return;
+    }
+
+    // Start processing if queue has items
+    if (syncQueueRef.current.length === 0) {
+      return;
+    }
+
+    // Create the processor promise that processes ONE operation at a time
+    queueProcessorRef.current = (async () => {
+      try {
+        while (syncQueueRef.current.length > 0) {
+          const operation = syncQueueRef.current.shift()!;
+
+          const startTime = Date.now();
+
+          try {
+            // Fully await each operation before moving to next
+            await operation.execute();
+          } catch (error) {
+            const duration = Date.now() - startTime;
+            console.error(
+              `FAILED operation ${operation.id} after ${duration}ms:`,
+              error
+            );
+          }
+        }
+      } finally {
+        queueProcessorRef.current = null;
+      }
+    })();
+
+    // Wait for the entire queue to complete
+    await queueProcessorRef.current;
+  }, []);
+
+  // Thread-safe state updater using functional updates
+  const updateSmartPlaylistsImmediate = useCallback(
+    (updater: (prev: SmartPlaylistCriteria[]) => SmartPlaylistCriteria[]) => {
+      const currentPlaylists = smartPlaylistsRef.current;
+      const updated = updater(currentPlaylists);
+
+      if (currentPlaylists.length > 0 && updated.length === 0) {
+        return currentPlaylists;
+      }
+
+      // Update ref immediately - this is the source of truth
+      smartPlaylistsRef.current = updated;
+
+      // Update React state
+      setSmartPlaylists(updated);
+
+      // Save to localStorage
+      try {
+        localStorage.setItem(SMART_PLAYLIST_KEY, JSON.stringify(updated));
+      } catch (error) {
+        console.error("Error saving smart playlist data:", error);
+      }
+
+      return updated;
+    },
+    []
+  );
 
   // Load smart playlists on mount
   useEffect(() => {
@@ -205,11 +289,29 @@ export function useTagData() {
           : [];
 
         setSmartPlaylists(validPlaylists);
+        smartPlaylistsRef.current = validPlaylists;
       }
     } catch (error) {
       console.error("Error loading smart playlists:", error);
     }
   }, []);
+
+  const updatePlaylistTrackUris = useCallback(
+    (playlistId: string, newTrackUris: string[]) => {
+      updateSmartPlaylistsImmediate((playlists) =>
+        playlists.map((playlist) =>
+          playlist.playlistId === playlistId
+            ? {
+                ...playlist,
+                smartPlaylistTrackUris: newTrackUris,
+                lastSyncAt: Date.now(),
+              }
+            : playlist
+        )
+      );
+    },
+    [updateSmartPlaylistsImmediate]
+  );
 
   // RUN MIGRATIONS
   useEffect(() => {
@@ -384,280 +486,246 @@ export function useTagData() {
     }
   };
 
-  const syncMultipleTracksWithSmartPlaylists = async (
-    trackUpdates: Record<string, TrackData | null>
-  ): Promise<void> => {
-    if (!smartPlaylists || smartPlaylists.length === 0) {
-      return;
-    }
+  const syncMultipleTracksWithSmartPlaylists = useCallback(
+    async (trackUpdates: Record<string, TrackData | null>): Promise<void> => {
+      const operationId = `multi-${Date.now()}-${Math.random()}`;
 
-    const updatedPlaylists = [...smartPlaylists];
-    let hasChanges = false;
+      const syncOperation: SyncOperation = {
+        id: operationId,
+        type: "multiple",
+        execute: async () => {
+          // Get current state at execution time (from ref - the source of truth)
+          const currentPlaylists = smartPlaylistsRef.current;
 
-    for (let i = 0; i < updatedPlaylists.length; i++) {
-      const smartPlaylist = updatedPlaylists[i];
+          if (!currentPlaylists || currentPlaylists.length === 0) {
+            return;
+          }
 
-      if (!smartPlaylist || !smartPlaylist.playlistId) {
-        continue;
-      }
+          console.log(
+            `[${operationId}] Processing ${currentPlaylists.length} smart playlists`
+          );
 
-      if (!smartPlaylist.isActive) continue;
+          // Process each playlist sequentially to avoid conflicts
+          for (const playlist of currentPlaylists) {
+            if (!playlist?.playlistId || !playlist.isActive) {
+              continue;
+            }
 
-      let playlistChanged = false;
-      let newTrackUris = [...(smartPlaylist.smartPlaylistTrackUris || [])];
-      const originalTrackUris = [
-        ...(smartPlaylist.smartPlaylistTrackUris || []),
-      ];
+            // Get the most current state for this playlist
+            const currentPlaylistData = smartPlaylistsRef.current.find(
+              (p) => p.playlistId === playlist.playlistId
+            );
+            if (!currentPlaylistData) continue;
 
-      for (const [trackUri, trackData] of Object.entries(trackUpdates)) {
-        try {
-          if (!trackData) {
-            // Track was deleted - remove from playlist
-            if (originalTrackUris.includes(trackUri)) {
-              const success = await spotifyApiService.removeTrackFromPlaylist(
-                trackUri,
-                smartPlaylist.playlistId
-              );
-              if (success) {
-                newTrackUris = newTrackUris.filter((uri) => uri !== trackUri);
-                playlistChanged = true;
-                Spicetify.showNotification(
-                  `❌ Track removed from smart playlist "${smartPlaylist.playlistName}"`,
-                  false,
-                  3000
+            let trackUris = [
+              ...(currentPlaylistData.smartPlaylistTrackUris || []),
+            ];
+            let hasChanges = false;
+
+            // Process each track update for this playlist
+            for (const [trackUri, trackData] of Object.entries(trackUpdates)) {
+              const isCurrentlyTracked = trackUris.includes(trackUri);
+              if (!trackData) {
+                // Track deleted - remove from playlist
+                if (isCurrentlyTracked) {
+                  const success =
+                    await spotifyApiService.removeTrackFromPlaylist(
+                      trackUri,
+                      playlist.playlistId
+                    );
+                  if (success) {
+                    trackUris = trackUris.filter((uri) => uri !== trackUri);
+                    hasChanges = true;
+                    // Update state immediately so next operation sees the change
+                    updatePlaylistTrackUris(playlist.playlistId, trackUris);
+                    showTrackRemovedNotification(playlist.playlistName);
+                  }
+                }
+              } else {
+                const matches = evaluateTrackMatchesCriteria(
+                  trackData,
+                  playlist.criteria
                 );
+
+                if (matches && !isCurrentlyTracked) {
+                  // ADD TRACK
+                  const result =
+                    await spotifyApiService.addTrackToSpotifyPlaylist(
+                      trackUri,
+                      playlist.playlistId
+                    );
+                  if (result.success && !trackUris.includes(trackUri)) {
+                    trackUris.push(trackUri);
+                    hasChanges = true;
+                    // Update state immediately
+                    updatePlaylistTrackUris(playlist.playlistId, trackUris);
+                    showTrackAddedNotification(
+                      trackUri,
+                      playlist.playlistName,
+                      result.wasAdded
+                    );
+                  }
+                } else if (!matches && isCurrentlyTracked) {
+                  // REMOVE TRACK
+                  const success =
+                    await spotifyApiService.removeTrackFromPlaylist(
+                      trackUri,
+                      playlist.playlistId
+                    );
+                  if (success) {
+                    trackUris = trackUris.filter((uri) => uri !== trackUri);
+                    hasChanges = true;
+                    // Update state immediately
+                    updatePlaylistTrackUris(playlist.playlistId, trackUris);
+                    showTrackRemovedNotification(playlist.playlistName);
+                  }
+                }
               }
             }
-          } else {
-            const matches = evaluateTrackMatchesCriteria(
-              trackData,
-              smartPlaylist.criteria
-            );
-            const isCurrentlyTracked = originalTrackUris.includes(trackUri);
 
-            if (matches && !isCurrentlyTracked) {
-              // ADD TRACK
-              const result = await spotifyApiService.addTrackToSpotifyPlaylist(
-                trackUri,
-                smartPlaylist.playlistId
-              );
-              if (result.success) {
-                if (!newTrackUris.includes(trackUri)) {
-                  newTrackUris.push(trackUri);
-                }
-                playlistChanged = true;
-
-                if (trackUri.startsWith("spotify:local:")) {
-                  Spicetify.showNotification(
-                    `🎵 Local file matches "${smartPlaylist.playlistName}" criteria but must be added manually`,
-                    true,
-                    5000
+            if (hasChanges) {
+              // Final validation to ensure consistency
+              try {
+                const actualTrackUris =
+                  await spotifyApiService.getAllTrackUrisInPlaylist(
+                    playlist.playlistId
                   );
-                } else if (result.wasAdded) {
-                  Spicetify.showNotification(
-                    `✅ Added track to smart playlist "${smartPlaylist.playlistName}"`,
-                    false,
-                    3000
-                  );
+                if (actualTrackUris && actualTrackUris.length >= 0) {
+                  updatePlaylistTrackUris(playlist.playlistId, actualTrackUris);
                 }
-              }
-            } else if (!matches && isCurrentlyTracked) {
-              // REMOVE TRACK
-              const success = await spotifyApiService.removeTrackFromPlaylist(
-                trackUri,
-                smartPlaylist.playlistId
-              );
-              if (success) {
-                newTrackUris = newTrackUris.filter((uri) => uri !== trackUri);
-                playlistChanged = true;
-
-                Spicetify.showNotification(
-                  `❌ Track removed from smart playlist "${smartPlaylist.playlistName}"`,
-                  false,
-                  3000
+              } catch (error) {
+                console.error(
+                  `[${operationId}] Validation failed for ${playlist.playlistName}:`,
+                  error
                 );
               }
             }
           }
-        } catch (error) {
-          console.error(
-            `❌ Error syncing track ${trackUri} with playlist ${smartPlaylist.playlistName}:`,
-            error
-          );
-          // Continue with other tracks/playlists
-        }
-      }
+        },
+      };
 
-      if (playlistChanged) {
-        updatedPlaylists[i] = {
-          ...smartPlaylist,
-          smartPlaylistTrackUris: newTrackUris,
-          lastSyncAt: Date.now(),
-        };
-        hasChanges = true;
-      }
-    }
+      syncQueueRef.current.push(syncOperation);
+      processSyncQueue();
+    },
+    [updatePlaylistTrackUris, processSyncQueue]
+  );
 
-    if (hasChanges && updatedPlaylists.length > 0) {
-      setSmartPlaylists(updatedPlaylists);
+  const syncTrackWithSmartPlaylists = useCallback(
+    async (trackUri: string, trackData: TrackData | null): Promise<void> => {
+      const operationId = `single-${Date.now()}-${Math.random()}`;
+
+      const syncOperation: SyncOperation = {
+        id: operationId,
+        type: "single",
+        execute: async () => {
+          const currentPlaylists = smartPlaylistsRef.current;
+          if (!currentPlaylists || currentPlaylists.length === 0) {
+            return;
+          }
+
+          // Process each playlist sequentially
+          for (const playlist of currentPlaylists) {
+            if (!playlist?.playlistId || !playlist.isActive) {
+              continue;
+            }
+
+            // Get current state for this playlist
+            const currentPlaylistData = smartPlaylistsRef.current.find(
+              (p) => p.playlistId === playlist.playlistId
+            );
+            if (!currentPlaylistData) continue;
+
+            const isCurrentlyTracked = (
+              currentPlaylistData.smartPlaylistTrackUris || []
+            ).includes(trackUri);
+            let trackUris = [
+              ...(currentPlaylistData.smartPlaylistTrackUris || []),
+            ];
+
+            if (!trackData) {
+              // Track deleted - remove from playlist
+              if (isCurrentlyTracked) {
+                const success = await spotifyApiService.removeTrackFromPlaylist(
+                  trackUri,
+                  playlist.playlistId
+                );
+                if (success) {
+                  trackUris = trackUris.filter((uri) => uri !== trackUri);
+                  updatePlaylistTrackUris(playlist.playlistId, trackUris);
+                  showTrackRemovedNotification(playlist.playlistName);
+                }
+              }
+            } else {
+              const matches = evaluateTrackMatchesCriteria(
+                trackData,
+                playlist.criteria
+              );
+
+              if (matches && !isCurrentlyTracked) {
+                // ADD TRACK
+                const result =
+                  await spotifyApiService.addTrackToSpotifyPlaylist(
+                    trackUri,
+                    playlist.playlistId
+                  );
+                if (result.success && !trackUris.includes(trackUri)) {
+                  trackUris.push(trackUri);
+                  updatePlaylistTrackUris(playlist.playlistId, trackUris);
+                  showTrackAddedNotification(
+                    trackUri,
+                    playlist.playlistName,
+                    result.wasAdded
+                  );
+                }
+              } else if (!matches && isCurrentlyTracked) {
+                // REMOVE TRACK
+                const success = await spotifyApiService.removeTrackFromPlaylist(
+                  trackUri,
+                  playlist.playlistId
+                );
+                if (success) {
+                  trackUris = trackUris.filter((uri) => uri !== trackUri);
+                  updatePlaylistTrackUris(playlist.playlistId, trackUris);
+                  showTrackRemovedNotification(playlist.playlistName);
+                }
+              }
+            }
+          }
+        },
+      };
+
+      syncQueueRef.current.push(syncOperation);
+      processSyncQueue();
+    },
+    [updatePlaylistTrackUris, processSyncQueue]
+  );
+
+  const showTrackAddedNotification = (
+    trackUri: string,
+    playlistName: string,
+    wasAdded: boolean
+  ) => {
+    if (trackUri.startsWith("spotify:local:")) {
+      Spicetify.showNotification(
+        `🎵 Local file matches "${playlistName}" criteria but must be added manually`,
+        true,
+        5000
+      );
+    } else if (wasAdded) {
+      Spicetify.showNotification(
+        `✅ Added track to smart playlist "${playlistName}"`,
+        false,
+        3000
+      );
     }
   };
 
-  const syncTrackWithSmartPlaylists = async (
-    trackUri: string,
-    trackData: TrackData | null
-  ): Promise<void> => {
-    if (!smartPlaylists || smartPlaylists.length === 0) {
-      return;
-    }
-
-    if (!trackData) {
-      // Handle case where track was deleted - remove from all smart playlists
-      const updatedPlaylists = [...smartPlaylists];
-      let hasChanges = false;
-
-      for (let i = 0; i < updatedPlaylists.length; i++) {
-        const smartPlaylist = updatedPlaylists[i];
-
-        if (!smartPlaylist || !smartPlaylist.playlistId) {
-          continue;
-        }
-
-        if ((smartPlaylist.smartPlaylistTrackUris || []).includes(trackUri)) {
-          try {
-            const success = await spotifyApiService.removeTrackFromPlaylist(
-              trackUri,
-              smartPlaylist.playlistId
-            );
-            if (success) {
-              updatedPlaylists[i] = {
-                ...smartPlaylist,
-                smartPlaylistTrackUris: (
-                  smartPlaylist.smartPlaylistTrackUris || []
-                ).filter((uri) => uri !== trackUri),
-                lastSyncAt: Date.now(),
-              };
-              hasChanges = true;
-            }
-          } catch (error) {
-            console.error(
-              `Error removing track ${trackUri} from playlist ${smartPlaylist.playlistId}:`,
-              error
-            );
-          }
-        }
-      }
-
-      if (hasChanges && updatedPlaylists.length > 0) {
-        setSmartPlaylists(updatedPlaylists);
-      }
-      return;
-    }
-
-    const updatedPlaylists = [...smartPlaylists];
-    let hasChanges = false;
-
-    for (let i = 0; i < updatedPlaylists.length; i++) {
-      const smartPlaylist = updatedPlaylists[i];
-
-      if (!smartPlaylist || !smartPlaylist.playlistId) {
-        continue;
-      }
-
-      if (!smartPlaylist.isActive) {
-        continue;
-      }
-
-      try {
-        const matches = evaluateTrackMatchesCriteria(
-          trackData,
-          smartPlaylist.criteria
-        );
-        const isCurrentlyTracked = (
-          smartPlaylist.smartPlaylistTrackUris || []
-        ).includes(trackUri);
-
-        if (matches && !isCurrentlyTracked) {
-          // ADD TRACK
-          const result = await spotifyApiService.addTrackToSpotifyPlaylist(
-            trackUri,
-            smartPlaylist.playlistId
-          );
-
-          if (result.success) {
-            console.log(
-              `✅ Successfully added ${trackUri} to ${smartPlaylist.playlistName}`
-            );
-            updatedPlaylists[i] = {
-              ...smartPlaylist,
-              smartPlaylistTrackUris: [
-                ...(smartPlaylist.smartPlaylistTrackUris || []),
-                trackUri,
-              ],
-              lastSyncAt: Date.now(),
-            };
-            hasChanges = true;
-
-            if (trackUri.startsWith("spotify:local:")) {
-              Spicetify.showNotification(
-                `🎵 Local file matches "${smartPlaylist.playlistName}" criteria but must be added manually`,
-                true,
-                5000
-              );
-            } else if (result.wasAdded) {
-              Spicetify.showNotification(
-                `✅ Added track to smart playlist "${smartPlaylist.playlistName}"`,
-                false,
-                5000
-              );
-            }
-          } else {
-            console.error(
-              `Failed to add ${trackUri} to ${smartPlaylist.playlistName}`
-            );
-          }
-        } else if (!matches && isCurrentlyTracked) {
-          // REMOVE TRACK
-          const success = await spotifyApiService.removeTrackFromPlaylist(
-            trackUri,
-            smartPlaylist.playlistId
-          );
-
-          if (success) {
-            console.log(
-              `✅ Successfully removed ${trackUri} from ${smartPlaylist.playlistName}`
-            );
-            updatedPlaylists[i] = {
-              ...smartPlaylist,
-              smartPlaylistTrackUris: (
-                smartPlaylist.smartPlaylistTrackUris || []
-              ).filter((uri) => uri !== trackUri),
-              lastSyncAt: Date.now(),
-            };
-            hasChanges = true;
-
-            Spicetify.showNotification(
-              `❌ Track removed from smart playlist "${smartPlaylist.playlistName}"`,
-              false,
-              5000
-            );
-          } else {
-            console.error(
-              `Failed to remove ${trackUri} from ${smartPlaylist.playlistName} - keeping in local tracking`
-            );
-          }
-        }
-      } catch (error) {
-        console.error(
-          `API Error syncing ${trackUri} with ${smartPlaylist.playlistName}:`,
-          error
-        );
-      }
-    }
-
-    if (hasChanges && updatedPlaylists.length > 0) {
-      setSmartPlaylists(updatedPlaylists);
-    }
+  const showTrackRemovedNotification = (playlistName: string) => {
+    Spicetify.showNotification(
+      `❌ Track removed from smart playlist "${playlistName}"`,
+      false,
+      3000
+    );
   };
 
   const syncSmartPlaylistFull = async (
