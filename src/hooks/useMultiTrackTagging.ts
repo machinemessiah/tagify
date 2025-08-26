@@ -39,8 +39,7 @@ interface UseMultiTrackTaggingReturn {
   ) => void;
 }
 
-export function useMultiTrackTagging(
-): UseMultiTrackTaggingReturn {
+export function useMultiTrackTagging(): UseMultiTrackTaggingReturn {
   // State
   const [isMultiTagging, setIsMultiTagging] = useState<boolean>(false);
   const [lockedMultiTrackUri, setLockedMultiTrackUri] = useState<string | null>(

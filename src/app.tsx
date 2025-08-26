@@ -20,6 +20,7 @@ import packageJson from "../package.json";
 import { useUpdateChecker } from "./hooks/useUpdateChecker";
 import UpdateBanner from "./components/UpdateBanner";
 import { useMultiTrackTagging } from "./hooks/useMultiTrackTagging";
+import { useSmartPlaylists } from "./hooks/useSmartPlaylists";
 
 function App() {
   const [showTagManager, setShowTagManager] = useState<boolean>(false);
@@ -33,22 +34,23 @@ function App() {
     setRating,
     setEnergy,
     setBpm,
-    toggleTagForMultipleTracks,
     replaceCategories,
     exportTagData,
     importTagData,
-    exportSmartPlaylists,
-    importSmartPlaylists,
-    findCommonTags,
     updateBpm,
     applyBatchTagUpdates,
     exportData,
+  } = useTagData();
+
+  const {
+    syncSmartPlaylistFull,
     createSmartPlaylist,
+    cleanupDeletedSmartPlaylists,
     smartPlaylists,
     setSmartPlaylists,
-    syncSmartPlaylistFull,
-    cleanupDeletedSmartPlaylists,
-  } = useTagData();
+    exportSmartPlaylists,
+    importSmartPlaylists,
+  } = useSmartPlaylists({ tagData });
 
   const {
     activeTagFilters,
@@ -115,12 +117,6 @@ function App() {
   });
 
   useFontAwesome();
-
-  // useEffect(() => {
-  //   cleanupDeletedSmartPlaylists().catch((error) => {
-  //     console.error("Error during smart playlist cleanup:", error);
-  //   });
-  // }, []);
 
   const playTrack = trackService.playTrack;
   const getTracksWithResolvedTags = () =>
