@@ -5,17 +5,7 @@ import { parseLocalFileUri } from "../utils/LocalFileParser";
 const LOCK_STATE_KEY = "tagify:lockState";
 const LOCKED_TRACK_KEY = "tagify:lockedTrack";
 
-interface UseTrackStateProps {
-  setIsMultiTagging: (isMultiTagging: boolean) => void;
-  setMultiTagTracks: (tracks: SpotifyTrack[]) => void;
-  setLockedMultiTrackUri: (uri: string | null) => void;
-}
-
-export function useTrackState({
-  setIsMultiTagging,
-  setMultiTagTracks,
-  setLockedMultiTrackUri,
-}: UseTrackStateProps) {
+export function useTrackState() {
   const [currentTrack, setCurrentTrack] = useState<SpotifyTrack | null>(null);
   const [lockedTrack, setLockedTrack] = useState<SpotifyTrack | null>(null);
   const [isStorageLoaded, setIsStorageLoaded] = useState(false);
@@ -107,23 +97,6 @@ export function useTrackState({
     };
   }, [isLocked, isStorageLoaded]);
 
-  // Cancel multi-tagging mode
-  const cancelMultiTagging = () => {
-    setMultiTagTracks([]);
-    setIsMultiTagging(false);
-    setLockedMultiTrackUri(null);
-
-    // If there's no active track to show but we have a current track,
-    // set it as the locked track
-    if (!activeTrack && currentTrack) {
-      setLockedTrack(currentTrack);
-      setIsLocked(true);
-    }
-
-    // Clear any URL parameters to avoid getting back into multi-tagging mode
-    Spicetify.Platform.History.push("/tagify");
-  };
-
   // Function to handle locking/unlocking the track
   const toggleLock = () => {
     if (isLocked) {
@@ -206,6 +179,5 @@ export function useTrackState({
     activeTrack,
     toggleLock,
     handleTagTrack,
-    cancelMultiTagging,
   };
 }

@@ -15,17 +15,6 @@ interface MultiTrackDetailsProps {
   }>;
   trackTagsMap: Record<string, TrackTag[]>;
   categories: TagCategory[];
-  onTagAllTracks: (
-    categoryId: string,
-    subcategoryId: string,
-    tagId: string
-  ) => void;
-  onTagSingleTrack?: (
-    trackUri: string,
-    categoryId: string,
-    subcategoryId: string,
-    tagId: string
-  ) => void;
   onCancelTagging: () => void;
   onPlayTrack: (uri: string) => void;
   lockedTrackUri: string | null;
@@ -45,8 +34,6 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   tracks,
   trackTagsMap,
   categories,
-  onTagAllTracks,
-  onTagSingleTrack,
   onCancelTagging,
   onPlayTrack,
   lockedTrackUri,
