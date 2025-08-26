@@ -732,7 +732,6 @@ export function useTagData() {
     playlist: SmartPlaylistCriteria
   ): Promise<void> => {
     try {
-      // await cleanupDeletedSmartPlaylists();
       if (!playlist.isActive) {
         return;
       }
