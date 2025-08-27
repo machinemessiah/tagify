@@ -58,7 +58,7 @@ describe("Smart Playlist Integration Flow", () => {
 
       // Store the smart playlist
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylistCriteria);
+        result.current.createSmartPlaylist(smartPlaylistCriteria);
       });
 
       // Verify it's stored in localStorage
@@ -184,8 +184,8 @@ describe("Smart Playlist Integration Flow", () => {
       };
 
       await act(async () => {
-        result.current.storeSmartPlaylist(housePlaylist);
-        result.current.storeSmartPlaylist(chillPlaylist);
+        result.current.createSmartPlaylist(housePlaylist);
+        result.current.createSmartPlaylist(chillPlaylist);
       });
 
       // Add a track that matches both playlists
@@ -341,7 +341,7 @@ describe("Smart Playlist Integration Flow", () => {
       };
 
       await act(async () => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       const trackData: TrackData = {
@@ -400,7 +400,7 @@ describe("Smart Playlist Integration Flow", () => {
       // Should not throw error despite localStorage failure
       expect(() => {
         act(() => {
-          result.current.storeSmartPlaylist(smartPlaylist);
+          result.current.createSmartPlaylist(smartPlaylist);
         });
       }).not.toThrow();
 
@@ -437,7 +437,7 @@ describe("Smart Playlist Integration Flow", () => {
       };
 
       await act(async () => {
-        result.current.storeSmartPlaylist(complexPlaylist);
+        result.current.createSmartPlaylist(complexPlaylist);
       });
 
       // Test track that meets ALL criteria

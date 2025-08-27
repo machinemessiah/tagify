@@ -63,14 +63,14 @@ interface TrackListProps {
     isPublic: boolean,
     isSmartPlaylist: boolean
   ) => Promise<string | null>;
-  onStoreSmartPlaylist: (criteria: SmartPlaylistCriteria) => void;
+  onCreateSmartPlaylist: (criteria: SmartPlaylistCriteria) => void;
   parseTagId: (
     fullTagId: string
   ) => { categoryId: string; subcategoryId: string; tagId: string } | null;
   smartPlaylists: SmartPlaylistCriteria[];
   onSetSmartPlaylists: (updatedPlaylists: SmartPlaylistCriteria[]) => void;
   onSyncPlaylist: (playlist: SmartPlaylistCriteria) => Promise<void>;
-  cleanupDeletedSmartPlaylists: () => Promise<void>;
+  onCleanupDeletedSmartPlaylists: () => Promise<void>;
   onExportSmartPlaylists: () => void;
   onImportSmartPlaylists: (data: SmartPlaylistCriteria[]) => void;
 }
@@ -89,12 +89,12 @@ const TrackList: React.FC<TrackListProps> = ({
   onTagTrack,
   onClearTagFilters,
   onCreatePlaylist,
-  onStoreSmartPlaylist,
+  onCreateSmartPlaylist,
   parseTagId,
   smartPlaylists,
   onSetSmartPlaylists,
   onSyncPlaylist,
-  cleanupDeletedSmartPlaylists,
+  onCleanupDeletedSmartPlaylists,
   onExportSmartPlaylists,
   onImportSmartPlaylists,
 }) => {
@@ -723,7 +723,7 @@ const TrackList: React.FC<TrackListProps> = ({
     if (isSmartPlaylist && playlistId) {
       const smartPlaylistCriteria: SmartPlaylistCriteria =
         createSmartPlaylistCriteria(playlistId, playlistName, trackUris);
-      onStoreSmartPlaylist(smartPlaylistCriteria);
+      onCreateSmartPlaylist(smartPlaylistCriteria);
     }
   };
 
@@ -735,7 +735,7 @@ const TrackList: React.FC<TrackListProps> = ({
 
   const handleSmartPlaylistClick = async () => {
     setShowSmartPlaylistModal(true);
-    cleanupDeletedSmartPlaylists();
+    // onCleanupDeletedSmartPlaylists();
   };
 
   const navigateToAlbum = (uri: string) => {
@@ -1503,6 +1503,7 @@ const TrackList: React.FC<TrackListProps> = ({
           onSyncPlaylist={onSyncPlaylist}
           onExportSmartPlaylists={onExportSmartPlaylists}
           onImportSmartPlaylists={onImportSmartPlaylists}
+          onCleanupDeletedSmartPlaylists={onCleanupDeletedSmartPlaylists}
           onClose={() => setShowSmartPlaylistModal(false)}
         />
       )}

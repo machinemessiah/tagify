@@ -440,7 +440,7 @@ describe("useTagData - Smart Playlist Logic", () => {
       };
 
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylistCriteria);
+        result.current.createSmartPlaylist(smartPlaylistCriteria);
       });
 
       expect(localStorage.setItem).toHaveBeenCalledWith(
@@ -508,7 +508,7 @@ describe("useTagData - Smart Playlist Logic", () => {
       };
 
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       // Mock track data that matches the criteria
@@ -561,7 +561,7 @@ describe("useTagData - Smart Playlist Logic", () => {
       };
 
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       // Mock track data that no longer matches the criteria
@@ -684,7 +684,7 @@ describe("useTagData - Smart Playlist Logic", () => {
       };
 
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       const trackData: TrackData = {

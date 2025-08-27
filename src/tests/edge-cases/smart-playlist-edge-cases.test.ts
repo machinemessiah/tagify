@@ -8,6 +8,7 @@ import {
   simulateNetworkError,
   simulateRateLimitError,
 } from "../utils/test-helpers";
+import { useSmartPlaylists } from "../../hooks/useSmartPlaylists";
 
 vi.mock("../../services/SpotifyApiService", () => ({
   spotifyApiService: {
@@ -46,8 +47,9 @@ describe.skip("Smart Playlist Edge Cases", () => {
 
   describe("Local File Handling", () => {
     it("should handle local files correctly in smart playlists", async () => {
-      const { result } = renderHook(() => useTagData());
-
+      const { result1 } = renderHook(() => useTagData());
+      const { result } = renderHook(() => useSmartPlaylists(result1.tagData));
+      
       const smartPlaylist = createMockSmartPlaylist({
         criteria: {
           activeTagFilters: [{ categoryId: "genre", subcategoryId: "electronic", tagId: "house" }],
@@ -62,7 +64,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
       });
 
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       // Create local file track data that matches criteria
@@ -101,7 +103,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
 
       const smartPlaylist = createMockSmartPlaylist();
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       const trackUpdates: Record<string, TrackData> = {
@@ -133,7 +135,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
 
       const smartPlaylist = createMockSmartPlaylist();
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       const trackData = createMockTrackData();
@@ -153,7 +155,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
 
       const smartPlaylist = createMockSmartPlaylist();
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       const trackData = createMockTrackData();
@@ -185,7 +187,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
 
       const smartPlaylist = createMockSmartPlaylist();
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       const trackData = createMockTrackData();
@@ -212,7 +214,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
       });
 
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       const trackData = createMockTrackData();
@@ -301,7 +303,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
       expect(() => {
         const { result } = renderHook(() => useTagData());
         act(() => {
-          result.current.storeSmartPlaylist(largePlaylist);
+          result.current.createSmartPlaylist(largePlaylist);
         });
       }).not.toThrow();
     });
@@ -318,9 +320,9 @@ describe.skip("Smart Playlist Edge Cases", () => {
       // Simulate concurrent playlist creation
       await act(async () => {
         await Promise.all([
-          Promise.resolve(result.current.storeSmartPlaylist(playlist1)),
-          Promise.resolve(result.current.storeSmartPlaylist(playlist2)),
-          Promise.resolve(result.current.storeSmartPlaylist(playlist3)),
+          Promise.resolve(result.current.createSmartPlaylist(playlist1)),
+          Promise.resolve(result.current.createSmartPlaylist(playlist2)),
+          Promise.resolve(result.current.createSmartPlaylist(playlist3)),
         ]);
       });
 
@@ -332,7 +334,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
 
       const smartPlaylist = createMockSmartPlaylist();
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       const trackData = createMockTrackData();
@@ -361,7 +363,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
 
       const smartPlaylist = createMockSmartPlaylist();
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       const trackData = createMockTrackData();
@@ -415,8 +417,8 @@ describe.skip("Smart Playlist Edge Cases", () => {
       });
 
       act(() => {
-        result.current.storeSmartPlaylist(minRatingPlaylist);
-        result.current.storeSmartPlaylist(maxRatingPlaylist);
+        result.current.createSmartPlaylist(minRatingPlaylist);
+        result.current.createSmartPlaylist(maxRatingPlaylist);
       });
 
       // Test with minimum rating track
@@ -445,7 +447,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
 
       const smartPlaylist = createMockSmartPlaylist();
       act(() => {
-        result.current.storeSmartPlaylist(smartPlaylist);
+        result.current.createSmartPlaylist(smartPlaylist);
       });
 
       // Test with zero/negative values
@@ -486,7 +488,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
       });
 
       act(() => {
-        result.current.storeSmartPlaylist(highValuePlaylist);
+        result.current.createSmartPlaylist(highValuePlaylist);
       });
 
       const extremeTrack = createMockTrackData({
@@ -523,7 +525,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
       });
 
       act(() => {
-        result.current.storeSmartPlaylist(unicodePlaylist);
+        result.current.createSmartPlaylist(unicodePlaylist);
       });
 
       const unicodeTrackData = createMockTrackData({
@@ -547,7 +549,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
       });
 
       act(() => {
-        result.current.storeSmartPlaylist(longPlaylist);
+        result.current.createSmartPlaylist(longPlaylist);
       });
 
       expect(result.current.smartPlaylists[0].playlistName).toBe(longName);
@@ -568,7 +570,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
       });
 
       act(() => {
-        result.current.storeSmartPlaylist(deletedPlaylist);
+        result.current.createSmartPlaylist(deletedPlaylist);
       });
 
       // Trigger cleanup by attempting sync
@@ -597,7 +599,7 @@ describe.skip("Smart Playlist Edge Cases", () => {
       expect(() => {
         act(() => {
           manyPlaylists.forEach((playlist) => {
-            result.current.storeSmartPlaylist(playlist);
+            result.current.createSmartPlaylist(playlist);
           });
         });
       }).not.toThrow();
