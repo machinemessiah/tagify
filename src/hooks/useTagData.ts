@@ -60,10 +60,12 @@ export interface BatchTagChanges {
   }>;
 }
 
-interface BatchTagUpdate {
+export interface BatchTagUpdate {
   trackUri: string;
   toAdd: TrackTag[];
   toRemove: TrackTag[];
+  newRating?: number;
+  newEnergy?: number;
 }
 
 interface TagAnalytics {
@@ -368,7 +370,7 @@ export function useTagData() {
       };
 
       // Apply all updates
-      updates.forEach(({ trackUri, toAdd, toRemove }) => {
+      updates.forEach(({ trackUri, toAdd, toRemove, newRating, newEnergy }) => {
         // Ensure track exists
         if (!newData.tracks[trackUri]) {
           newData.tracks[trackUri] = {
@@ -415,6 +417,14 @@ export function useTagData() {
         const updatedTrackData = {
           ...newData.tracks[trackUri],
           tags: trackTags,
+          rating:
+            newRating !== undefined
+              ? newRating
+              : newData.tracks[trackUri].rating,
+          energy:
+            newEnergy !== undefined
+              ? newEnergy
+              : newData.tracks[trackUri].energy,
           dateModified: now,
           dateCreated: newData.tracks[trackUri].dateCreated || now,
         };
@@ -542,8 +552,6 @@ export function useTagData() {
       100
     );
   };
-
-  
 
   const isTrackEmpty = (trackData: TrackData): boolean => {
     return (

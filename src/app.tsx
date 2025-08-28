@@ -115,35 +115,6 @@ function App() {
     delayMs: 2000,
   });
 
-  useEffect(() => {
-    // This creates a global reference for debugging in browser console
-    (window as any).__TAGIFY_DEBUG__ = {
-      multiTrackDraftTags,
-      isMultiTagging,
-      lockedMultiTrackUri,
-      multiTagTracks,
-      tagData,
-      smartPlaylists,
-      activeTagFilters,
-      excludedTagFilters,
-      currentlyPlayingTrack,
-      activeTrack,
-      selectedTagsForSelector,
-    };
-  }, [
-    multiTrackDraftTags,
-    isMultiTagging,
-    lockedMultiTrackUri,
-    multiTagTracks,
-    tagData,
-    smartPlaylists,
-    activeTagFilters,
-    excludedTagFilters,
-    currentlyPlayingTrack,
-    activeTrack,
-    selectedTagsForSelector,
-  ]);
-
   useFontAwesome();
 
   const playTrack = trackService.playTrack;
@@ -187,14 +158,49 @@ function App() {
     }
   };
 
-  const trackTagsMap = useMemo(() => {
+  const trackDataMap = useMemo(() => {
     return Object.fromEntries(
       multiTagTracks.map((track) => [
         track.uri,
-        tagData.tracks[track.uri]?.tags || [],
+        {
+          tags: tagData.tracks[track.uri]?.tags || [],
+          rating: tagData.tracks[track.uri]?.rating || 0,
+          energy: tagData.tracks[track.uri]?.energy || 0,
+        },
       ])
     );
   }, [multiTagTracks, tagData.tracks]);
+
+  useEffect(() => {
+    // This creates a global reference for debugging in browser console
+    (window as any).__TAGIFY_DEBUG__ = {
+      multiTrackDraftTags,
+      isMultiTagging,
+      lockedMultiTrackUri,
+      multiTagTracks,
+      tagData,
+      smartPlaylists,
+      activeTagFilters,
+      excludedTagFilters,
+      currentlyPlayingTrack,
+      activeTrack,
+      selectedTagsForSelector,
+      trackDataMap,
+    };
+  }, [
+    multiTrackDraftTags,
+    isMultiTagging,
+    lockedMultiTrackUri,
+    multiTagTracks,
+    tagData,
+    smartPlaylists,
+    activeTagFilters,
+    excludedTagFilters,
+    currentlyPlayingTrack,
+    activeTrack,
+    selectedTagsForSelector,
+    trackDataMap,
+  ]);
 
   return (
     <div className={styles.container}>
@@ -221,10 +227,13 @@ function App() {
         </div>
       ) : (
         <div className={styles.content}>
-          {isMultiTagging && multiTagTracks.length > 0 && multiTrackDraftTags ? (
+          {isMultiTagging &&
+          multiTagTracks.length > 0 &&
+          multiTrackDraftTags
+           ? (
             <MultiTrackDetails
               tracks={multiTagTracks}
-              trackTagsMap={trackTagsMap}
+              trackDataMap={trackDataMap}
               categories={tagData.categories}
               onCancelTagging={cancelMultiTagging}
               onPlayTrack={playTrack}
