@@ -547,6 +547,15 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
             <div className={styles.ratingContainer}>
               <div className={styles.stars}>
                 <ReactStars
+                  key={`stars-${lockedTrackUri || "bulk"}-${(() => {
+                    if (lockedTrackUri) {
+                      return multiTrackDraftTags[lockedTrackUri]?.rating || 0;
+                    } else {
+                      return (
+                        findCommonStarRatingFromDraft(multiTrackDraftTags) || 0
+                      );
+                    }
+                  })()}`}
                   count={5}
                   value={(() => {
                     if (lockedTrackUri) {
@@ -624,6 +633,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
             </label>
             <div className={styles.energyContainer}>
               <input
+                key={`energy-${lockedTrackUri || "bulk"}`}
                 type="range"
                 min="1"
                 max="10"
@@ -834,7 +844,10 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                 <div className={styles.trackRatingSection}>
                   {hasEnergy && (
                     <div className={styles.trackItemEnergy}>
-                      <span title={`Energy: ${trackData.energy}`}>
+                      <span
+                        key={`energy-${track.uri}-${trackData.energy}`}
+                        title={`Energy: ${trackData.energy}`}
+                      >
                         {trackData.energy}
                       </span>
                     </div>
@@ -842,6 +855,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                   {hasRating && (
                     <div className={styles.trackItemRating}>
                       <ReactStars
+                        key={`stars-${track.uri}-${trackData.rating}`}
                         count={5}
                         value={trackData.rating}
                         edit={false}
