@@ -18,6 +18,17 @@ export function useMultiTrackTagging() {
   // Get tag data and functions from the main tag data hook
   const { tagData, findCommonTags } = useTagData();
 
+  // initialize draft from current saved tags
+  useEffect(() => {
+    if (isMultiTagging && multiTagTracks.length > 0) {
+      const initialDraft: DraftTagState = {};
+      multiTagTracks.forEach((track) => {
+        initialDraft[track.uri] = [...(tagData.tracks[track.uri]?.tags || [])];
+      });
+      setMultiTrackDraftTags(initialDraft);
+    }
+  }, [isMultiTagging, multiTagTracks.length, tagData.tracks]);
+
   // Helper function to find common tags from draft state
   const findCommonTagsFromDraft = useCallback(
     (draftTags: DraftTagState, tracks: SpotifyTrack[]): TrackTag[] => {

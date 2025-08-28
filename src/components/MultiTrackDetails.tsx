@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./MultiTrackDetails.module.css";
 import { TagCategory, TrackTag } from "../hooks/useTagData";
 
+// TODO: this is duplicated in useMultiTrackTagging
 export interface DraftTagState {
   [trackUri: string]: TrackTag[];
 }
@@ -19,8 +20,8 @@ interface MultiTrackDetailsProps {
   onPlayTrack: (uri: string) => void;
   lockedTrackUri: string | null;
   onLockTrack: (uri: string | null) => void;
-  draftTags: DraftTagState | null;
-  onDraftTagsChange: (draftTags: DraftTagState) => void;
+  multiTrackDraftTags: DraftTagState;
+  onSetMultiTrackDraftTags: (draftTags: DraftTagState) => void;
   onBatchUpdate: (
     updates: Array<{
       trackUri: string;
@@ -38,49 +39,22 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   onPlayTrack,
   lockedTrackUri,
   onLockTrack,
-  draftTags: externalDraftTags,
-  onDraftTagsChange,
+  multiTrackDraftTags,
+  onSetMultiTrackDraftTags,
   onBatchUpdate,
 }) => {
-  // Initialize draft state from current tags
-  const [internalDraftTags, setInternalDraftTags] = useState<DraftTagState>(
-    () => {
-      const initial: DraftTagState = {};
-      tracks.forEach((track) => {
-        initial[track.uri] = [...(trackTagsMap[track.uri] || [])];
-      });
-      return initial;
-    }
-  );
-
-  // Use external draft tags if provided, otherwise use internal
-  const draftTags = externalDraftTags || internalDraftTags;
-  const setDraftTags = (
-    updaterOrValue: DraftTagState | ((prev: DraftTagState) => DraftTagState)
-  ) => {
-    // External handler - need to compute the new value
-    const newValue =
-      typeof updaterOrValue === "function"
-        ? updaterOrValue(externalDraftTags || {})
-        : updaterOrValue;
-    onDraftTagsChange(newValue);
-  };
-
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Update draft tags when props change - when new tracks are added
-  useEffect(() => {
-    const newDraft: DraftTagState = {};
-    tracks.forEach((track) => {
-      // Preserve existing draft changes if track already exists
-      if (draftTags[track.uri] !== undefined) {
-        newDraft[track.uri] = draftTags[track.uri];
-      } else {
-        newDraft[track.uri] = [...(trackTagsMap[track.uri] || [])];
-      }
-    });
-    setDraftTags(newDraft);
-  }, [tracks.length]);
+  const updateDraftTags = (
+    updater: DraftTagState | ((prev: DraftTagState) => DraftTagState)
+  ) => {
+    if (typeof updater === "function") {
+      const newDraft = updater(multiTrackDraftTags);
+      onSetMultiTrackDraftTags(newDraft);
+    } else {
+      onSetMultiTrackDraftTags(updater);
+    }
+  };
 
   // Check for changes whenever draft tags update
   useEffect(() => {
@@ -88,7 +62,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
 
     for (const track of tracks) {
       const originalTags = trackTagsMap[track.uri] || [];
-      const draftTrackTags = draftTags[track.uri] || [];
+      const draftTrackTags = multiTrackDraftTags[track.uri] || [];
 
       if (originalTags.length !== draftTrackTags.length) {
         hasAnyChanges = true;
@@ -112,7 +86,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     }
 
     setHasUnsavedChanges(hasAnyChanges);
-  }, [draftTags, trackTagsMap, tracks]);
+  }, [multiTrackDraftTags, trackTagsMap, tracks]);
 
   const getTagName = (
     categoryId: string,
@@ -135,13 +109,13 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     if (tracks.length === 0) return [];
 
     const firstTrackUri = tracks[0].uri;
-    const firstTrackTags = draftTags[firstTrackUri] || [];
+    const firstTrackTags = multiTrackDraftTags[firstTrackUri] || [];
 
     if (tracks.length === 1) return firstTrackTags;
 
     return firstTrackTags.filter((tag) => {
       return tracks.every((track) => {
-        const trackTags = draftTags[track.uri] || [];
+        const trackTags = multiTrackDraftTags[track.uri] || [];
         return trackTags.some(
           (t) =>
             t.categoryId === tag.categoryId &&
@@ -170,8 +144,8 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   // Handle tag removal/addition in draft state
   const handleRemoveTagDraft = (tag: TrackTag) => {
     if (lockedTrackUri) {
-      // Toggle tag for single track
-      setDraftTags((prev) => {
+      updateDraftTags((prev: DraftTagState) => {
+        // Toggle tag for single track
         const newDraft = { ...prev };
         const trackTags = newDraft[lockedTrackUri] || [];
         const tagIndex = trackTags.findIndex(
@@ -186,12 +160,11 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
         } else {
           newDraft[lockedTrackUri] = [...trackTags, tag];
         }
-
         return newDraft;
       });
     } else {
-      // Toggle tag for all tracks
-      setDraftTags((prev) => {
+      updateDraftTags((prev: DraftTagState) => {
+        // Toggle tag for all tracks
         const newDraft = { ...prev };
 
         // Check if all tracks have this tag
@@ -223,7 +196,6 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
             newDraft[track.uri] = [...trackTags, tag];
           }
         });
-
         return newDraft;
       });
     }
@@ -256,7 +228,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     e.stopPropagation(); // Prevent track locking when clicking on tags
 
     // Toggle the tag for this specific track in draft state
-    setDraftTags((prev) => {
+    updateDraftTags((prev: DraftTagState) => {
       const newDraft = { ...prev };
       const trackTags = newDraft[trackUri] || [];
       const tagIndex = trackTags.findIndex(
@@ -287,7 +259,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
 
     tracks.forEach((track) => {
       const originalTags = trackTagsMap[track.uri] || [];
-      const draftTrackTags = draftTags[track.uri] || [];
+      const draftTrackTags = multiTrackDraftTags[track.uri] || [];
 
       const toAdd = draftTrackTags.filter(
         (draftTag) =>
@@ -326,9 +298,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     // This ensures the UI reflects the saved state immediately
     const newDraft: DraftTagState = {};
     tracks.forEach((track) => {
-      newDraft[track.uri] = draftTags[track.uri] || [];
+      newDraft[track.uri] = multiTrackDraftTags[track.uri] || [];
     });
-    setDraftTags(newDraft);
+    onSetMultiTrackDraftTags(newDraft);
 
     setHasUnsavedChanges(false);
     Spicetify.showNotification(`Saved changes to ${changes.length} tracks`);
@@ -340,7 +312,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     tracks.forEach((track) => {
       resetDraft[track.uri] = [...(trackTagsMap[track.uri] || [])];
     });
-    setDraftTags(resetDraft);
+    onSetMultiTrackDraftTags(resetDraft);
     setHasUnsavedChanges(false);
   };
 
@@ -457,9 +429,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                 </span>
               </div>
               <div className={styles.trackTagsInline}>
-                {(draftTags[track.uri] || []).length > 0 ? (
+                {(multiTrackDraftTags[track.uri] || []).length > 0 ? (
                   <div className={styles.tagList}>
-                    {draftTags[track.uri]
+                    {multiTrackDraftTags[track.uri]
                       .slice()
                       .sort((a, b) => {
                         const nameA = getTagName(

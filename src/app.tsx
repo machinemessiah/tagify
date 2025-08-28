@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./app.module.css";
 import "./styles/globals.css";
 import TrackDetails from "./components/TrackDetails";
@@ -187,6 +187,15 @@ function App() {
     }
   };
 
+  const trackTagsMap = useMemo(() => {
+    return Object.fromEntries(
+      multiTagTracks.map((track) => [
+        track.uri,
+        tagData.tracks[track.uri]?.tags || [],
+      ])
+    );
+  }, [multiTagTracks, tagData.tracks]);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -212,22 +221,17 @@ function App() {
         </div>
       ) : (
         <div className={styles.content}>
-          {isMultiTagging && multiTagTracks.length > 0 ? (
+          {isMultiTagging && multiTagTracks.length > 0 && multiTrackDraftTags ? (
             <MultiTrackDetails
               tracks={multiTagTracks}
-              trackTagsMap={Object.fromEntries(
-                multiTagTracks.map((track) => [
-                  track.uri,
-                  tagData.tracks[track.uri]?.tags || [],
-                ])
-              )}
+              trackTagsMap={trackTagsMap}
               categories={tagData.categories}
               onCancelTagging={cancelMultiTagging}
               onPlayTrack={playTrack}
               lockedTrackUri={lockedMultiTrackUri}
               onLockTrack={setLockedMultiTrackUri}
-              draftTags={multiTrackDraftTags}
-              onDraftTagsChange={setMultiTrackDraftTags}
+              multiTrackDraftTags={multiTrackDraftTags}
+              onSetMultiTrackDraftTags={setMultiTrackDraftTags}
               onBatchUpdate={applyBatchTagUpdates}
             />
           ) : (
