@@ -543,27 +543,7 @@ export function useTagData() {
     );
   };
 
-  const findCommonTags = (trackUris: string[]): TrackTag[] => {
-    if (trackUris.length === 0) return [];
-
-    // Get tags from the first track
-    const firstTrackTags = tagData.tracks[trackUris[0]]?.tags || [];
-
-    if (trackUris.length === 1) return firstTrackTags;
-
-    // Check which tags exist in all tracks
-    return firstTrackTags.filter((tag) => {
-      return trackUris.every((uri) => {
-        const trackTags = tagData.tracks[uri]?.tags || [];
-        return trackTags.some(
-          (t) =>
-            t.categoryId === tag.categoryId &&
-            t.subcategoryId === tag.subcategoryId &&
-            t.tagId === tag.tagId
-        );
-      });
-    });
-  };
+  
 
   const isTrackEmpty = (trackData: TrackData): boolean => {
     return (
@@ -1059,7 +1039,6 @@ export function useTagData() {
     setEnergy,
     setBpm,
     updateBpm,
-    findCommonTags,
     applyBatchTagUpdates,
 
     // Category management

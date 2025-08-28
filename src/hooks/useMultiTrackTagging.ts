@@ -16,7 +16,7 @@ export function useMultiTrackTagging() {
   const [multiTagTracks, setMultiTagTracks] = useState<SpotifyTrack[]>([]);
 
   // Get tag data and functions from the main tag data hook
-  const { tagData, findCommonTags } = useTagData();
+  const { tagData } = useTagData();
 
   // initialize draft from current saved tags
   useEffect(() => {
@@ -141,30 +141,18 @@ export function useMultiTrackTagging() {
       return null;
     }
 
-    // priority 1: draft state (user is actively editing)
-    if (multiTrackDraftTags) {
-      if (lockedMultiTrackUri) {
-        // if locked track is in multi-track mode, highlight only its particular draft tags
-        return multiTrackDraftTags[lockedMultiTrackUri] || [];
-      }
-      // otherwise, highlight ALL common draft tags
-      return findCommonTagsFromDraft(multiTrackDraftTags, multiTagTracks);
-    }
-
-    // priority 2: saved state (showing current reality - there are no draft tags)
+    // if locked track is in multi-track mode, highlight only its particular draft tags
     if (lockedMultiTrackUri) {
-      return tagData.tracks[lockedMultiTrackUri]?.tags || [];
+      return multiTrackDraftTags?.[lockedMultiTrackUri] || [];
     }
-    // if no locked track, find common tags across ALL tracks in multi-track mode
-    return findCommonTags(multiTagTracks.map((track) => track.uri));
+    // otherwise, highlight ALL common draft tags
+    return findCommonTagsFromDraft(multiTrackDraftTags ?? {}, multiTagTracks);
   }, [
     isMultiTagging,
     multiTrackDraftTags,
     lockedMultiTrackUri,
     multiTagTracks,
-    tagData.tracks,
     findCommonTagsFromDraft,
-    findCommonTags,
   ]);
 
   return {
