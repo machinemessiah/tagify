@@ -30,7 +30,7 @@ export interface UseSpicetifyHistoryProps {
   setLockedMultiTrackUri: (uri: string | null) => void;
 }
 /**
- * Spicetify History Integration Hook.
+ * SPICETIFY HISTORY INTERGRATION HOOK
  *
  * @remarks
  * This hook **listens for navigation changes** in `Spicetify.Platform.History`
@@ -54,6 +54,7 @@ export interface UseSpicetifyHistoryProps {
  * ### URL Formats
  * - Single track: `/tagify?uri=spotify%3Atrack%3A123`
  * - Multi track:  `/tagify?uris=%5B%22spotify%3Atrack%3A123%22%2C%22spotify%3Atrack%3A456%22%5D`
+ *
  */
 export function useSpicetifyHistory({
   isMultiTagging,

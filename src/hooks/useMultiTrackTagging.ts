@@ -6,6 +6,47 @@ export interface DraftTagState {
   [trackUri: string]: TrackTag[];
 }
 
+/**
+ * MULTI-TRACK TAGGING HOOK
+ * 
+ * This hook encapsulates all state and logic related to bulk tagging operations, including:
+ * - Managing multiple selected tracks for batch tagging
+ * - Handling draft tag state with optimistic updates
+ * - Supporting **track locking** for **individual track tagging** within bulk mode
+ * - Computing common tags across selected tracks
+ * - Providing tag toggle functionality for both individual and bulk operations
+ * 
+ * The hook implements a draft system where tag changes are staged locally before being
+ * committed via batch operations, allowing users to make multiple changes and save them
+ * atomically or discard them entirely.
+ * 
+ * @example
+ * ```typescript
+ * const {
+ *   isMultiTagging,
+ *   multiTagTracks,
+ *   toggleTag,
+ *   selectedTagsForSelector,
+ *   cancelMultiTagging
+ * } = useMultiTrackTagging();
+ * 
+ * // Enter multi-tagging mode with selected tracks
+ * setIsMultiTagging(true);
+ * setMultiTagTracks(selectedTracks);
+ * 
+ * // Toggle a tag for all selected tracks
+ * toggleTag('genre', 'electronic', 'house');
+ * ```
+ * 
+ * @remarks
+ * This hook is designed to work in conjunction with:
+ * - `useTagData` for accessing global tag data and categories
+ * - `MultiTrackDetails` component for UI rendering
+ * - `TagSelector` component for tag selection interface
+ * 
+ * The hook maintains referential equality for memoized values and uses `useCallback`
+ * for performance optimization with large track selections.
+ */
 export function useMultiTrackTagging() {
   const [isMultiTagging, setIsMultiTagging] = useState<boolean>(false);
   const [lockedMultiTrackUri, setLockedMultiTrackUri] = useState<string | null>(
