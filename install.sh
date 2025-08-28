@@ -69,9 +69,9 @@ spicetify apply
 # Clean up
 rm -rf "$ZIP_FILE" "$TEMP_DIR"
 
-echo -e "${GREEN}Tagify installation complete!"
+echo -e "${GREEN}Tagify installation complete!
 
 Next steps:
 1. Restart Spotify completely
 2. Look for 'Tagify' in your Spotify top navigation bar
-3. Start tagging your tracks!
+3. Start tagging your tracks!${NC}"
