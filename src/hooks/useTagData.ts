@@ -681,108 +681,6 @@ export function useTagData() {
     );
   };
 
-  const toggleTagForMultipleTracks = (
-    trackUris: string[],
-    categoryId: string,
-    subcategoryId: string,
-    tagId: string
-  ) => {
-    // Create a copy of the current tagData
-    const updatedTagData = { ...tagData };
-    const now = Date.now();
-
-    // Check if all tracks have this tag
-    const allHaveTag = trackUris.every((uri) => {
-      const trackTags = updatedTagData.tracks[uri]?.tags || [];
-      return trackTags.some(
-        (t) =>
-          t.categoryId === categoryId &&
-          t.subcategoryId === subcategoryId &&
-          t.tagId === tagId
-      );
-    });
-
-    // Process each track
-    trackUris.forEach((uri) => {
-      // Ensure track data exists
-      if (!updatedTagData.tracks[uri]) {
-        updatedTagData.tracks[uri] = {
-          rating: 0,
-          energy: 0,
-          bpm: null,
-          tags: [],
-          dateCreated: now,
-          dateModified: now,
-        };
-      }
-
-      const trackData = updatedTagData.tracks[uri];
-      const hasTag = trackData.tags.some(
-        (t) =>
-          t.categoryId === categoryId &&
-          t.subcategoryId === subcategoryId &&
-          t.tagId === tagId
-      );
-
-      if (allHaveTag) {
-        // Remove tag if all have it
-        if (hasTag) {
-          const existingTagIndex = trackData.tags.findIndex(
-            (t) =>
-              t.categoryId === categoryId &&
-              t.subcategoryId === subcategoryId &&
-              t.tagId === tagId
-          );
-
-          updatedTagData.tracks[uri] = {
-            ...trackData,
-            tags: [
-              ...trackData.tags.slice(0, existingTagIndex),
-              ...trackData.tags.slice(existingTagIndex + 1),
-            ],
-            dateCreated: trackData.dateCreated || now,
-            dateModified: now,
-          };
-
-          if (
-            updatedTagData.tracks[uri].tags.length === 0 &&
-            updatedTagData.tracks[uri].rating === 0 &&
-            updatedTagData.tracks[uri].energy === 0
-          ) {
-            TrackInfoCacheManager.removeTrackInfo(uri);
-          }
-        }
-      } else {
-        // Add tag if not all have it
-        if (!hasTag) {
-          updatedTagData.tracks[uri] = {
-            ...trackData,
-            tags: [...trackData.tags, { categoryId, subcategoryId, tagId }],
-            dateCreated: trackData.dateCreated || now,
-            dateModified: now,
-          };
-        }
-      }
-    });
-
-    // Clean up empty tracks
-    Object.keys(updatedTagData.tracks).forEach((uri) => {
-      const trackData = updatedTagData.tracks[uri];
-      if (
-        trackData.rating === 0 &&
-        trackData.energy === 0 &&
-        trackData.tags.length === 0
-      ) {
-        // Remove empty track
-        const { [uri]: _, ...remainingTracks } = updatedTagData.tracks;
-        updatedTagData.tracks = remainingTracks;
-      }
-    });
-
-    // Update the state once with all changes
-    setTagData(updatedTagData);
-  };
-
   const setRating = (trackUri: string, rating: number) => {
     // Ensure track data exists
     const currentData = getOrCreateTrackData(trackUri);
@@ -1161,7 +1059,6 @@ export function useTagData() {
     setEnergy,
     setBpm,
     updateBpm,
-    toggleTagForMultipleTracks,
     findCommonTags,
     applyBatchTagUpdates,
 

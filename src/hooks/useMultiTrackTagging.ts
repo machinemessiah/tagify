@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { SpotifyTrack } from "../types/SpotifyTypes";
 import { TrackTag, useTagData } from "./useTagData";
 
@@ -6,41 +6,7 @@ export interface DraftTagState {
   [trackUri: string]: TrackTag[];
 }
 
-interface UseMultiTrackTaggingReturn {
-  // State
-  isMultiTagging: boolean;
-  lockedMultiTrackUri: string | null;
-  multiTagTracks: SpotifyTrack[];
-  multiTrackDraftTags: DraftTagState | null;
-
-  // Actions
-  setIsMultiTagging: (value: boolean) => void;
-  setMultiTagTracks: (tracks: SpotifyTrack[]) => void;
-  setLockedMultiTrackUri: (uri: string | null) => void;
-  setMultiTrackDraftTags: (draftTags: DraftTagState | null) => void;
-  toggleTag: (categoryId: string, subcategoryId: string, tagId: string) => void;
-  cancelMultiTagging: () => void;
-
-  // Computed values for component props
-  displayTrack: SpotifyTrack | null;
-  displayTrackTags: TrackTag[] | null; // null when not in multi-tagging mode
-
-  // Handlers for components
-  handleTagAllTracks: (
-    categoryId: string,
-    subcategoryId: string,
-    tagId: string
-  ) => void;
-  handleTagSingleTrack: (
-    trackUri: string,
-    categoryId: string,
-    subcategoryId: string,
-    tagId: string
-  ) => void;
-}
-
-export function useMultiTrackTagging(): UseMultiTrackTaggingReturn {
-  // State
+export function useMultiTrackTagging() {
   const [isMultiTagging, setIsMultiTagging] = useState<boolean>(false);
   const [lockedMultiTrackUri, setLockedMultiTrackUri] = useState<string | null>(
     null
@@ -50,12 +16,7 @@ export function useMultiTrackTagging(): UseMultiTrackTaggingReturn {
   const [multiTagTracks, setMultiTagTracks] = useState<SpotifyTrack[]>([]);
 
   // Get tag data and functions from the main tag data hook
-  const {
-    tagData,
-    toggleTagForTrack,
-    toggleTagForMultipleTracks,
-    findCommonTags,
-  } = useTagData();
+  const { tagData, findCommonTags } = useTagData();
 
   // Helper function to find common tags from draft state
   const findCommonTagsFromDraft = useCallback(
@@ -90,109 +51,67 @@ export function useMultiTrackTagging(): UseMultiTrackTaggingReturn {
         return;
       }
 
-      if (multiTrackDraftTags) {
-        // When in multi-tagging mode with draft state, update the draft instead
-        const newDraft: DraftTagState = { ...multiTrackDraftTags };
+      // When in multi-tagging mode with draft state, update the draft instead
+      const newDraft: DraftTagState = { ...multiTrackDraftTags };
 
-        if (lockedMultiTrackUri) {
-          // Toggle for single track
-          const trackTags = newDraft[lockedMultiTrackUri] || [];
-          const tagIndex: number = trackTags.findIndex(
+      if (lockedMultiTrackUri) {
+        // Toggle for single track
+        const trackTags = newDraft[lockedMultiTrackUri] || [];
+        const tagIndex: number = trackTags.findIndex(
+          (t) =>
+            t.categoryId === categoryId &&
+            t.subcategoryId === subcategoryId &&
+            t.tagId === tagId
+        );
+
+        if (tagIndex >= 0) {
+          newDraft[lockedMultiTrackUri] = trackTags.filter(
+            (_, i) => i !== tagIndex
+          );
+        } else {
+          newDraft[lockedMultiTrackUri] = [
+            ...trackTags,
+            { categoryId, subcategoryId, tagId },
+          ];
+        }
+      } else {
+        // Toggle for all tracks
+        const allHaveTag = multiTagTracks.every((track) => {
+          const tags = newDraft[track.uri] || [];
+          return tags.some(
+            (t) =>
+              t.categoryId === categoryId &&
+              t.subcategoryId === subcategoryId &&
+              t.tagId === tagId
+          );
+        });
+
+        multiTagTracks.forEach((track) => {
+          const trackTags = newDraft[track.uri] || [];
+          const tagIndex = trackTags.findIndex(
             (t) =>
               t.categoryId === categoryId &&
               t.subcategoryId === subcategoryId &&
               t.tagId === tagId
           );
 
-          if (tagIndex >= 0) {
-            newDraft[lockedMultiTrackUri] = trackTags.filter(
-              (_, i) => i !== tagIndex
-            );
-          } else {
-            newDraft[lockedMultiTrackUri] = [
+          if (allHaveTag && tagIndex >= 0) {
+            newDraft[track.uri] = trackTags.filter((_, i) => i !== tagIndex);
+          } else if (!allHaveTag && tagIndex < 0) {
+            newDraft[track.uri] = [
               ...trackTags,
               { categoryId, subcategoryId, tagId },
             ];
           }
-        } else {
-          // Toggle for all tracks
-          const allHaveTag = multiTagTracks.every((track) => {
-            const tags = newDraft[track.uri] || [];
-            return tags.some(
-              (t) =>
-                t.categoryId === categoryId &&
-                t.subcategoryId === subcategoryId &&
-                t.tagId === tagId
-            );
-          });
-
-          multiTagTracks.forEach((track) => {
-            const trackTags = newDraft[track.uri] || [];
-            const tagIndex = trackTags.findIndex(
-              (t) =>
-                t.categoryId === categoryId &&
-                t.subcategoryId === subcategoryId &&
-                t.tagId === tagId
-            );
-
-            if (allHaveTag && tagIndex >= 0) {
-              newDraft[track.uri] = trackTags.filter((_, i) => i !== tagIndex);
-            } else if (!allHaveTag && tagIndex < 0) {
-              newDraft[track.uri] = [
-                ...trackTags,
-                { categoryId, subcategoryId, tagId },
-              ];
-            }
-          });
-        }
-
-        setMultiTrackDraftTags(newDraft);
-      } else {
-        // Original multi-tagging logic without draft
-        if (lockedMultiTrackUri) {
-          handleTagSingleTrack(
-            lockedMultiTrackUri,
-            categoryId,
-            subcategoryId,
-            tagId
-          );
-        } else {
-          handleTagAllTracks(categoryId, subcategoryId, tagId);
-        }
+        });
       }
+
+      setMultiTrackDraftTags(newDraft);
     },
     [isMultiTagging, multiTrackDraftTags, lockedMultiTrackUri, multiTagTracks]
   );
 
-  // Handler for toggling a tag on a single track
-  const handleTagSingleTrack = useCallback(
-    (
-      trackUri: string,
-      categoryId: string,
-      subcategoryId: string,
-      tagId: string
-    ) => {
-      toggleTagForTrack(trackUri, categoryId, subcategoryId, tagId);
-    },
-    [toggleTagForTrack]
-  );
-
-  // Handler for toggling a tag on all tracks
-  const handleTagAllTracks = useCallback(
-    (categoryId: string, subcategoryId: string, tagId: string) => {
-      // Use the batch update function to apply to all selected tracks
-      toggleTagForMultipleTracks(
-        multiTagTracks.map((track) => track.uri),
-        categoryId,
-        subcategoryId,
-        tagId
-      );
-    },
-    [multiTagTracks, toggleTagForMultipleTracks]
-  );
-
-  // Cancel multi-tagging mode
-  const cancelMultiTagging = useCallback(() => {
+  const cancelMultiTagging = () => {
     setMultiTagTracks([]);
     setIsMultiTagging(false);
     setLockedMultiTrackUri(null);
@@ -202,41 +121,30 @@ export function useMultiTrackTagging(): UseMultiTrackTaggingReturn {
     if (Spicetify?.Platform?.History?.push) {
       Spicetify.Platform.History.push("/tagify");
     }
-  }, []);
+  };
 
-  // Computed value: determine which track to display (ONLY for multi-track mode)
-  const displayTrack = useMemo((): SpotifyTrack | null => {
+  // Determine which tags to highlight in TagSelector (ONLY for multi-track mode)
+  const selectedTagsForSelector = useMemo((): TrackTag[] | null => {
     // Only compute for multi-track mode
     if (!isMultiTagging) {
       return null;
     }
 
-    if (lockedMultiTrackUri) {
-      return (
-        multiTagTracks.find((t) => t.uri === lockedMultiTrackUri) ||
-        multiTagTracks[0]
-      );
-    }
-    return multiTagTracks[0] || null;
-  }, [isMultiTagging, lockedMultiTrackUri, multiTagTracks]);
-
-  // Computed value: determine which tags to display (ONLY for multi-track mode)
-  const displayTrackTags = useMemo((): TrackTag[] | null => {
-    // Only compute for multi-track mode
-    if (!isMultiTagging) {
-      return null;
-    }
-
+    // priority 1: draft state (user is actively editing)
     if (multiTrackDraftTags) {
       if (lockedMultiTrackUri) {
+        // if locked track is in multi-track mode, highlight only its particular draft tags
         return multiTrackDraftTags[lockedMultiTrackUri] || [];
       }
+      // otherwise, highlight ALL common draft tags
       return findCommonTagsFromDraft(multiTrackDraftTags, multiTagTracks);
     }
 
+    // priority 2: saved state (showing current reality - there are no draft tags)
     if (lockedMultiTrackUri) {
       return tagData.tracks[lockedMultiTrackUri]?.tags || [];
     }
+    // if no locked track, find common tags across ALL tracks in multi-track mode
     return findCommonTags(multiTagTracks.map((track) => track.uri));
   }, [
     isMultiTagging,
@@ -264,11 +172,6 @@ export function useMultiTrackTagging(): UseMultiTrackTaggingReturn {
     cancelMultiTagging,
 
     // Computed values
-    displayTrack,
-    displayTrackTags,
-
-    // Handlers for components
-    handleTagAllTracks,
-    handleTagSingleTrack,
+    selectedTagsForSelector,
   };
 }
