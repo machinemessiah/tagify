@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./MultiTrackDetails.module.css";
 import { TagCategory, TrackTag } from "../hooks/useTagData";
-
-// TODO: this is duplicated in useMultiTrackTagging
-export interface DraftTagState {
-  [trackUri: string]: TrackTag[];
-}
+import { DraftTagState } from "../hooks/useMultiTrackTagging";
 
 interface MultiTrackDetailsProps {
   tracks: Array<{
