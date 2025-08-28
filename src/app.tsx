@@ -21,7 +21,6 @@ import { useUpdateChecker } from "./hooks/useUpdateChecker";
 import UpdateBanner from "./components/UpdateBanner";
 import { useMultiTrackTagging } from "./hooks/useMultiTrackTagging";
 import { useSmartPlaylists } from "./hooks/useSmartPlaylists";
-import { useTagToggle } from "./hooks/useTagToggle";
 
 function App() {
   const [showTagManager, setShowTagManager] = useState<boolean>(false);
@@ -31,7 +30,7 @@ function App() {
     tagData,
     lastSaved,
     isLoading,
-    toggleTagSingleTrack,
+    toggleTagForTrack,
     setRating,
     setEnergy,
     setBpm,
@@ -93,11 +92,9 @@ function App() {
     setMultiTagTracks,
     setLockedMultiTrackUri,
     setMultiTrackDraftTags,
+    toggleTag,
     cancelMultiTagging,
     selectedTagsForSelector,
-    toggleTagMultiTrack,
-    toggleStarRating,
-    toggleEnergyRating,
   } = useMultiTrackTagging();
 
   // Set up history tracking and URL param handling
@@ -109,8 +106,6 @@ function App() {
     setIsLocked,
     setLockedMultiTrackUri,
   });
-
-  const { handleToggleTag } = useTagToggle()
 
   const { updateInfo, dismissUpdate } = useUpdateChecker({
     currentVersion: packageJson.version,
@@ -145,10 +140,23 @@ function App() {
     };
   }, []);
 
-  // TODO: what is this
   const trackTags = isMultiTagging
     ? selectedTagsForSelector || []
     : tagData.tracks[activeTrack?.uri || ""]?.tags || [];
+
+  const handleToggleTag = (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => {
+    if (isMultiTagging) {
+      // Multi-track mode: Use the hook's logic
+      toggleTag(categoryId, subcategoryId, tagId);
+    } else if (activeTrack) {
+      // Single-track mode: Use the original logic directly
+      toggleTagForTrack(activeTrack.uri, categoryId, subcategoryId, tagId);
+    }
+  };
 
   const trackDataMap = useMemo(() => {
     return Object.fromEntries(
@@ -255,7 +263,7 @@ function App() {
                 onSetEnergy={(energy) => setEnergy(activeTrack.uri, energy)}
                 onSetBpm={(bpm) => setBpm(activeTrack.uri, bpm)}
                 onRemoveTag={(categoryId, subcategoryId, tagId) =>
-                  toggleTagSingleTrack(
+                  toggleTagForTrack(
                     activeTrack.uri,
                     categoryId,
                     subcategoryId,

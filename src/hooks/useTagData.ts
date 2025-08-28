@@ -561,7 +561,7 @@ export function useTagData() {
     );
   };
 
-  const toggleTagSingleTrack = (
+  const toggleTagForTrack = (
     trackUri: string,
     categoryId: string,
     subcategoryId: string,
@@ -1042,7 +1042,7 @@ export function useTagData() {
     lastSaved,
 
     // Track tag management
-    toggleTagSingleTrack,
+    toggleTagForTrack,
     setRating,
     setEnergy,
     setBpm,

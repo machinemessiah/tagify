@@ -156,7 +156,7 @@ export function useMultiTrackTagging() {
   );
 
   // Main tag toggle handler (ONLY for multi-track mode)
-  const toggleTagMultiTrack = useCallback(
+  const toggleTag = useCallback(
     (categoryId: string, subcategoryId: string, tagId: string) => {
       if (!isMultiTagging) {
         console.warn("toggleTag called when not in multi-tagging mode");
@@ -402,10 +402,8 @@ export function useMultiTrackTagging() {
     setMultiTagTracks,
     setLockedMultiTrackUri,
     setMultiTrackDraftTags,
+    toggleTag,
     cancelMultiTagging,
-    toggleTagMultiTrack,
-    toggleStarRating,
-    toggleEnergyRating,
 
     // Computed values
     selectedTagsForSelector,
