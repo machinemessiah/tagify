@@ -69,7 +69,7 @@ spicetify apply
 # Clean up
 rm -rf "$ZIP_FILE" "$TEMP_DIR"
 
-echo -e "${GREEN}Tagify installation complete!
+echo -e "${GREEN}Tagify installation complete!"
 
 Next steps:
 1. Restart Spotify completely
