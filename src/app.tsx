@@ -79,7 +79,7 @@ function App() {
     isLocked,
     setIsLocked,
     toggleLock,
-    handleTagTrack,
+    handleSelectTrackForTagging,
     activeTrack,
   } = useTrackState();
 
@@ -294,7 +294,7 @@ function App() {
             onToggleTagIncludeOff={toggleTagIncludeOff} // ON OFF
             onClearTagFilters={clearTagFilters}
             onPlayTrack={playTrack}
-            onTagTrack={handleTagTrack}
+            onTagTrack={handleSelectTrackForTagging}
             onCreatePlaylist={createPlaylistFromFilters}
             onCreateSmartPlaylist={createSmartPlaylist}
             parseTagId={parseTagId}

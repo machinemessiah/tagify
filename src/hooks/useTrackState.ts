@@ -5,6 +5,30 @@ import { parseLocalFileUri } from "../utils/LocalFileParser";
 const LOCK_STATE_KEY = "tagify:lockState";
 const LOCKED_TRACK_KEY = "tagify:lockedTrack";
 
+/**
+ * SINGLE TRACK STATE MANAGEMENT HOOK
+ * 
+ * Manages the currently active track for **single-track** tagging operations.
+ * Handles **track locking** functionality and **Spicetify Player integration**.
+ * 
+ * @responsibilities
+ * - **Track Spotify Player state** (currently playing track)
+ * - Manage track locking (freeze on specific track vs follow player)
+ * - Persist lock state across browser sessions via localStorage
+ * - Handle manual track selection from TrackList (for tagging)
+ * - Provide computed activeTrack (locked track OR currently playing)
+ * 
+ * @state_behavior
+ * - currentlyPlayingTrack: Always reflects Spicetify.Player.data.item
+ * - lockedTrack: User-frozen track for extended tagging sessions
+ * - activeTrack: Computed property - **locked track takes precedence**
+ * - isLocked: Toggle between following player vs staying on locked track
+ * 
+ * @persistence
+ * - Lock state persisted to localStorage on change
+ * - Restored automatically on app reload
+ * - Cleaned up when unlocked
+ */
 export function useTrackState() {
   const [currentlyPlayingTrack, setCurrentlyPlayingTrack] = useState<SpotifyTrack | null>(null);
   const [lockedTrack, setLockedTrack] = useState<SpotifyTrack | null>(null);
@@ -112,7 +136,7 @@ export function useTrackState() {
   };
 
   // Function to handle a track selected from TrackList for tagging
-  const handleTagTrack = async (uri: string) => {
+  const handleSelectTrackForTagging = async (uri: string) => {
     try {
       // Check if this is a local file
       if (uri.startsWith("spotify:local:")) {
@@ -172,12 +196,12 @@ export function useTrackState() {
   return {
     currentlyPlayingTrack,
     setCurrentlyPlayingTrack,
+    activeTrack,
     lockedTrack,
     setLockedTrack,
     isLocked,
     setIsLocked,
-    activeTrack,
     toggleLock,
-    handleTagTrack,
+    handleSelectTrackForTagging,
   };
 }
