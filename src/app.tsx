@@ -30,7 +30,7 @@ function App() {
     tagData,
     lastSaved,
     isLoading,
-    toggleTagForTrack,
+    toggleTagSingleTrack,
     setRating,
     setEnergy,
     setBpm,
@@ -92,7 +92,7 @@ function App() {
     setMultiTagTracks,
     setLockedMultiTrackUri,
     setMultiTrackDraftTags,
-    toggleTag,
+    toggleTagMultiTrack,
     cancelMultiTagging,
     selectedTagsForSelector,
   } = useMultiTrackTagging();
@@ -150,11 +150,9 @@ function App() {
     tagId: string
   ) => {
     if (isMultiTagging) {
-      // Multi-track mode: Use the hook's logic
-      toggleTag(categoryId, subcategoryId, tagId);
+      toggleTagMultiTrack(categoryId, subcategoryId, tagId);
     } else if (activeTrack) {
-      // Single-track mode: Use the original logic directly
-      toggleTagForTrack(activeTrack.uri, categoryId, subcategoryId, tagId);
+      toggleTagSingleTrack(activeTrack.uri, categoryId, subcategoryId, tagId);
     }
   };
 
@@ -229,8 +227,7 @@ function App() {
         <div className={styles.content}>
           {isMultiTagging &&
           multiTagTracks.length > 0 &&
-          multiTrackDraftTags
-           ? (
+          multiTrackDraftTags ? (
             <MultiTrackDetails
               tracks={multiTagTracks}
               trackDataMap={trackDataMap}
@@ -263,7 +260,7 @@ function App() {
                 onSetEnergy={(energy) => setEnergy(activeTrack.uri, energy)}
                 onSetBpm={(bpm) => setBpm(activeTrack.uri, bpm)}
                 onRemoveTag={(categoryId, subcategoryId, tagId) =>
-                  toggleTagForTrack(
+                  toggleTagSingleTrack(
                     activeTrack.uri,
                     categoryId,
                     subcategoryId,
