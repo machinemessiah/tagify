@@ -5,6 +5,7 @@ import {
   DraftTagState,
   useMultiTrackTagging,
 } from "../hooks/useMultiTrackTagging";
+import ReactStars from "react-rating-stars-component";
 
 interface MultiTrackDetailsProps {
   tracks: Array<{
@@ -522,6 +523,202 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
         </div>
       </div>
 
+      <div className={styles.bulkControlsSection}>
+        <h3 className={styles.sectionTitle}>
+          {lockedTrackUri ? "Track Controls" : "Bulk Controls"}
+        </h3>
+        <div className={styles.controlsContainer}>
+          {/* Rating Control */}
+          <div className={styles.controlSection}>
+            <label className={styles.label}>
+              Rating:
+              {(() => {
+                if (lockedTrackUri) {
+                  const lockedTrackRating =
+                    multiTrackDraftTags[lockedTrackUri]?.rating || 0;
+                  return lockedTrackRating > 0 ? lockedTrackRating : "None";
+                } else {
+                  const commonRating =
+                    findCommonStarRatingFromDraft(multiTrackDraftTags);
+                  return commonRating !== undefined ? commonRating : "Mixed";
+                }
+              })()}
+            </label>
+            <div className={styles.ratingContainer}>
+              <div className={styles.stars}>
+                <ReactStars
+                  count={5}
+                  value={(() => {
+                    if (lockedTrackUri) {
+                      return multiTrackDraftTags[lockedTrackUri]?.rating || 0;
+                    } else {
+                      return (
+                        findCommonStarRatingFromDraft(multiTrackDraftTags) || 0
+                      );
+                    }
+                  })()}
+                  onChange={(newRating: number) =>
+                    handleBulkStarRatingClick(newRating)
+                  }
+                  size={24}
+                  isHalf={true}
+                  emptyIcon={<i className="far fa-star"></i>}
+                  halfIcon={<i className="fa fa-star-half-alt"></i>}
+                  fullIcon={<i className="fa fa-star"></i>}
+                  activeColor="#ffd700"
+                  color="var(--spice-button-disabled)"
+                />
+              </div>
+              {(() => {
+                const currentRating = lockedTrackUri
+                  ? multiTrackDraftTags[lockedTrackUri]?.rating || 0
+                  : findCommonStarRatingFromDraft(multiTrackDraftTags);
+
+                return (
+                  currentRating !== undefined &&
+                  currentRating > 0 && (
+                    <button
+                      className={styles.clearButton}
+                      onClick={() => handleBulkStarRatingClick(0)}
+                      aria-label={
+                        lockedTrackUri
+                          ? "Clear track rating"
+                          : "Clear all ratings"
+                      }
+                    >
+                      Clear
+                    </button>
+                  )
+                );
+              })()}
+            </div>
+          </div>
+
+          {/* Energy Control */}
+          <div className={styles.controlSection}>
+            <label className={styles.label}>
+              Energy Level:
+              {(() => {
+                if (lockedTrackUri) {
+                  const lockedTrackEnergy =
+                    multiTrackDraftTags[lockedTrackUri]?.energy || 0;
+                  return lockedTrackEnergy > 0 ? (
+                    <span className={styles.energyValue}>
+                      {lockedTrackEnergy}
+                    </span>
+                  ) : (
+                    "None"
+                  );
+                } else {
+                  const commonEnergy =
+                    findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                  return commonEnergy !== undefined && commonEnergy > 0 ? (
+                    <span className={styles.energyValue}>{commonEnergy}</span>
+                  ) : commonEnergy === undefined ? (
+                    <span className={styles.energyValue}>Mixed</span>
+                  ) : (
+                    "None"
+                  );
+                }
+              })()}
+            </label>
+            <div className={styles.energyContainer}>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={(() => {
+                  if (lockedTrackUri) {
+                    const lockedTrackEnergy =
+                      multiTrackDraftTags[lockedTrackUri]?.energy || 0;
+                    return lockedTrackEnergy || 5;
+                  } else {
+                    const commonEnergy =
+                      findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                    return commonEnergy || 5;
+                  }
+                })()}
+                data-is-set={(() => {
+                  if (lockedTrackUri) {
+                    const lockedTrackEnergy =
+                      multiTrackDraftTags[lockedTrackUri]?.energy || 0;
+                    return lockedTrackEnergy > 0 ? "true" : "false";
+                  } else {
+                    const commonEnergy =
+                      findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                    return commonEnergy !== undefined && commonEnergy > 0
+                      ? "true"
+                      : "false";
+                  }
+                })()}
+                className={`${styles.energySlider} ${(() => {
+                  let isUnset;
+                  if (lockedTrackUri) {
+                    const lockedTrackEnergy =
+                      multiTrackDraftTags[lockedTrackUri]?.energy || 0;
+                    isUnset = lockedTrackEnergy === 0;
+                  } else {
+                    const commonEnergy =
+                      findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                    isUnset = commonEnergy === undefined || commonEnergy === 0;
+                  }
+                  return isUnset ? styles.energySliderUnset : "";
+                })()}`}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  handleBulkEnergyClick(value);
+                }}
+                onClick={(e) => {
+                  let shouldSetValue;
+                  if (lockedTrackUri) {
+                    const lockedTrackEnergy =
+                      multiTrackDraftTags[lockedTrackUri]?.energy || 0;
+                    shouldSetValue = lockedTrackEnergy === 0;
+                  } else {
+                    const commonEnergy =
+                      findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                    shouldSetValue =
+                      commonEnergy === undefined || commonEnergy === 0;
+                  }
+
+                  if (shouldSetValue) {
+                    const value = parseInt(
+                      (e.target as HTMLInputElement).value
+                    );
+                    handleBulkEnergyClick(value);
+                  }
+                }}
+                onDoubleClick={() => {
+                  handleBulkEnergyClick(0);
+                }}
+              />
+              {(() => {
+                const currentEnergy = lockedTrackUri
+                  ? multiTrackDraftTags[lockedTrackUri]?.energy || 0
+                  : findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+
+                return (
+                  currentEnergy !== undefined &&
+                  currentEnergy > 0 && (
+                    <button
+                      className={styles.clearButton}
+                      onClick={() => handleBulkEnergyClick(0)}
+                      aria-label={
+                        lockedTrackUri
+                          ? "Clear track energy rating"
+                          : "Clear all energy ratings"
+                      }
+                    >
+                      Clear
+                    </button>
+                  )
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {lockedTrackUri ? (
         <div className={styles.lockingBanner}>
           <span className={styles.lockingIcon}>🔒</span>
@@ -568,76 +765,110 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       <div className={styles.trackListContainer}>
         <h3 className={styles.sectionTitle}>Selected Tracks</h3>
         <div className={styles.trackList}>
-          {tracks.map((track) => (
-            <div
-              key={track.uri}
-              className={`${styles.trackItem} ${
-                lockedTrackUri === track.uri ? styles.lockedTrack : ""
-              }`}
-              onClick={(e) => handleTrackClick(track.uri, e)}
-            >
-              <div className={styles.trackInfo}>
-                {lockedTrackUri === track.uri && (
-                  <span className={styles.lockIcon}>🔒</span>
-                )}
-                <span className={styles.trackName}>{track.name}</span>
-                <span className={styles.trackArtist}>
-                  {track.artists.map((artist) => artist.name).join(", ")}
-                </span>
-              </div>
-              <div className={styles.trackTagsInline}>
-                {(multiTrackDraftTags[track.uri]?.tags || []).length > 0 ? (
-                  <div className={styles.tagList}>
-                    {multiTrackDraftTags[track.uri]?.tags
-                      .slice()
-                      .sort((a, b) => {
-                        const nameA = getTagName(
-                          a.categoryId,
-                          a.subcategoryId,
-                          a.tagId
-                        );
-                        const nameB = getTagName(
-                          b.categoryId,
-                          b.subcategoryId,
-                          b.tagId
-                        );
-                        return nameA.localeCompare(nameB);
-                      })
-                      .map((tag, index) => (
-                        <div
-                          key={index}
-                          className={`${styles.tagItem} ${
-                            isCommonTag(tag) ? styles.commonTagHighlight : ""
-                          }`}
-                          onClick={(e) =>
-                            handleTagClickDraft(track.uri, tag, e)
-                          }
-                          title="Click to toggle this tag on this track"
-                        >
-                          {getTagName(
-                            tag.categoryId,
-                            tag.subcategoryId,
-                            tag.tagId
-                          )}
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  <span className={styles.noTags}>No tags</span>
-                )}
-              </div>
-              <button
-                className={styles.playButton}
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent event bubbling
-                  onPlayTrack(track.uri);
-                }}
-                title={"Play this track"}
+          {tracks.map((track) => {
+            const trackData = multiTrackDraftTags[track.uri];
+            const hasRating = (trackData?.rating ?? 0) > 0;
+            const hasEnergy = (trackData?.energy ?? 0) > 0;
+
+            return (
+              <div
+                key={track.uri}
+                className={`${styles.trackItem} ${
+                  lockedTrackUri === track.uri ? styles.lockedTrack : ""
+                }`}
+                onClick={(e) => handleTrackClick(track.uri, e)}
               >
-                {"Play"}
-              </button>
-            </div>
-          ))}
+                <div className={styles.trackInfo}>
+                  {lockedTrackUri === track.uri && (
+                    <span className={styles.lockIcon}>🔒</span>
+                  )}
+                  <span className={styles.trackName} title={track.name}>
+                    {track.name}
+                  </span>
+                  <span className={styles.trackArtist}>
+                    {track.artists.map((artist) => artist.name).join(", ")}
+                  </span>
+                </div>
+
+                <div className={styles.trackTagsInline}>
+                  {(trackData?.tags || []).length > 0 ? (
+                    <div className={styles.tagList}>
+                      {trackData.tags
+                        .slice()
+                        .sort((a, b) => {
+                          const nameA = getTagName(
+                            a.categoryId,
+                            a.subcategoryId,
+                            a.tagId
+                          );
+                          const nameB = getTagName(
+                            b.categoryId,
+                            b.subcategoryId,
+                            b.tagId
+                          );
+                          return nameA.localeCompare(nameB);
+                        })
+                        .map((tag, index) => (
+                          <div
+                            key={index}
+                            className={`${styles.tagItem} ${
+                              isCommonTag(tag) ? styles.commonTagHighlight : ""
+                            }`}
+                            onClick={(e) =>
+                              handleTagClickDraft(track.uri, tag, e)
+                            }
+                            title="Click to toggle this tag on this track"
+                          >
+                            {getTagName(
+                              tag.categoryId,
+                              tag.subcategoryId,
+                              tag.tagId
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <span className={styles.noTags}>No tags</span>
+                  )}
+                </div>
+                <div className={styles.trackRatingSection}>
+                  {hasEnergy && (
+                    <div className={styles.trackItemEnergy}>
+                      <span title={`Energy: ${trackData.energy}`}>
+                        {trackData.energy}
+                      </span>
+                    </div>
+                  )}
+                  {hasRating && (
+                    <div className={styles.trackItemRating}>
+                      <ReactStars
+                        count={5}
+                        value={trackData.rating}
+                        edit={false}
+                        size={16}
+                        isHalf={true}
+                        emptyIcon={<i className="far fa-star"></i>}
+                        halfIcon={<i className="fa fa-star-half-alt"></i>}
+                        fullIcon={<i className="fa fa-star"></i>}
+                        activeColor="#ffd700"
+                        color="var(--spice-button-disabled)"
+                      />
+                    </div>
+                  )}
+                </div>
+                <button
+                  className={styles.playButton}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent event bubbling
+                    onPlayTrack(track.uri);
+                  }}
+                  title={"Play this track"}
+                >
+                  {"Play"}
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
 

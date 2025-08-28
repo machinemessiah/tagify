@@ -135,7 +135,8 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  flex: 1;
+  flex: 0 0 auto;
+  width: 200px;
   margin-right: 12px;
 }
 
@@ -157,18 +158,20 @@
 }
 
 .trackTagsInline {
-  flex: 2;
+  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  min-width: 0;
+  padding-right: 120px;
   margin-right: 8px;
 }
 
 /* This ensures tags will wrap if they exceed available space */
-.trackTagsInline .tagList {
+/* .trackTagsInline .tagList {
   justify-content: flex-end;
   margin-left: auto;
-}
+} */
 
 .instructions {
   font-size: 14px;
@@ -187,6 +190,13 @@
 .trackTagsInline .tagItem {
   font-size: 11px;
   padding: 3px 8px;
+}
+
+.trackRatingSection {
+  display: flex;
+  flex-direction: row;
+  min-width: 0;
+  margin-right: 12px;
 }
 
 /* Play button styles */
@@ -336,4 +346,138 @@
 
 .commonTagHighlight:hover {
   background: #1a7ee0 !important;
+}
+
+.controlsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  max-width: 400px;
+}
+
+.controlSection {
+  margin-bottom: 0;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+  color: var(--spice-text);
+}
+
+.ratingContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  height: 28px; /* Match the height of the energy container */
+}
+
+.stars {
+  display: flex;
+}
+
+.star {
+  background: transparent;
+  border: none;
+  color: var(--spice-button-disabled);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.star:hover {
+  color: #ffd700;
+}
+
+.energySlider {
+  width: 100%;
+  max-width: 250px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--spice-button-disabled);
+  border-radius: 2px;
+  outline: none;
+}
+
+.energySlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #1e90ff; /* Match the blue used for stars */
+  cursor: pointer;
+}
+
+.energySlider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #1e90ff; /* Match the blue used for stars */
+  cursor: pointer;
+  border: none;
+}
+
+/* Styles for when energy is not set */
+.energySliderUnset::-webkit-slider-thumb {
+  background: var(--spice-button-disabled);
+  border: 1px solid var(--spice-subtext);
+}
+
+.energySliderUnset::-moz-range-thumb {
+  background: var(--spice-button-disabled);
+  border: 1px solid var(--spice-subtext);
+}
+
+.energyValue {
+  display: inline-block;
+  margin-left: 8px;
+  font-weight: 700;
+  color: #1e90ff;
+}
+
+.clearButton {
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--spice-text);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clearButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.energyContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  height: 28px; /* Fixed height to prevent shifting */
+}
+
+.trackItemRating {
+  display: flex;
+  align-items: center;
+}
+
+.trackItemEnergy {
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--spice-text);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 6px;
 }
