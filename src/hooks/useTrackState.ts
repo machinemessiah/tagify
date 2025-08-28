@@ -6,13 +6,13 @@ const LOCK_STATE_KEY = "tagify:lockState";
 const LOCKED_TRACK_KEY = "tagify:lockedTrack";
 
 export function useTrackState() {
-  const [currentTrack, setCurrentTrack] = useState<SpotifyTrack | null>(null);
+  const [currentlyPlayingTrack, setCurrentlyPlayingTrack] = useState<SpotifyTrack | null>(null);
   const [lockedTrack, setLockedTrack] = useState<SpotifyTrack | null>(null);
   const [isStorageLoaded, setIsStorageLoaded] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
 
   // Derived state - the active track is either locked track or current track
-  const activeTrack = isLocked && lockedTrack ? lockedTrack : currentTrack;
+  const activeTrack = isLocked && lockedTrack ? lockedTrack : currentlyPlayingTrack;
 
   // Load saved lock state and locked track on initial render
   useEffect(() => {
@@ -73,9 +73,9 @@ export function useTrackState() {
           duration_ms: typeof trackData.duration === "number" ? trackData.duration : 0,
         };
 
-        // ALWAYS update currentTrack to reflect what's playing in Spotify
+        // ALWAYS update currentlyPlayingTrack to reflect what's playing in Spotify
         // so that when you unlock - it snaps to the currently playing track
-        setCurrentTrack(newTrack);
+        setCurrentlyPlayingTrack(newTrack);
 
         // ONLY update lockedTrack if we're NOT locked
         if (!isLocked) {
@@ -101,7 +101,7 @@ export function useTrackState() {
   const toggleLock = () => {
     if (isLocked) {
       // When unlocking, update the locked track to the current track
-      setLockedTrack(currentTrack);
+      setLockedTrack(currentlyPlayingTrack);
       setIsLocked(false);
       // Clear URL parameters to prevent history hook from re-locking
       Spicetify.Platform.History.push("/tagify");
@@ -170,8 +170,8 @@ export function useTrackState() {
   };
 
   return {
-    currentTrack,
-    setCurrentTrack,
+    currentlyPlayingTrack,
+    setCurrentlyPlayingTrack,
     lockedTrack,
     setLockedTrack,
     isLocked,

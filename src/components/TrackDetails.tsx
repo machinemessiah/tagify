@@ -12,7 +12,7 @@ import { formatTimestamp } from "../utils/formatters";
 
 interface TrackDetailsProps {
   displayedTrack: SpotifyTrack; // The track displayed in TrackDetails
-  nowPlayingTrack: SpotifyTrack | null; // The currently playing track
+  currentlyPlayingTrack: SpotifyTrack | null; // The currently playing track
   trackData: {
     rating: number;
     energy: number;
@@ -56,7 +56,7 @@ interface TrackMetadata {
 
 const TrackDetails: React.FC<TrackDetailsProps> = ({
   displayedTrack,
-  nowPlayingTrack,
+  currentlyPlayingTrack,
   trackData,
   categories,
   activeTagFilters,
@@ -708,12 +708,12 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
     <div className={styles.container}>
       <div className={styles.lockControlContainer}>
         {isLocked &&
-          nowPlayingTrack &&
-          nowPlayingTrack.uri !== displayedTrack.uri && (
+          currentlyPlayingTrack &&
+          currentlyPlayingTrack.uri !== displayedTrack.uri && (
             <button
               className={styles.switchTrackButton}
               onClick={() => {
-                onSwitchToCurrentTrack(nowPlayingTrack);
+                onSwitchToCurrentTrack(currentlyPlayingTrack);
               }}
               title="Switch to currently playing track"
             >

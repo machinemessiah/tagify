@@ -2,10 +2,8 @@ import React, { useEffect, useRef } from "react";
 import styles from "./TagSelector.module.css";
 import { TagCategory, TrackTag } from "../hooks/useTagData";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { SpotifyTrack } from "../types/SpotifyTypes";
 
 interface TagSelectorProps {
-  track: SpotifyTrack | null;
   categories: TagCategory[];
   trackTags: TrackTag[];
   onToggleTag: (

@@ -74,7 +74,7 @@ function App() {
   } = usePlaylistState();
 
   const {
-    currentTrack,
+    currentlyPlayingTrack,
     setLockedTrack,
     isLocked,
     setIsLocked,
@@ -94,8 +94,7 @@ function App() {
     setMultiTrackDraftTags,
     toggleTag,
     cancelMultiTagging,
-    displayTrack,
-    displayTrackTags,
+    selectedTagsForSelector,
   } = useMultiTrackTagging();
 
   // Set up history tracking and URL param handling
@@ -115,6 +114,35 @@ function App() {
     checkOnMount: true,
     delayMs: 2000,
   });
+
+  useEffect(() => {
+    // This creates a global reference for debugging in browser console
+    (window as any).__TAGIFY_DEBUG__ = {
+      multiTrackDraftTags,
+      isMultiTagging,
+      lockedMultiTrackUri,
+      multiTagTracks,
+      tagData,
+      smartPlaylists,
+      activeTagFilters,
+      excludedTagFilters,
+      currentlyPlayingTrack,
+      activeTrack,
+      selectedTagsForSelector,
+    };
+  }, [
+    multiTrackDraftTags,
+    isMultiTagging,
+    lockedMultiTrackUri,
+    multiTagTracks,
+    tagData,
+    smartPlaylists,
+    activeTagFilters,
+    excludedTagFilters,
+    currentlyPlayingTrack,
+    activeTrack,
+    selectedTagsForSelector,
+  ]);
 
   useFontAwesome();
 
@@ -141,10 +169,8 @@ function App() {
     };
   }, []);
 
-  const track = isMultiTagging ? displayTrack : activeTrack;
-
   const trackTags = isMultiTagging
-    ? displayTrackTags || []
+    ? selectedTagsForSelector || []
     : tagData.tracks[activeTrack?.uri || ""]?.tags || [];
 
   const handleToggleTag = (
@@ -196,10 +222,7 @@ function App() {
                 ])
               )}
               categories={tagData.categories}
-              onCancelTagging={() => {
-                setMultiTrackDraftTags(null);
-                cancelMultiTagging();
-              }}
+              onCancelTagging={cancelMultiTagging}
               onPlayTrack={playTrack}
               lockedTrackUri={lockedMultiTrackUri}
               onLockTrack={setLockedMultiTrackUri}
@@ -211,7 +234,7 @@ function App() {
             activeTrack && (
               <TrackDetails
                 displayedTrack={activeTrack}
-                nowPlayingTrack={currentTrack}
+                currentlyPlayingTrack={currentlyPlayingTrack}
                 trackData={
                   tagData.tracks[activeTrack.uri] || {
                     rating: 0,
@@ -247,7 +270,6 @@ function App() {
 
           {(activeTrack || (isMultiTagging && multiTagTracks.length > 0)) && (
             <TagSelector
-              track={track}
               categories={tagData.categories}
               trackTags={trackTags}
               onToggleTag={handleToggleTag}
