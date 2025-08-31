@@ -261,10 +261,76 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   };
 
   const commonRating = onFindCommonStarRatingFromDraft(multiTrackDraftTags);
-  const isRatingMixed = commonRating === undefined;
-
   const commonEnergy = onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
-  const isEnergyMixed = commonEnergy === undefined;
+
+  const getRatingDisplayValue = () => {
+    if (lockedTrackUri) {
+      const lockedTrackRating =
+        multiTrackDraftTags[lockedTrackUri]?.rating || 0;
+      return lockedTrackRating > 0 ? lockedTrackRating : "None";
+    } else {
+      return commonRating !== undefined ? commonRating : "Mixed";
+    }
+  };
+
+  const getEnergyDisplayValue = () => {
+    if (lockedTrackUri) {
+      const lockedTrackEnergy =
+        multiTrackDraftTags[lockedTrackUri]?.energy || 0;
+      return lockedTrackEnergy > 0 ? lockedTrackEnergy : "None";
+    } else {
+      if (commonEnergy !== undefined && commonEnergy > 0) {
+        return commonEnergy;
+      } else if (commonEnergy === undefined) {
+        return "Mixed";
+      } else {
+        return "None";
+      }
+    }
+  };
+
+  const getCurrentRating = () => {
+    if (lockedTrackUri) {
+      return multiTrackDraftTags[lockedTrackUri]?.rating || 0;
+    } else {
+      return onFindCommonStarRatingFromDraft(multiTrackDraftTags) || 0;
+    }
+  };
+
+  const getCurrentEnergy = () => {
+    if (lockedTrackUri) {
+      return multiTrackDraftTags[lockedTrackUri]?.energy || 0;
+    } else {
+      return onFindCommonEnergyRatingFromDraft(multiTrackDraftTags) || 0;
+    }
+  };
+
+  const shouldShowRatingClearButton = () => {
+    const currentRating = lockedTrackUri
+      ? multiTrackDraftTags[lockedTrackUri]?.rating || 0
+      : onFindCommonStarRatingFromDraft(multiTrackDraftTags);
+
+    return currentRating !== undefined && currentRating > 0;
+  };
+
+  const shouldShowEnergyClearButton = () => {
+    const currentEnergy = lockedTrackUri
+      ? multiTrackDraftTags[lockedTrackUri]?.energy || 0
+      : onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
+
+    return currentEnergy !== undefined && currentEnergy > 0;
+  };
+
+  // For the energy slider's data-is-set attribute
+  const getEnergyIsSetValue = () => {
+    if (lockedTrackUri) {
+      const lockedTrackEnergy =
+        multiTrackDraftTags[lockedTrackUri]?.energy || 0;
+      return lockedTrackEnergy > 0 ? "true" : "false";
+    } else {
+      return commonEnergy !== undefined && commonEnergy > 0 ? "true" : "false";
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -307,35 +373,17 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
           {/* Rating Control */}
           <div className={styles.controlSection}>
             <label className={styles.label}>
-              Rating:{" "}
-              {(() => {
-                if (lockedTrackUri) {
-                  const lockedTrackRating =
-                    multiTrackDraftTags[lockedTrackUri]?.rating || 0;
-                  return lockedTrackRating > 0 ? lockedTrackRating : "None";
-                } else {
-                  const commonRating =
-                    onFindCommonStarRatingFromDraft(multiTrackDraftTags);
-                  return commonRating !== undefined ? commonRating : "Mixed";
-                }
-              })()}
+              Rating: {getRatingDisplayValue()}
             </label>
             <div className={styles.ratingContainer}>
               <div></div> {/* empty left column */}
               <div className={styles.stars}>
                 <ReactStars
-                  key={`stars-${lockedTrackUri || "bulk"}-${(() => {
-                    if (lockedTrackUri) {
-                      return multiTrackDraftTags[lockedTrackUri]?.rating || 0;
-                    } else {
-                      return (
-                        onFindCommonStarRatingFromDraft(multiTrackDraftTags) ||
-                        0
-                      );
-                    }
-                  })()}`}
+                  key={`stars-${
+                    lockedTrackUri || "bulk"
+                  }-${getCurrentRating()}`}
                   count={5}
-                  value={isRatingMixed ? 0 : commonRating || 0}
+                  value={getCurrentRating()}
                   onChange={(newRating: number) =>
                     handleBulkStarRatingClick(newRating)
                   }
@@ -349,16 +397,13 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                 />
               </div>
               <button
-                className={`${styles.clearButton} ${(() => {
-                  const currentRating = lockedTrackUri
-                    ? multiTrackDraftTags[lockedTrackUri]?.rating || 0
-                    : onFindCommonStarRatingFromDraft(multiTrackDraftTags);
-
-                  return currentRating === undefined || currentRating <= 0
-                    ? styles.hidden
-                    : "";
-                })()}`}
+                className={`${styles.clearButton} ${
+                  !shouldShowRatingClearButton() ? styles.hidden : ""
+                }`}
                 onClick={() => handleBulkStarRatingClick(0)}
+                aria-label={
+                  lockedTrackUri ? "Clear track rating" : "Clear all ratings"
+                }
               >
                 Clear
               </button>
@@ -369,29 +414,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
           <div className={styles.controlSection}>
             <label className={styles.label}>
               Energy:{" "}
-              {(() => {
-                if (lockedTrackUri) {
-                  const lockedTrackEnergy =
-                    multiTrackDraftTags[lockedTrackUri]?.energy || 0;
-                  return lockedTrackEnergy > 0 ? (
-                    <span className={styles.energyValue}>
-                      {lockedTrackEnergy}
-                    </span>
-                  ) : (
-                    <span className={styles.energyValue}>None</span>
-                  );
-                } else {
-                  const commonEnergy =
-                    onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
-                  return commonEnergy !== undefined && commonEnergy > 0 ? (
-                    <span className={styles.energyValue}>{commonEnergy}</span>
-                  ) : commonEnergy === undefined ? (
-                    <span className={styles.energyValue}>Mixed</span>
-                  ) : (
-                    <span className={styles.energyValue}>None</span>
-                  );
-                }
-              })()}
+              <span className={styles.energyValue}>
+                {getEnergyDisplayValue()}
+              </span>
             </label>
             <div className={styles.energyContainer}>
               <div></div> {/* empty left column */}
@@ -400,48 +425,15 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                 type="range"
                 min="1"
                 max="10"
-                value={(() => {
-                  if (lockedTrackUri) {
-                    const lockedTrackEnergy =
-                      multiTrackDraftTags[lockedTrackUri]?.energy || 0;
-                    return lockedTrackEnergy || 5;
-                  } else {
-                    const commonEnergy =
-                      onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
-                    return commonEnergy || 5;
-                  }
-                })()}
-                data-is-set={(() => {
-                  if (lockedTrackUri) {
-                    const lockedTrackEnergy =
-                      multiTrackDraftTags[lockedTrackUri]?.energy || 0;
-                    return lockedTrackEnergy > 0 ? "true" : "false";
-                  } else {
-                    const commonEnergy =
-                      onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
-                    return commonEnergy !== undefined && commonEnergy > 0
-                      ? "true"
-                      : "false";
-                  }
-                })()}
+                value={getCurrentEnergy() || 5}
+                data-is-set={getEnergyIsSetValue()}
                 className={styles.energySlider}
                 onChange={(e) => {
                   const value = parseInt(e.target.value);
                   handleBulkEnergyClick(value);
                 }}
                 onClick={(e) => {
-                  let shouldSetValue;
-                  if (lockedTrackUri) {
-                    const lockedTrackEnergy =
-                      multiTrackDraftTags[lockedTrackUri]?.energy || 0;
-                    shouldSetValue = lockedTrackEnergy === 0;
-                  } else {
-                    const commonEnergy =
-                      onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
-                    shouldSetValue =
-                      commonEnergy === undefined || commonEnergy === 0;
-                  }
-
+                  const shouldSetValue = getCurrentEnergy() === 0;
                   if (shouldSetValue) {
                     const value = parseInt(
                       (e.target as HTMLInputElement).value
@@ -449,21 +441,18 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                     handleBulkEnergyClick(value);
                   }
                 }}
-                onDoubleClick={() => {
-                  handleBulkEnergyClick(0);
-                }}
+                onDoubleClick={() => handleBulkEnergyClick(0)}
               />
               <button
-                className={`${styles.clearButton} ${(() => {
-                  const currentEnergy = lockedTrackUri
-                    ? multiTrackDraftTags[lockedTrackUri]?.energy || 0
-                    : onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
-
-                  return currentEnergy === undefined || currentEnergy <= 0
-                    ? styles.hidden
-                    : "";
-                })()}`}
+                className={`${styles.clearButton} ${
+                  !shouldShowEnergyClearButton() ? styles.hidden : ""
+                }`}
                 onClick={() => handleBulkEnergyClick(0)}
+                aria-label={
+                  lockedTrackUri
+                    ? "Clear track energy rating"
+                    : "Clear all energy ratings"
+                }
               >
                 Clear
               </button>
