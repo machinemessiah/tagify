@@ -92,9 +92,14 @@ function App() {
     setMultiTagTracks,
     setLockedMultiTrackUri,
     setMultiTrackDraftTags,
-    toggleTagMultiTrack,
     cancelMultiTagging,
     selectedTagsForSelector,
+    findCommonTagsFromDraft,
+    findCommonStarRatingFromDraft,
+    findCommonEnergyRatingFromDraft,
+    toggleTagMultiTrack,
+    toggleStarRating,
+    toggleEnergyRating,
   } = useMultiTrackTagging();
 
   // Set up history tracking and URL param handling
@@ -239,6 +244,11 @@ function App() {
               multiTrackDraftTags={multiTrackDraftTags}
               onSetMultiTrackDraftTags={setMultiTrackDraftTags}
               onBatchUpdate={applyBatchTagUpdates}
+              onFindCommonTagsFromDraft={findCommonTagsFromDraft}
+              onFindCommonStarRatingFromDraft={findCommonStarRatingFromDraft}
+              onFindCommonEnergyRatingFromDraft={findCommonEnergyRatingFromDraft}
+              onToggleStarRating={toggleStarRating}
+              onToggleEnergyRating={toggleEnergyRating}
             />
           ) : (
             activeTrack && (

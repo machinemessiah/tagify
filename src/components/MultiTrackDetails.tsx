@@ -23,6 +23,15 @@ interface MultiTrackDetailsProps {
   multiTrackDraftTags: DraftTagState;
   onSetMultiTrackDraftTags: (draftTags: DraftTagState) => void;
   onBatchUpdate: (updates: BatchTagUpdate[]) => void;
+  onFindCommonTagsFromDraft: (draftTags: DraftTagState) => TrackTag[];
+  onFindCommonStarRatingFromDraft: (
+    draftTags: DraftTagState
+  ) => number | undefined;
+  onFindCommonEnergyRatingFromDraft: (
+    draftTags: DraftTagState
+  ) => number | undefined;
+  onToggleStarRating: (rating: number) => void;
+  onToggleEnergyRating: (energy: number) => void;
 }
 
 const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
@@ -36,14 +45,13 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   multiTrackDraftTags,
   onSetMultiTrackDraftTags,
   onBatchUpdate,
+  onFindCommonTagsFromDraft,
+  onFindCommonStarRatingFromDraft,
+  onFindCommonEnergyRatingFromDraft,
+  onToggleStarRating,
+  onToggleEnergyRating,
 }) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
-  const {
-    findCommonTagsFromDraft,
-    findCommonStarRatingFromDraft,
-    findCommonEnergyRatingFromDraft,
-  } = useMultiTrackTagging();
 
   const updateDraftTags = (
     updater: DraftTagState | ((prev: DraftTagState) => DraftTagState)
@@ -117,7 +125,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     return tag ? tag.name : "Unknown";
   };
 
-  const commonTags = findCommonTagsFromDraft(multiTrackDraftTags).sort(
+  const commonTags = onFindCommonTagsFromDraft(multiTrackDraftTags).sort(
     (a, b) => {
       const nameA = getTagName(a.categoryId, a.subcategoryId, a.tagId);
       const nameB = getTagName(b.categoryId, b.subcategoryId, b.tagId);
@@ -167,7 +175,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
 
         return newDraft;
       } else {
-        const commonTags = findCommonTagsFromDraft(newDraft);
+        const commonTags = onFindCommonTagsFromDraft(newDraft);
         const allHaveTag = commonTags.some(
           (commonTag) =>
             commonTag.categoryId === tag.categoryId &&
@@ -266,82 +274,11 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   };
 
   const handleBulkStarRatingClick = (rating: number) => {
-    updateDraftTags((prev: DraftTagState) => {
-      const newDraft = { ...prev };
-
-      if (lockedTrackUri) {
-        // Single track toggle
-        const trackData = newDraft[lockedTrackUri] || {
-          tags: [],
-          rating: 0,
-          energy: 0,
-        };
-        const newRating = trackData.rating === rating ? 0 : rating;
-
-        newDraft[lockedTrackUri] = {
-          ...trackData,
-          rating: newRating,
-        };
-      } else {
-        // Bulk toggle
-        const commonRating = findCommonStarRatingFromDraft(newDraft);
-        const newRating = commonRating === rating ? 0 : rating;
-
-        tracks.forEach((track) => {
-          const trackData = newDraft[track.uri] || {
-            tags: [],
-            rating: 0,
-            energy: 0,
-          };
-          newDraft[track.uri] = {
-            ...trackData,
-            rating: newRating,
-          };
-        });
-      }
-
-      return newDraft;
-    });
+    onToggleStarRating(rating);
   };
 
-  // Handle bulk energy rating click
   const handleBulkEnergyClick = (energy: number) => {
-    updateDraftTags((prev: DraftTagState) => {
-      const newDraft = { ...prev };
-
-      if (lockedTrackUri) {
-        // Single track toggle
-        const trackData = newDraft[lockedTrackUri] || {
-          tags: [],
-          rating: 0,
-          energy: 0,
-        };
-        const newEnergy = trackData.energy === energy ? 0 : energy;
-
-        newDraft[lockedTrackUri] = {
-          ...trackData,
-          energy: newEnergy,
-        };
-      } else {
-        // Bulk toggle
-        const commonEnergy = findCommonEnergyRatingFromDraft(newDraft);
-        const newEnergy = commonEnergy === energy ? 0 : energy;
-
-        tracks.forEach((track) => {
-          const trackData = newDraft[track.uri] || {
-            tags: [],
-            rating: 0,
-            energy: 0,
-          };
-          newDraft[track.uri] = {
-            ...trackData,
-            energy: newEnergy,
-          };
-        });
-      }
-
-      return newDraft;
-    });
+    onToggleEnergyRating(energy);
   };
 
   // Save changes - apply all draft changes
@@ -487,6 +424,12 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     }
   };
 
+  const commonRating = onFindCommonStarRatingFromDraft(multiTrackDraftTags);
+  const isRatingMixed = commonRating === undefined;
+
+  const commonEnergy = onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
+  const isEnergyMixed = commonEnergy === undefined;
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -539,7 +482,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                   return lockedTrackRating > 0 ? lockedTrackRating : "None";
                 } else {
                   const commonRating =
-                    findCommonStarRatingFromDraft(multiTrackDraftTags);
+                    onFindCommonStarRatingFromDraft(multiTrackDraftTags);
                   return commonRating !== undefined ? commonRating : "Mixed";
                 }
               })()}
@@ -552,24 +495,17 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                       return multiTrackDraftTags[lockedTrackUri]?.rating || 0;
                     } else {
                       return (
-                        findCommonStarRatingFromDraft(multiTrackDraftTags) || 0
+                        onFindCommonStarRatingFromDraft(multiTrackDraftTags) ||
+                        0
                       );
                     }
                   })()}`}
                   count={5}
-                  value={(() => {
-                    if (lockedTrackUri) {
-                      return multiTrackDraftTags[lockedTrackUri]?.rating || 0;
-                    } else {
-                      return (
-                        findCommonStarRatingFromDraft(multiTrackDraftTags) || 0
-                      );
-                    }
-                  })()}
+                  value={isRatingMixed ? 0 : commonRating || 0}
                   onChange={(newRating: number) =>
                     handleBulkStarRatingClick(newRating)
                   }
-                  size={24}
+                  size={30}
                   isHalf={true}
                   emptyIcon={<i className="far fa-star"></i>}
                   halfIcon={<i className="fa fa-star-half-alt"></i>}
@@ -581,7 +517,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
               {(() => {
                 const currentRating = lockedTrackUri
                   ? multiTrackDraftTags[lockedTrackUri]?.rating || 0
-                  : findCommonStarRatingFromDraft(multiTrackDraftTags);
+                  : onFindCommonStarRatingFromDraft(multiTrackDraftTags);
 
                 return (
                   currentRating !== undefined &&
@@ -620,7 +556,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                   );
                 } else {
                   const commonEnergy =
-                    findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                    onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
                   return commonEnergy !== undefined && commonEnergy > 0 ? (
                     <span className={styles.energyValue}>{commonEnergy}</span>
                   ) : commonEnergy === undefined ? (
@@ -644,7 +580,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                     return lockedTrackEnergy || 5;
                   } else {
                     const commonEnergy =
-                      findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                      onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
                     return commonEnergy || 5;
                   }
                 })()}
@@ -655,7 +591,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                     return lockedTrackEnergy > 0 ? "true" : "false";
                   } else {
                     const commonEnergy =
-                      findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                      onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
                     return commonEnergy !== undefined && commonEnergy > 0
                       ? "true"
                       : "false";
@@ -669,7 +605,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                     isUnset = lockedTrackEnergy === 0;
                   } else {
                     const commonEnergy =
-                      findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                      onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
                     isUnset = commonEnergy === undefined || commonEnergy === 0;
                   }
                   return isUnset ? styles.energySliderUnset : "";
@@ -686,7 +622,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                     shouldSetValue = lockedTrackEnergy === 0;
                   } else {
                     const commonEnergy =
-                      findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                      onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
                     shouldSetValue =
                       commonEnergy === undefined || commonEnergy === 0;
                   }
@@ -705,7 +641,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
               {(() => {
                 const currentEnergy = lockedTrackUri
                   ? multiTrackDraftTags[lockedTrackUri]?.energy || 0
-                  : findCommonEnergyRatingFromDraft(multiTrackDraftTags);
+                  : onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
 
                 return (
                   currentEnergy !== undefined &&

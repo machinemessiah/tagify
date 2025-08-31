@@ -167,12 +167,6 @@
   margin-right: 8px;
 }
 
-/* This ensures tags will wrap if they exceed available space */
-/* .trackTagsInline .tagList {
-  justify-content: flex-end;
-  margin-left: auto;
-} */
-
 .instructions {
   font-size: 14px;
   color: var(--spice-subtext);
@@ -350,22 +344,27 @@
 
 .controlsContainer {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 16px;
   flex: 1;
-  max-width: 400px;
+  margin: 0 auto;
+  max-width: 800px;
 }
 
 .controlSection {
   margin-bottom: 0;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
 }
 
 .label {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 6px;
-  display: block;
+  display: grid;
   color: var(--spice-text);
+  justify-content: center;
 }
 
 .ratingContainer {
@@ -396,7 +395,7 @@
 
 .energySlider {
   width: 100%;
-  max-width: 250px;
+  min-width: 250px;
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
@@ -436,10 +435,11 @@
 }
 
 .energyValue {
-  display: inline-block;
+  display: grid;
   margin-left: 8px;
   font-weight: 700;
   color: #1e90ff;
+  justify-content: center;
 }
 
 .clearButton {
@@ -480,4 +480,8 @@
   display: inline-block;
   white-space: nowrap;
   margin-right: 6px;
+}
+
+.bulkControlsSection {
+  flex: 1;
 }

@@ -248,42 +248,36 @@ export function useMultiTrackTagging() {
 
       if (lockedMultiTrackUri) {
         // TOGGLE FOR SINGLE TRACK
-        const currentRating = newDraft[lockedMultiTrackUri]?.rating;
+        const trackData = newDraft[lockedMultiTrackUri] || {
+          tags: [],
+          rating: 0,
+          energy: 0,
+        };
 
-        if (currentRating === rating) {
-          // Same rating, set to 0 (remove rating)
-          newDraft[lockedMultiTrackUri] = {
-            ...newDraft[lockedMultiTrackUri],
-            rating: 0,
-          };
-        } else {
-          // Different rating, set to new rating
-          newDraft[lockedMultiTrackUri] = {
-            ...newDraft[lockedMultiTrackUri],
-            rating: rating,
-          };
-        }
+        // if clicking on the same rating, set to 0 (ie: if rating = 3.5, clicking 3.5 removes the rating)
+        const newRating = trackData.rating === rating ? 0 : rating;
+
+        newDraft[lockedMultiTrackUri] = {
+          ...trackData,
+          rating: newRating,
+        };
       } else {
         // TOGGLE FOR ALL TRACKS
         const commonRating = findCommonStarRatingFromDraft(newDraft);
 
-        if (commonRating === rating) {
-          // All tracks have this rating, remove it (set to 0)
-          Object.keys(newDraft).forEach((trackUri) => {
-            newDraft[trackUri] = {
-              ...newDraft[trackUri],
-              rating: 0,
-            };
-          });
-        } else {
-          // Not all tracks have this rating, set all to this rating
-          Object.keys(newDraft).forEach((trackUri) => {
-            newDraft[trackUri] = {
-              ...newDraft[trackUri],
-              rating: rating,
-            };
-          });
-        }
+        const newRating = commonRating === rating ? 0 : rating;
+
+        multiTagTracks.forEach((track) => {
+          const trackData = newDraft[track.uri] || {
+            tags: [],
+            rating: 0,
+            energy: 0,
+          };
+          newDraft[track.uri] = {
+            ...trackData,
+            rating: newRating,
+          };
+        });
       }
 
       setMultiTrackDraftTags(newDraft);
@@ -292,13 +286,14 @@ export function useMultiTrackTagging() {
       isMultiTagging,
       multiTrackDraftTags,
       lockedMultiTrackUri,
+      multiTagTracks,
       findCommonStarRatingFromDraft,
     ]
   );
 
   const toggleEnergyRating = useCallback(
     (energy: number) => {
-      if (!isMultiTagging) {
+      if (!isMultiTagging || !multiTrackDraftTags) {
         console.warn(
           "toggleEnergyRating called when not in multi-tagging mode"
         );
@@ -309,42 +304,33 @@ export function useMultiTrackTagging() {
 
       if (lockedMultiTrackUri) {
         // TOGGLE FOR SINGLE TRACK
-        const currentEnergy = newDraft[lockedMultiTrackUri]?.energy;
+        const trackData = newDraft[lockedMultiTrackUri] || {
+          tags: [],
+          rating: 0,
+          energy: 0,
+        };
+        const newEnergy = trackData.energy === energy ? 0 : energy;
 
-        if (currentEnergy === energy) {
-          // Same energy, set to 0 (remove energy)
-          newDraft[lockedMultiTrackUri] = {
-            ...newDraft[lockedMultiTrackUri],
-            energy: 0,
-          };
-        } else {
-          // Different energy, set to new energy
-          newDraft[lockedMultiTrackUri] = {
-            ...newDraft[lockedMultiTrackUri],
-            energy: energy,
-          };
-        }
+        newDraft[lockedMultiTrackUri] = {
+          ...trackData,
+          energy: newEnergy,
+        };
       } else {
         // TOGGLE FOR ALL TRACKS
         const commonEnergy = findCommonEnergyRatingFromDraft(newDraft);
+        const newEnergy = commonEnergy === energy ? 0 : energy;
 
-        if (commonEnergy === energy) {
-          // All tracks have this energy, remove it (set to 0)
-          Object.keys(newDraft).forEach((trackUri) => {
-            newDraft[trackUri] = {
-              ...newDraft[trackUri],
-              energy: 0,
-            };
-          });
-        } else {
-          // Not all tracks have this energy, set all to this energy
-          Object.keys(newDraft).forEach((trackUri) => {
-            newDraft[trackUri] = {
-              ...newDraft[trackUri],
-              energy: energy,
-            };
-          });
-        }
+        multiTagTracks.forEach((track) => {
+          const trackData = newDraft[track.uri] || {
+            tags: [],
+            rating: 0,
+            energy: 0,
+          };
+          newDraft[track.uri] = {
+            ...trackData,
+            energy: newEnergy,
+          };
+        });
       }
 
       setMultiTrackDraftTags(newDraft);
@@ -353,6 +339,7 @@ export function useMultiTrackTagging() {
       isMultiTagging,
       multiTrackDraftTags,
       lockedMultiTrackUri,
+      multiTagTracks,
       findCommonEnergyRatingFromDraft,
     ]
   );
@@ -403,6 +390,8 @@ export function useMultiTrackTagging() {
     setLockedMultiTrackUri,
     setMultiTrackDraftTags,
     toggleTagMultiTrack,
+    toggleStarRating,
+    toggleEnergyRating,
     cancelMultiTagging,
 
     // Computed values
