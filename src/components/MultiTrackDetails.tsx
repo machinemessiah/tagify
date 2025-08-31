@@ -520,10 +520,12 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                 }`}
                 onClick={(e) => handleTrackClick(track.uri, e)}
               >
-                <div className={styles.trackInfo}>
+                <div className={styles.lockColumn}>
                   {lockedTrackUri === track.uri && (
                     <span className={styles.lockIcon}>🔒</span>
                   )}
+                </div>
+                <div className={styles.trackInfo}>
                   <span className={styles.trackName} title={track.name}>
                     {track.name}
                   </span>

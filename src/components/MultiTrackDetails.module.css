@@ -106,38 +106,48 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  /* The max-height is removed so it will grow/shrink with content */
 }
 
 .trackList {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  /* Removed max-height and overflow-y to allow full display */
 }
 
 .trackItem {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 30px 120px auto 120px 50px; /* lock, info, tags, ratings, play */
   align-items: center;
-  transition: background-color 0.2s ease;
   gap: 8px;
+  transition: background-color 0.2s ease;
 }
 
 .trackItem:hover {
   background: rgba(255, 255, 255, 0.05);
 }
 
+.lockColumn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  grid-column: 1;
+}
+
+.lockIcon {
+  font-size: 14px;
+  color: #1e90ff;
+  margin-left: 6px;
+}
+
 .trackInfo {
+  grid-column: 2;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  flex: 0 0 auto;
-  width: 200px;
-  margin-right: 12px;
 }
 
 .trackName {
@@ -158,13 +168,12 @@
 }
 
 .trackTagsInline {
-  flex: 1;
+  grid-column: 3;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   min-width: 0;
-  padding-right: 120px;
-  margin-right: 8px;
+  margin-left: 6px;
 }
 
 .instructions {
@@ -180,21 +189,42 @@
   margin: 4px 0;
 }
 
-/* Make tag items slightly smaller in the track rows */
 .trackTagsInline .tagItem {
   font-size: 11px;
   padding: 3px 8px;
 }
 
 .trackRatingSection {
+  grid-column: 4;
+  display: grid;
+  grid-template-columns: 20px 90px; /* for trackItem energy + rating  */
+  align-items: center;
+  min-width: 120px;
+}
+
+.trackItemEnergy {
+  grid-column: 1;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--spice-text);
+  padding: 4px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+  justify-self: start;
+}
+
+.trackItemRating {
+  grid-column: 2;
   display: flex;
-  flex-direction: row;
-  min-width: 0;
-  margin-right: 12px;
+  align-items: center;
+  justify-self: end; /* Align to the right of its column */
 }
 
 /* Play button styles */
 .playButton {
+  grid-column: 5;
   background: rgba(0, 0, 0, 0.24);
   color: white;
   border: none;
@@ -206,16 +236,18 @@
   transition: background-color 0.2s ease;
   min-width: 50px;
   white-space: nowrap;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 28px;
+  margin-right: 12px;
 }
 
 .lockedTrack {
   background: rgba(30, 144, 255, 0.1);
   border: 1px solid rgba(30, 144, 255, 0.3);
+  border-left: 4px solid #1e90ff; /* Add thick left border */
+  position: relative;
 }
 
 .lockedTrack:hover {
@@ -252,7 +284,6 @@
   border: 1px solid rgba(34, 197, 94, 0.3);
   border-radius: 6px;
   padding: 8px 12px;
-  margin-bottom: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -478,23 +509,6 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-}
-
-.trackItemRating {
-  display: flex;
-  align-items: center;
-}
-
-.trackItemEnergy {
-  background: rgba(0, 0, 0, 0.3);
-  color: var(--spice-text);
-  padding: 4px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  display: inline-block;
-  white-space: nowrap;
-  margin-right: 6px;
 }
 
 .bulkControlsSection {
