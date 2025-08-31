@@ -32,6 +32,7 @@ interface MultiTrackDetailsProps {
   ) => number | undefined;
   onToggleStarRating: (rating: number) => void;
   onToggleEnergyRating: (energy: number) => void;
+  onFindTagName: (categoryId: string, subCategoryId: string, tagId: string) => string;
 }
 
 const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
@@ -50,6 +51,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   onFindCommonEnergyRatingFromDraft,
   onToggleStarRating,
   onToggleEnergyRating,
+  onFindTagName,
 }) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -108,27 +110,10 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     setHasUnsavedChanges(hasAnyChanges);
   }, [multiTrackDraftTags, trackDataMap, tracks]);
 
-  const getTagName = (
-    categoryId: string,
-    subcategoryId: string,
-    tagId: string
-  ) => {
-    const category = categories.find((c) => c.id === categoryId);
-    if (!category) return "Unknown";
-
-    const subcategory = category.subcategories.find(
-      (s) => s.id === subcategoryId
-    );
-    if (!subcategory) return "Unknown";
-
-    const tag = subcategory.tags.find((t) => t.id === tagId);
-    return tag ? tag.name : "Unknown";
-  };
-
   const commonTags = onFindCommonTagsFromDraft(multiTrackDraftTags).sort(
     (a, b) => {
-      const nameA = getTagName(a.categoryId, a.subcategoryId, a.tagId);
-      const nameB = getTagName(b.categoryId, b.subcategoryId, b.tagId);
+      const nameA = onFindTagName(a.categoryId, a.subcategoryId, a.tagId);
+      const nameB = onFindTagName(b.categoryId, b.subcategoryId, b.tagId);
       return nameA.localeCompare(nameB);
     }
   );
@@ -698,7 +683,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                 onClick={() => handleRemoveTagDraft(tag)}
                 title="Click to toggle this tag"
               >
-                {getTagName(tag.categoryId, tag.subcategoryId, tag.tagId)}
+                {onFindTagName(tag.categoryId, tag.subcategoryId, tag.tagId)}
                 <span className={styles.removeTagIcon}>×</span>
               </div>
             ))}
@@ -742,12 +727,12 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                       {trackData.tags
                         .slice()
                         .sort((a, b) => {
-                          const nameA = getTagName(
+                          const nameA = onFindTagName(
                             a.categoryId,
                             a.subcategoryId,
                             a.tagId
                           );
-                          const nameB = getTagName(
+                          const nameB = onFindTagName(
                             b.categoryId,
                             b.subcategoryId,
                             b.tagId
@@ -765,7 +750,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                             }
                             title="Click to toggle this tag on this track"
                           >
-                            {getTagName(
+                            {onFindTagName(
                               tag.categoryId,
                               tag.subcategoryId,
                               tag.tagId

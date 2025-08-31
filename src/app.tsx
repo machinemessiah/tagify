@@ -40,6 +40,7 @@ function App() {
     updateBpm,
     applyBatchTagUpdates,
     exportData,
+    findTagName,
   } = useTagData();
 
   const {
@@ -249,6 +250,7 @@ function App() {
               onFindCommonEnergyRatingFromDraft={findCommonEnergyRatingFromDraft}
               onToggleStarRating={toggleStarRating}
               onToggleEnergyRating={toggleEnergyRating}
+              onFindTagName={findTagName}
             />
           ) : (
             activeTrack && (

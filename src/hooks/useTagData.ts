@@ -1048,6 +1048,7 @@ export function useTagData() {
     setBpm,
     updateBpm,
     applyBatchTagUpdates,
+    findTagName,
 
     // Category management
     replaceCategories,
