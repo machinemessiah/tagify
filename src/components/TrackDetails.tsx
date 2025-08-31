@@ -988,7 +988,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
           {/* Energy Level */}
           <div className={styles.controlSection}>
             <label className={styles.label}>
-              Energy Level:
+              Energy:
               {trackData.energy > 0 && (
                 <span className={styles.energyValue}>{trackData.energy}</span>
               )}

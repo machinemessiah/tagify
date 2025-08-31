@@ -352,31 +352,42 @@
 }
 
 .controlSection {
-  margin-bottom: 0;
-  margin: 0 auto;
-  justify-content: center;
+  display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
 .label {
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 6px;
-  display: grid;
+  margin-bottom: 8px;
   color: var(--spice-text);
-  justify-content: center;
+  text-align: center;
 }
 
-.ratingContainer {
-  display: flex;
+.ratingContainer,
+.energyContainer {
+  display: grid;
+  grid-template-columns: 60px auto 60px;
   align-items: center;
   gap: 12px;
-  margin-top: 8px;
-  height: 28px; /* Match the height of the energy container */
+  width: 320px;
+  height: 40px; /* Fixed height for both containers */
+  position: relative;
+}
+
+.stars,
+.energySlider {
+  grid-column: 2; /* Middle column - this is what the label centers on */
+  justify-self: center;
 }
 
 .stars {
+  grid-column: 2;
+  justify-self: center;
   display: flex;
+  align-items: center; /* Center the stars vertically */
+  height: 32px; /* Match the clear button height */
 }
 
 .star {
@@ -394,14 +405,17 @@
 }
 
 .energySlider {
-  width: 100%;
-  min-width: 250px;
+  grid-column: 2;
+  justify-self: center;
+  width: 200px;
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
   background: var(--spice-button-disabled);
   border-radius: 2px;
   outline: none;
+  /* Add margin to push it down slightly to match stars */
+  margin-top: 2px;
 }
 
 .energySlider::-webkit-slider-thumb {
@@ -410,7 +424,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #1e90ff; /* Match the blue used for stars */
+  background: #1e90ff;
   cursor: pointer;
 }
 
@@ -418,7 +432,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #1e90ff; /* Match the blue used for stars */
+  background: #1e90ff;
   cursor: pointer;
   border: none;
 }
@@ -435,34 +449,35 @@
 }
 
 .energyValue {
-  display: grid;
   margin-left: 8px;
   font-weight: 700;
   color: #1e90ff;
-  justify-content: center;
 }
 
 .clearButton {
+  grid-column: 3;
+  justify-self: start;
+  width: 50px;
+  height: 28px;
   background: rgba(0, 0, 0, 0.2);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
-  padding: 4px 8px;
   font-size: 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  /* Ensure button is vertically centered in its grid cell */
+  align-self: center;
 }
 
 .clearButton:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.energyContainer {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-  height: 28px; /* Fixed height to prevent shifting */
+.clearButton.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .trackItemRating {

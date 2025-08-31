@@ -303,14 +303,11 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
       </div>
 
       <div className={styles.bulkControlsSection}>
-        <h3 className={styles.sectionTitle}>
-          {lockedTrackUri ? "Track Controls" : "Bulk Controls"}
-        </h3>
         <div className={styles.controlsContainer}>
           {/* Rating Control */}
           <div className={styles.controlSection}>
             <label className={styles.label}>
-              Rating:
+              Rating:{" "}
               {(() => {
                 if (lockedTrackUri) {
                   const lockedTrackRating =
@@ -324,6 +321,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
               })()}
             </label>
             <div className={styles.ratingContainer}>
+              <div></div> {/* empty left column */}
               <div className={styles.stars}>
                 <ReactStars
                   key={`stars-${lockedTrackUri || "bulk"}-${(() => {
@@ -350,35 +348,27 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                   color="var(--spice-button-disabled)"
                 />
               </div>
-              {(() => {
-                const currentRating = lockedTrackUri
-                  ? multiTrackDraftTags[lockedTrackUri]?.rating || 0
-                  : onFindCommonStarRatingFromDraft(multiTrackDraftTags);
+              <button
+                className={`${styles.clearButton} ${(() => {
+                  const currentRating = lockedTrackUri
+                    ? multiTrackDraftTags[lockedTrackUri]?.rating || 0
+                    : onFindCommonStarRatingFromDraft(multiTrackDraftTags);
 
-                return (
-                  currentRating !== undefined &&
-                  currentRating > 0 && (
-                    <button
-                      className={styles.clearButton}
-                      onClick={() => handleBulkStarRatingClick(0)}
-                      aria-label={
-                        lockedTrackUri
-                          ? "Clear track rating"
-                          : "Clear all ratings"
-                      }
-                    >
-                      Clear
-                    </button>
-                  )
-                );
-              })()}
+                  return currentRating === undefined || currentRating <= 0
+                    ? styles.hidden
+                    : "";
+                })()}`}
+                onClick={() => handleBulkStarRatingClick(0)}
+              >
+                Clear
+              </button>
             </div>
           </div>
 
           {/* Energy Control */}
           <div className={styles.controlSection}>
             <label className={styles.label}>
-              Energy Level:
+              Energy:{" "}
               {(() => {
                 if (lockedTrackUri) {
                   const lockedTrackEnergy =
@@ -388,7 +378,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                       {lockedTrackEnergy}
                     </span>
                   ) : (
-                    "None"
+                    <span className={styles.energyValue}>None</span>
                   );
                 } else {
                   const commonEnergy =
@@ -398,12 +388,13 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                   ) : commonEnergy === undefined ? (
                     <span className={styles.energyValue}>Mixed</span>
                   ) : (
-                    "None"
+                    <span className={styles.energyValue}>None</span>
                   );
                 }
               })()}
             </label>
             <div className={styles.energyContainer}>
+              <div></div> {/* empty left column */}
               <input
                 key={`energy-${lockedTrackUri || "bulk"}`}
                 type="range"
@@ -433,19 +424,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                       : "false";
                   }
                 })()}
-                className={`${styles.energySlider} ${(() => {
-                  let isUnset;
-                  if (lockedTrackUri) {
-                    const lockedTrackEnergy =
-                      multiTrackDraftTags[lockedTrackUri]?.energy || 0;
-                    isUnset = lockedTrackEnergy === 0;
-                  } else {
-                    const commonEnergy =
-                      onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
-                    isUnset = commonEnergy === undefined || commonEnergy === 0;
-                  }
-                  return isUnset ? styles.energySliderUnset : "";
-                })()}`}
+                className={styles.energySlider}
                 onChange={(e) => {
                   const value = parseInt(e.target.value);
                   handleBulkEnergyClick(value);
@@ -474,28 +453,20 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                   handleBulkEnergyClick(0);
                 }}
               />
-              {(() => {
-                const currentEnergy = lockedTrackUri
-                  ? multiTrackDraftTags[lockedTrackUri]?.energy || 0
-                  : onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
+              <button
+                className={`${styles.clearButton} ${(() => {
+                  const currentEnergy = lockedTrackUri
+                    ? multiTrackDraftTags[lockedTrackUri]?.energy || 0
+                    : onFindCommonEnergyRatingFromDraft(multiTrackDraftTags);
 
-                return (
-                  currentEnergy !== undefined &&
-                  currentEnergy > 0 && (
-                    <button
-                      className={styles.clearButton}
-                      onClick={() => handleBulkEnergyClick(0)}
-                      aria-label={
-                        lockedTrackUri
-                          ? "Clear track energy rating"
-                          : "Clear all energy ratings"
-                      }
-                    >
-                      Clear
-                    </button>
-                  )
-                );
-              })()}
+                  return currentEnergy === undefined || currentEnergy <= 0
+                    ? styles.hidden
+                    : "";
+                })()}`}
+                onClick={() => handleBulkEnergyClick(0)}
+              >
+                Clear
+              </button>
             </div>
           </div>
         </div>
