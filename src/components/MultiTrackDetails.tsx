@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./MultiTrackDetails.module.css";
-import { BatchTagUpdate, TagCategory, TrackTag } from "../hooks/useTagData";
-import {
-  DraftTagState,
-  useMultiTrackTagging,
-} from "../hooks/useMultiTrackTagging";
+import { BatchTagUpdate, TrackTag } from "../hooks/useTagData";
+import { DraftTagState } from "../hooks/useMultiTrackTagging";
 import ReactStars from "react-rating-stars-component";
 
 interface MultiTrackDetailsProps {
@@ -15,14 +12,13 @@ interface MultiTrackDetailsProps {
     album: { name: string };
   }>;
   trackDataMap: DraftTagState;
-  categories: TagCategory[];
   onCancelTagging: () => void;
   onPlayTrack: (uri: string) => void;
   lockedTrackUri: string | null;
   onLockTrack: (uri: string | null) => void;
   multiTrackDraftTags: DraftTagState;
   onSetMultiTrackDraftTags: (draftTags: DraftTagState) => void;
-  onBatchUpdate: (updates: BatchTagUpdate[]) => void;
+  onApplyBatchTagUpdates: (updates: BatchTagUpdate[]) => void;
   onFindCommonTagsFromDraft: (draftTags: DraftTagState) => TrackTag[];
   onFindCommonStarRatingFromDraft: (
     draftTags: DraftTagState
@@ -30,41 +26,52 @@ interface MultiTrackDetailsProps {
   onFindCommonEnergyRatingFromDraft: (
     draftTags: DraftTagState
   ) => number | undefined;
-  onToggleStarRating: (rating: number) => void;
-  onToggleEnergyRating: (energy: number) => void;
-  onFindTagName: (categoryId: string, subCategoryId: string, tagId: string) => string;
+  onToggleStarRatingDraft: (rating: number) => void;
+  onToggleEnergyRatingDraft: (energy: number) => void;
+  onFindTagName: (
+    categoryId: string,
+    subCategoryId: string,
+    tagId: string
+  ) => string;
+  onToggleCommonTagDraft: (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => void;
+  onToggleTagForSpecificTrackDraft: (
+    trackUri: string,
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => void;
+  onCalculateBatchChanges: (
+    tracks: Array<{ uri: string }>,
+    originalTrackDataMap: DraftTagState,
+    draftTags: DraftTagState
+  ) => BatchTagUpdate[];
 }
 
 const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
   tracks,
   trackDataMap,
-  categories,
   onCancelTagging,
   onPlayTrack,
   lockedTrackUri,
   onLockTrack,
   multiTrackDraftTags,
   onSetMultiTrackDraftTags,
-  onBatchUpdate,
+  onApplyBatchTagUpdates,
   onFindCommonTagsFromDraft,
   onFindCommonStarRatingFromDraft,
   onFindCommonEnergyRatingFromDraft,
-  onToggleStarRating,
-  onToggleEnergyRating,
+  onToggleStarRatingDraft,
+  onToggleEnergyRatingDraft,
   onFindTagName,
+  onToggleCommonTagDraft,
+  onToggleTagForSpecificTrackDraft,
+  onCalculateBatchChanges,
 }) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
-  const updateDraftTags = (
-    updater: DraftTagState | ((prev: DraftTagState) => DraftTagState)
-  ) => {
-    if (typeof updater === "function") {
-      const newDraft = updater(multiTrackDraftTags);
-      onSetMultiTrackDraftTags(newDraft);
-    } else {
-      onSetMultiTrackDraftTags(updater);
-    }
-  };
 
   // Check for changes whenever draft tags update
   useEffect(() => {
@@ -127,78 +134,24 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     );
   };
 
-  // Handle tag removal/addition in draft state
-  const handleRemoveTagDraft = (tag: TrackTag) => {
-    updateDraftTags((prev: DraftTagState) => {
-      const newDraft = { ...prev };
+  // Handle common tag removal in draft state
+  const handleRemoveCommonTagsClick = (tag: TrackTag) => {
+    onToggleCommonTagDraft(tag.categoryId, tag.subcategoryId, tag.tagId);
+  };
 
-      if (lockedTrackUri) {
-        // Single track toggle
-        const trackData = newDraft[lockedTrackUri] || {
-          tags: [],
-          rating: 0,
-          energy: 0,
-        };
-        const tagIndex = trackData.tags.findIndex(
-          (t) =>
-            t.categoryId === tag.categoryId &&
-            t.subcategoryId === tag.subcategoryId &&
-            t.tagId === tag.tagId
-        );
-
-        if (tagIndex >= 0) {
-          newDraft[lockedTrackUri] = {
-            ...trackData,
-            tags: trackData.tags.filter((_, i) => i !== tagIndex),
-          };
-        } else {
-          newDraft[lockedTrackUri] = {
-            ...trackData,
-            tags: [...trackData.tags, tag],
-          };
-        }
-
-        return newDraft;
-      } else {
-        const commonTags = onFindCommonTagsFromDraft(newDraft);
-        const allHaveTag = commonTags.some(
-          (commonTag) =>
-            commonTag.categoryId === tag.categoryId &&
-            commonTag.subcategoryId === tag.subcategoryId &&
-            commonTag.tagId === tag.tagId
-        );
-
-        // Apply or remove to/from all tracks
-        tracks.forEach((track) => {
-          const trackData = newDraft[track.uri] || {
-            tags: [],
-            rating: 0,
-            energy: 0,
-          };
-          const tagIndex = trackData.tags.findIndex(
-            (t) =>
-              t.categoryId === tag.categoryId &&
-              t.subcategoryId === tag.subcategoryId &&
-              t.tagId === tag.tagId
-          );
-
-          if (allHaveTag && tagIndex >= 0) {
-            // Remove from all
-            newDraft[track.uri] = {
-              ...trackData,
-              tags: trackData.tags.filter((_, i) => i !== tagIndex),
-            };
-          } else if (!allHaveTag && tagIndex < 0) {
-            // Add to all that don't have it
-            newDraft[track.uri] = {
-              ...trackData,
-              tags: [...trackData.tags, tag],
-            };
-          }
-        });
-        return newDraft;
-      }
-    });
+  // Handle individual track tag click in draft state
+  const handleRemoveSpecificTagClick = (
+    trackUri: string,
+    tag: TrackTag,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation(); // Prevent track locking when clicking on tags
+    onToggleTagForSpecificTrackDraft(
+      trackUri,
+      tag.categoryId,
+      tag.subcategoryId,
+      tag.tagId
+    );
   };
 
   // Handle track click
@@ -219,130 +172,28 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     }
   };
 
-  // Handle individual track tag click in draft state
-  const handleTagClickDraft = (
-    trackUri: string,
-    tag: TrackTag,
-    e: React.MouseEvent
-  ) => {
-    e.stopPropagation(); // Prevent track locking when clicking on tags
-
-    // Toggle the tag for this specific track in draft state
-    updateDraftTags((prev: DraftTagState) => {
-      const newDraft = { ...prev };
-      const trackData = newDraft[trackUri] || {
-        tags: [],
-        rating: 0,
-        energy: 0,
-      };
-      const tagIndex = trackData.tags.findIndex(
-        (t) =>
-          t.categoryId === tag.categoryId &&
-          t.subcategoryId === tag.subcategoryId &&
-          t.tagId === tag.tagId
-      );
-
-      if (tagIndex >= 0) {
-        newDraft[trackUri] = {
-          ...trackData,
-          tags: trackData.tags.filter((_, i) => i !== tagIndex),
-        };
-      } else {
-        newDraft[trackUri] = {
-          ...trackData,
-          tags: [...trackData.tags, tag],
-        };
-      }
-
-      return newDraft;
-    });
-  };
-
   const handleBulkStarRatingClick = (rating: number) => {
-    onToggleStarRating(rating);
+    onToggleStarRatingDraft(rating);
   };
 
   const handleBulkEnergyClick = (energy: number) => {
-    onToggleEnergyRating(energy);
+    onToggleEnergyRatingDraft(energy);
   };
 
   // Save changes - apply all draft changes
   const handleSaveChanges = () => {
     // Calculate what changed
-    const changes: BatchTagUpdate[] = [];
-
-    tracks.forEach((track) => {
-      const originalData = trackDataMap[track.uri] || {
-        tags: [],
-        rating: 0,
-        energy: 0,
-      };
-      const draftData = multiTrackDraftTags[track.uri] || {
-        tags: [],
-        rating: 0,
-        energy: 0,
-      };
-
-      const toAdd = draftData.tags.filter(
-        (draftTag) =>
-          !originalData.tags.some(
-            (origTag) =>
-              origTag.categoryId === draftTag.categoryId &&
-              origTag.subcategoryId === draftTag.subcategoryId &&
-              origTag.tagId === draftTag.tagId
-          )
-      );
-
-      const toRemove = originalData.tags.filter(
-        (origTag) =>
-          !draftData.tags.some(
-            (draftTag) =>
-              draftTag.categoryId === origTag.categoryId &&
-              draftTag.subcategoryId === origTag.subcategoryId &&
-              draftTag.tagId === origTag.tagId
-          )
-      );
-
-      const ratingChanged = originalData.rating !== draftData.rating;
-      const energyChanged = originalData.energy !== draftData.energy;
-
-      if (
-        toAdd.length > 0 ||
-        toRemove.length > 0 ||
-        ratingChanged ||
-        energyChanged
-      ) {
-        const change: BatchTagUpdate = { trackUri: track.uri, toAdd, toRemove };
-
-        if (ratingChanged) {
-          change.newRating = draftData.rating;
-        }
-
-        if (energyChanged) {
-          change.newEnergy = draftData.energy;
-        }
-
-        changes.push(change);
-      }
-    });
-
+    const changes = onCalculateBatchChanges(
+      tracks,
+      trackDataMap,
+      multiTrackDraftTags
+    );
     if (changes.length === 0) {
       Spicetify.showNotification("No changes to save");
       return;
     }
 
-    // Apply all changes in a single batch
-    onBatchUpdate(changes);
-
-    // Update the draft state to match what we just saved
-    // This ensures the UI reflects the saved state immediately
-    const newDraft: DraftTagState = {};
-    tracks.forEach((track) => {
-      newDraft[track.uri] = { ...multiTrackDraftTags[track.uri] };
-    });
-    onSetMultiTrackDraftTags(newDraft);
-
-    // setHasUnsavedChanges(false);
+    onApplyBatchTagUpdates(changes);
     Spicetify.showNotification(`Saved changes to ${changes.length} tracks`);
   };
 
@@ -680,8 +531,8 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
               <div
                 key={index}
                 className={styles.tagItem}
-                onClick={() => handleRemoveTagDraft(tag)}
-                title="Click to toggle this tag"
+                onClick={() => handleRemoveCommonTagsClick(tag)}
+                title="Click to remove this tag from all tracks"
               >
                 {onFindTagName(tag.categoryId, tag.subcategoryId, tag.tagId)}
                 <span className={styles.removeTagIcon}>×</span>
@@ -723,6 +574,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
 
                 <div className={styles.trackTagsInline}>
                   {(trackData?.tags || []).length > 0 ? (
+                    // TODO: refactor this
                     <div className={styles.tagList}>
                       {trackData.tags
                         .slice()
@@ -746,9 +598,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                               isCommonTag(tag) ? styles.commonTagHighlight : ""
                             }`}
                             onClick={(e) =>
-                              handleTagClickDraft(track.uri, tag, e)
+                              handleRemoveSpecificTagClick(track.uri, tag, e)
                             }
-                            title="Click to toggle this tag on this track"
+                            title="Click to remove this tag from this track"
                           >
                             {onFindTagName(
                               tag.categoryId,

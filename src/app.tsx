@@ -98,9 +98,12 @@ function App() {
     findCommonTagsFromDraft,
     findCommonStarRatingFromDraft,
     findCommonEnergyRatingFromDraft,
-    toggleTagMultiTrack,
-    toggleStarRating,
-    toggleEnergyRating,
+    toggleTagMultiTrackDraft,
+    toggleStarRatingDraft,
+    toggleEnergyRatingDraft,
+    toggleCommonTagDraft,
+    toggleTagForSpecificTrackDraft,
+    calculateBatchChanges,
   } = useMultiTrackTagging();
 
   // Set up history tracking and URL param handling
@@ -156,7 +159,7 @@ function App() {
     tagId: string
   ) => {
     if (isMultiTagging) {
-      toggleTagMultiTrack(categoryId, subcategoryId, tagId);
+      toggleTagMultiTrackDraft(categoryId, subcategoryId, tagId);
     } else if (activeTrack) {
       toggleTagSingleTrack(activeTrack.uri, categoryId, subcategoryId, tagId);
     }
@@ -237,20 +240,22 @@ function App() {
             <MultiTrackDetails
               tracks={multiTagTracks}
               trackDataMap={trackDataMap}
-              categories={tagData.categories}
               onCancelTagging={cancelMultiTagging}
               onPlayTrack={playTrack}
               lockedTrackUri={lockedMultiTrackUri}
               onLockTrack={setLockedMultiTrackUri}
               multiTrackDraftTags={multiTrackDraftTags}
               onSetMultiTrackDraftTags={setMultiTrackDraftTags}
-              onBatchUpdate={applyBatchTagUpdates}
+              onApplyBatchTagUpdates={applyBatchTagUpdates}
               onFindCommonTagsFromDraft={findCommonTagsFromDraft}
               onFindCommonStarRatingFromDraft={findCommonStarRatingFromDraft}
               onFindCommonEnergyRatingFromDraft={findCommonEnergyRatingFromDraft}
-              onToggleStarRating={toggleStarRating}
-              onToggleEnergyRating={toggleEnergyRating}
+              onToggleStarRatingDraft={toggleStarRatingDraft}
+              onToggleEnergyRatingDraft={toggleEnergyRatingDraft}
               onFindTagName={findTagName}
+              onToggleCommonTagDraft={toggleCommonTagDraft}
+              onToggleTagForSpecificTrackDraft={toggleTagForSpecificTrackDraft}
+              onCalculateBatchChanges={calculateBatchChanges}
             />
           ) : (
             activeTrack && (

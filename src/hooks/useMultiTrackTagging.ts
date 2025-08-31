@@ -1,12 +1,12 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { SpotifyTrack } from "../types/SpotifyTypes";
-import { TrackData, TrackTag, useTagData } from "./useTagData";
+import { BatchTagUpdate, TrackTag, useTagData } from "./useTagData";
 
 export interface DraftTagState {
   [trackUri: string]: {
     tags: TrackTag[];
-    rating?: number;
-    energy?: number;
+    rating: number;
+    energy: number;
   };
 }
 
@@ -156,7 +156,8 @@ export function useMultiTrackTagging() {
   );
 
   // Main tag toggle handler (ONLY for multi-track mode)
-  const toggleTagMultiTrack = useCallback(
+  // only manipulates the tag draft! doesn't directly update tags
+  const toggleTagMultiTrackDraft = useCallback(
     (categoryId: string, subcategoryId: string, tagId: string) => {
       if (!isMultiTagging) {
         console.warn("toggleTag called when not in multi-tagging mode");
@@ -237,7 +238,175 @@ export function useMultiTrackTagging() {
     [isMultiTagging, multiTrackDraftTags, lockedMultiTrackUri, multiTagTracks]
   );
 
-  const toggleStarRating = useCallback(
+  const calculateBatchChanges = useCallback(
+    (
+      tracks: Array<{ uri: string }>,
+      originalTrackDataMap: DraftTagState,
+      draftTags: DraftTagState
+    ): BatchTagUpdate[] => {
+      const changes: BatchTagUpdate[] = [];
+
+      tracks.forEach((track) => {
+        const originalData = originalTrackDataMap[track.uri] || {
+          tags: [],
+          rating: 0,
+          energy: 0,
+        };
+        const draftData = draftTags[track.uri] || {
+          tags: [],
+          rating: 0,
+          energy: 0,
+        };
+
+        const toAdd = draftData.tags.filter(
+          (draftTag) =>
+            !originalData.tags.some(
+              (origTag) =>
+                origTag.categoryId === draftTag.categoryId &&
+                origTag.subcategoryId === draftTag.subcategoryId &&
+                origTag.tagId === draftTag.tagId
+            )
+        );
+
+        const toRemove = originalData.tags.filter(
+          (origTag) =>
+            !draftData.tags.some(
+              (draftTag) =>
+                draftTag.categoryId === origTag.categoryId &&
+                draftTag.subcategoryId === origTag.subcategoryId &&
+                draftTag.tagId === origTag.tagId
+            )
+        );
+
+        const ratingChanged = originalData.rating !== draftData.rating;
+        const energyChanged = originalData.energy !== draftData.energy;
+
+        if (
+          toAdd.length > 0 ||
+          toRemove.length > 0 ||
+          ratingChanged ||
+          energyChanged
+        ) {
+          const change: BatchTagUpdate = {
+            trackUri: track.uri,
+            toAdd,
+            toRemove,
+          };
+
+          if (ratingChanged) {
+            change.newRating = draftData.rating;
+          }
+
+          if (energyChanged) {
+            change.newEnergy = draftData.energy;
+          }
+
+          changes.push(change);
+        }
+      });
+
+      return changes;
+    },
+    []
+  );
+
+  const toggleTagForSpecificTrackDraft = useCallback(
+    (
+      trackUri: string,
+      categoryId: string,
+      subcategoryId: string,
+      tagId: string
+    ) => {
+      if (!multiTrackDraftTags) return;
+
+      const newDraft = { ...multiTrackDraftTags };
+      const trackData = newDraft[trackUri] || {
+        tags: [],
+        rating: 0,
+        energy: 0,
+      };
+
+      const tagIndex = trackData.tags.findIndex(
+        (t) =>
+          t.categoryId === categoryId &&
+          t.subcategoryId === subcategoryId &&
+          t.tagId === tagId
+      );
+
+      if (tagIndex >= 0) {
+        newDraft[trackUri] = {
+          ...trackData,
+          tags: trackData.tags.filter((_, i) => i !== tagIndex),
+        };
+      } else {
+        newDraft[trackUri] = {
+          ...trackData,
+          tags: [...trackData.tags, { categoryId, subcategoryId, tagId }],
+        };
+      }
+
+      setMultiTrackDraftTags(newDraft);
+    },
+    [multiTrackDraftTags]
+  );
+
+  const toggleCommonTagDraft = useCallback(
+    (categoryId: string, subcategoryId: string, tagId: string) => {
+      if (!isMultiTagging || !multiTrackDraftTags) {
+        console.warn("toggleCommonTag called when not in multi-tagging mode");
+        return;
+      }
+
+      // ALWAYS operate on ALL tracks, ignore lock state for common tags
+      const newDraft: DraftTagState = { ...multiTrackDraftTags };
+      const commonTags = findCommonTagsFromDraft(newDraft);
+      const tagIsCommonToAll = commonTags.some(
+        (tag) =>
+          tag.categoryId === categoryId &&
+          tag.subcategoryId === subcategoryId &&
+          tag.tagId === tagId
+      );
+
+      // Apply toggle logic to ALL tracks
+      multiTagTracks.forEach((track) => {
+        const trackData = newDraft[track.uri] || {
+          tags: [],
+          rating: 0,
+          energy: 0,
+        };
+        const tagIndex = trackData.tags.findIndex(
+          (t) =>
+            t.categoryId === categoryId &&
+            t.subcategoryId === subcategoryId &&
+            t.tagId === tagId
+        );
+
+        if (tagIsCommonToAll && tagIndex >= 0) {
+          // All tracks had the tag, remove it from all
+          newDraft[track.uri] = {
+            ...trackData,
+            tags: trackData.tags.filter((_, i) => i !== tagIndex),
+          };
+        } else if (!tagIsCommonToAll && tagIndex < 0) {
+          // Not all tracks had the tag, add it to those that don't have it
+          newDraft[track.uri] = {
+            ...trackData,
+            tags: [...trackData.tags, { categoryId, subcategoryId, tagId }],
+          };
+        }
+      });
+
+      setMultiTrackDraftTags(newDraft);
+    },
+    [
+      isMultiTagging,
+      multiTrackDraftTags,
+      multiTagTracks,
+      findCommonTagsFromDraft,
+    ]
+  );
+
+  const toggleStarRatingDraft = useCallback(
     (rating: number) => {
       if (!isMultiTagging) {
         console.warn("toggleStarRating called when not in multi-tagging mode");
@@ -291,7 +460,7 @@ export function useMultiTrackTagging() {
     ]
   );
 
-  const toggleEnergyRating = useCallback(
+  const toggleEnergyRatingDraft = useCallback(
     (energy: number) => {
       if (!isMultiTagging || !multiTrackDraftTags) {
         console.warn(
@@ -389,10 +558,13 @@ export function useMultiTrackTagging() {
     setMultiTagTracks,
     setLockedMultiTrackUri,
     setMultiTrackDraftTags,
-    toggleTagMultiTrack,
-    toggleStarRating,
-    toggleEnergyRating,
+    toggleTagMultiTrackDraft,
+    toggleStarRatingDraft,
+    toggleEnergyRatingDraft,
     cancelMultiTagging,
+    toggleCommonTagDraft,
+    toggleTagForSpecificTrackDraft,
+    calculateBatchChanges,
 
     // Computed values
     selectedTagsForSelector,
