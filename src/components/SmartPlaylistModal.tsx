@@ -4,6 +4,20 @@ import Portal from "../utils/Portal";
 import { SmartPlaylistCriteria, TagCategory } from "../hooks/useTagData";
 import { formatCondensedDate, formatTimestamp } from "../utils/formatters";
 import { spotifyApiService } from "../services/SpotifyApiService";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowUpRightFromSquare,
+  faBan,
+  faBolt,
+  faCheckCircle,
+  faExclamationTriangle,
+  faMagnifyingGlass,
+  faMusic,
+  faQuestionCircle,
+  faTag,
+  faTrophy,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 
 const PLAYLIST_SORT_OPTIONS = {
   ALPHABETICAL: "alphabetical",
@@ -401,7 +415,8 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                   onClick={handleExportClick}
                   title="Backup your smart playlists"
                 >
-                  ↗ Backup
+                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} size="sm" />{" "}
+                  Backup
                 </button>
 
                 <button
@@ -409,11 +424,16 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                   onClick={handleImportClick}
                   title="Import smart playlists"
                 >
-                  ↙ Import
+                  <FontAwesomeIcon
+                    icon={faArrowUpRightFromSquare}
+                    rotation={180}
+                    size="sm"
+                  />{" "}
+                  Import
                 </button>
 
                 <button className="modal-close-button" onClick={onClose}>
-                  ×
+                  <FontAwesomeIcon icon={faXmark} />
                 </button>
               </div>
             </div>
@@ -434,7 +454,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                     onClick={() => setSearchQuery("")}
                     title="Clear search"
                   >
-                    ×
+                    <FontAwesomeIcon icon={faXmark} />
                   </button>
                 )}
               </div>
@@ -484,13 +504,17 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                 <div className={styles.emptyState}>
                   {searchQuery ? (
                     <>
-                      <div className={styles.emptyIcon}>🔍</div>
+                      <div className={styles.emptyIcon}>
+                        <FontAwesomeIcon icon={faMagnifyingGlass} />
+                      </div>
                       <h3>No playlists found</h3>
                       <p>No playlists match "{searchQuery}"</p>
                     </>
                   ) : (
                     <>
-                      <div className={styles.emptyIcon}>🎵</div>
+                      <div className={styles.emptyIcon}>
+                        <FontAwesomeIcon icon={faMusic} />
+                      </div>
                       <h3>No Smart Playlists Yet</h3>
                       <p>
                         Create a playlist with filters and enable "Smart
@@ -586,21 +610,26 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                                 <span
                                   className={`${styles.syncIndicator} ${styles.synced}`}
                                 >
-                                  ✓ In Sync
+                                  <FontAwesomeIcon icon={faCheckCircle} /> In
+                                  Sync
                                 </span>
                               )}
                               {getSyncStatus(playlist) === "needsSync" && (
                                 <span
                                   className={`${styles.syncIndicator} ${styles.needsSync}`}
                                 >
-                                  ⚠ Needs Sync
+                                  <FontAwesomeIcon
+                                    icon={faExclamationTriangle}
+                                  />{" "}
+                                  Needs Sync
                                 </span>
                               )}
                               {getSyncStatus(playlist) === "unknown" && (
                                 <span
                                   className={`${styles.syncIndicator} ${styles.unknown}`}
                                 >
-                                  ? Unknown
+                                  <FontAwesomeIcon icon={faQuestionCircle} />{" "}
+                                  Unknown
                                 </span>
                               )}
                             </div>
@@ -618,7 +647,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                               {activeTagsText && (
                                 <div className={styles.criteriaItem}>
                                   <span className={styles.criteriaLabel}>
-                                    🏷️ Tags:
+                                    <FontAwesomeIcon icon={faTag} /> Tags:
                                   </span>
                                   <span className={styles.criteriaValue}>
                                     {activeTagsText}
@@ -628,7 +657,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                               {excludedTagsText && (
                                 <div className={styles.criteriaItem}>
                                   <span className={styles.criteriaLabel}>
-                                    🚫 Excluded:
+                                    <FontAwesomeIcon icon={faBan} /> Excluded:
                                   </span>
                                   <span className={styles.criteriaValue}>
                                     {excludedTagsText}
@@ -638,7 +667,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                               {ratingText && (
                                 <div className={styles.criteriaItem}>
                                   <span className={styles.criteriaLabel}>
-                                    🏆 Rating:
+                                    <FontAwesomeIcon icon={faTrophy} /> Rating:
                                   </span>
                                   <span className={styles.criteriaValue}>
                                     {ratingText}
@@ -648,7 +677,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                               {energyText && (
                                 <div className={styles.criteriaItem}>
                                   <span className={styles.criteriaLabel}>
-                                    ⚡ Energy:
+                                    <FontAwesomeIcon icon={faBolt} /> Energy:
                                   </span>
                                   <span className={styles.criteriaValue}>
                                     {energyText}
@@ -658,7 +687,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                               {bpmText && (
                                 <div className={styles.criteriaItem}>
                                   <span className={styles.criteriaLabel}>
-                                    🎵 BPM:
+                                    <FontAwesomeIcon icon={faMusic} /> BPM:
                                   </span>
                                   <span className={styles.criteriaValue}>
                                     {bpmText}
