@@ -10,6 +10,8 @@ import {
 } from "../types/SpotifyTypes";
 import { formatTimestamp } from "../utils/formatters";
 import { Lock, LockOpen } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
 
 interface TrackDetailsProps {
   displayedTrack: SpotifyTrack; // The track displayed in TrackDetails
@@ -970,9 +972,9 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                   onChange={(newRating: number) => onSetRating(newRating)}
                   size={24}
                   isHalf={true}
-                  emptyIcon={<i className="far fa-star"></i>}
-                  halfIcon={<i className="fa fa-star-half-alt"></i>}
-                  fullIcon={<i className="fa fa-star"></i>}
+                  emptyIcon={<FontAwesomeIcon icon={faStar} />}
+                  halfIcon={<FontAwesomeIcon icon={faStarHalf} />}
+                  fullIcon={<FontAwesomeIcon icon={faStar} />}
                   activeColor="#ffd700"
                   color="var(--spice-button-disabled)"
                 />

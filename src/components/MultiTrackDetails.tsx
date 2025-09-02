@@ -4,6 +4,8 @@ import { BatchTagUpdate, TrackTag } from "../hooks/useTagData";
 import { DraftTagState } from "../hooks/useMultiTrackTagging";
 import ReactStars from "react-rating-stars-component";
 import { Lock, Tag } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
 
 interface MultiTrackDetailsProps {
   tracks: Array<{
@@ -394,9 +396,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                   }
                   size={30}
                   isHalf={true}
-                  emptyIcon={<i className="far fa-star"></i>}
-                  halfIcon={<i className="fa fa-star-half-alt"></i>}
-                  fullIcon={<i className="fa fa-star"></i>}
+                  emptyIcon={<FontAwesomeIcon icon={faStar} />}
+                  halfIcon={<FontAwesomeIcon icon={faStarHalf} />}
+                  fullIcon={<FontAwesomeIcon icon={faStar} />}
                   activeColor="#ffd700"
                   color="var(--spice-button-disabled)"
                 />
@@ -594,9 +596,9 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                         edit={false}
                         size={16}
                         isHalf={true}
-                        emptyIcon={<i className="far fa-star"></i>}
-                        halfIcon={<i className="fa fa-star-half-alt"></i>}
-                        fullIcon={<i className="fa fa-star"></i>}
+                        emptyIcon={<FontAwesomeIcon icon={faStar} />}
+                        halfIcon={<FontAwesomeIcon icon={faStarHalf} />}
+                        fullIcon={<FontAwesomeIcon icon={faStar} />}
                         activeColor="#ffd700"
                         color="var(--spice-button-disabled)"
                       />

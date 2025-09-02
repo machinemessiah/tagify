@@ -26,7 +26,11 @@ import {
 import SmartPlaylistModal from "./SmartPlaylistModal";
 import { formatTimestamp } from "../utils/formatters";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBoltLightning,
+  faStar,
+  faStarHalf,
+} from "@fortawesome/free-solid-svg-icons";
 
 export interface TrackData {
   rating: number;
@@ -867,7 +871,9 @@ const TrackList: React.FC<TrackListProps> = ({
             onClick={handleSmartPlaylistClick}
             title={`Smart Playlists (${smartPlaylists.length})`}
           >
-            <i className="fa-solid fa-bolt-lightning"></i>
+            {/* <i className="fa-solid fa-bolt-lightning"></i> */}
+
+            <FontAwesomeIcon icon={faBoltLightning} />
           </button>
         </div>
         <div className={styles.filterControlsRightGrid}>

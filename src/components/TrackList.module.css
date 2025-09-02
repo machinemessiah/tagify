@@ -516,14 +516,14 @@
   left: 100%;
 }
 
-.smartPlaylistButton i {
+.smartPlaylistButton svg {
   color: #ffd700;
   font-size: 12px;
   filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
   animation: sparkle 2s ease-in-out infinite;
 }
 
-.smartPlaylistButton:hover i {
+.smartPlaylistButton:hover svg {
   color: #fff;
   filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
 }
@@ -550,7 +550,7 @@
   box-shadow: none;
 }
 
-.smartPlaylistButton:disabled i {
+.smartPlaylistButton:disabled svg {
   animation: none;
   filter: none;
 }

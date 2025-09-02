@@ -9,7 +9,7 @@ import MainSettingsModal from "./MainSettingsModal";
 import InfoModal from "./InfoModal";
 import { Settings } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faChartSimple, faDownload, faInfo, faUpload } from "@fortawesome/free-solid-svg-icons";
 
 interface DataManagerProps {
   onExportTagData: () => void;
@@ -103,14 +103,14 @@ const DataManager: React.FC<DataManagerProps> = ({
             onClick={onExportRekordbox}
             title="View your tag stats"
           >
-            <i className="fa-solid fa-chart-simple"></i> Stats
+            <FontAwesomeIcon icon={faChartSimple} /> Stats
           </button>
           <button
             className={`${styles.pillButton} ${styles.infoButton}`}
             onClick={() => setShowInfoModal(true)}
             title="Help & Tutorial"
           >
-            <i className="fa-solid fa-info"></i> Info
+            <FontAwesomeIcon icon={faInfo} /> Info
           </button>
         </div>
       </div>
