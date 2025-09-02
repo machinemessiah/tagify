@@ -25,6 +25,8 @@ import {
 } from "../types/SpotifyTypes";
 import SmartPlaylistModal from "./SmartPlaylistModal";
 import { formatTimestamp } from "../utils/formatters";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";
 
 export interface TrackData {
   rating: number;
@@ -865,7 +867,7 @@ const TrackList: React.FC<TrackListProps> = ({
             onClick={handleSmartPlaylistClick}
             title={`Smart Playlists (${smartPlaylists.length})`}
           >
-            <i className="fas fa-bolt"></i>
+            <i className="fa-solid fa-bolt-lightning"></i>
           </button>
         </div>
         <div className={styles.filterControlsRightGrid}>
@@ -984,9 +986,9 @@ const TrackList: React.FC<TrackListProps> = ({
                         edit={false}
                         size={14}
                         isHalf={true}
-                        emptyIcon={<i className="far fa-star"></i>}
-                        halfIcon={<i className="fa fa-star-half-alt"></i>}
-                        fullIcon={<i className="fa fa-star"></i>}
+                        emptyIcon={<FontAwesomeIcon icon={faStar} />}
+                        halfIcon={<FontAwesomeIcon icon={faStarHalf} />}
+                        fullIcon={<FontAwesomeIcon icon={faStar} />}
                         activeColor="#ffd700"
                         color="rgba(255, 255, 255, 0.2)"
                       />
@@ -1365,9 +1367,9 @@ const TrackList: React.FC<TrackListProps> = ({
                             edit={false}
                             size={16}
                             isHalf={true}
-                            emptyIcon={<i className="far fa-star"></i>}
-                            halfIcon={<i className="fa fa-star-half-alt"></i>}
-                            fullIcon={<i className="fa fa-star"></i>}
+                            emptyIcon={<FontAwesomeIcon icon={faStar} />}
+                            halfIcon={<FontAwesomeIcon icon={faStarHalf} />}
+                            fullIcon={<FontAwesomeIcon icon={faStar} />}
                             activeColor="#ffd700"
                             color="var(--spice-button-disabled)"
                           />

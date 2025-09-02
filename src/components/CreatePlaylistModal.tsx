@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./CreatePlaylistModal.module.css";
 import Portal from "../utils/Portal";
+import { Lightbulb } from "lucide-react";
 
 interface CreatePlaylistModalProps {
   trackCount: number;
@@ -248,7 +249,7 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                   <div className={styles.helpTooltip}>
                     ?
                     <div className={styles.tooltipContent}>
-                      <strong>💡 </strong> When new tracks match the filter criteria, they'll be
+                      <Lightbulb size={16} /> When new tracks match the filter criteria, they'll be
                       automatically added to this playlist!
                     </div>
                   </div>

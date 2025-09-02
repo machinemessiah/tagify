@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import styles from "./TagSelector.module.css";
 import { TagCategory, TrackTag } from "../hooks/useTagData";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { Lightbulb, Lock, Tag } from "lucide-react";
 
 interface TagSelectorProps {
   categories: TagCategory[];
@@ -165,9 +166,9 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           <div className={styles.helpTooltip}>
             ?
             <div className={styles.tooltipContent}>
-              <strong>💡 Pro tip:</strong> Select multiple tracks in any
-              playlist, right-click, and choose "Bulk Tag" to tag multiple
-              tracks at once!
+              <Lightbulb size={16} />{" "}
+              <strong>Pro tip:</strong> Select multiple tracks in any playlist,
+              right-click, and choose "Bulk Tag" to tag multiple tracks at once!
             </div>
           </div>
         </div>
@@ -209,9 +210,13 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       </div>
 
       {isMultiTagging && (
-        <div className={styles.multiTaggingBanner}>
+        <div
+          className={`${styles.multiTaggingBanner} ${
+            isLockedTrack ? styles.locked : ""
+          }`}
+        >
           <span className={styles.multiTaggingIcon}>
-            {isLockedTrack ? "🔒" : "🏷️"}
+            {isLockedTrack ? <Lock size={16} /> : <Tag size={16} />}
           </span>
           <span className={styles.multiTaggingText}>
             {isLockedTrack

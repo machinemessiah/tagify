@@ -9,6 +9,7 @@ import {
   SpotifyArtist,
 } from "../types/SpotifyTypes";
 import { formatTimestamp } from "../utils/formatters";
+import { Lock, LockOpen } from "lucide-react";
 
 interface TrackDetailsProps {
   displayedTrack: SpotifyTrack; // The track displayed in TrackDetails
@@ -733,7 +734,11 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
               : "Lock to this track"
           }
         >
-          {isLocked ? "🔒" : "🔓"}
+          {isLocked ? (
+            <Lock size={16} strokeWidth={1.25} absoluteStrokeWidth />
+          ) : (
+            <LockOpen size={16} strokeWidth={1.25} absoluteStrokeWidth />
+          )}
         </button>
       </div>
       <div className={styles.contentLayout}>

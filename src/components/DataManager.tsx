@@ -7,6 +7,9 @@ import { TagDataStructure } from "../hooks/useTagData";
 // import RefreshModal from "./RefreshModal";
 import MainSettingsModal from "./MainSettingsModal";
 import InfoModal from "./InfoModal";
+import { Settings } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload, faUpload } from "@fortawesome/free-solid-svg-icons";
 
 interface DataManagerProps {
   onExportTagData: () => void;
@@ -83,14 +86,14 @@ const DataManager: React.FC<DataManagerProps> = ({
             onClick={onExportTagData}
             title="Backup your tag data"
           >
-            📤 Export
+            <FontAwesomeIcon icon={faDownload} /> Backup
           </button>
           <button
             className={`${styles.pillButton} ${styles.importButton}`}
             onClick={handleImportClick}
             title="Import your tag data"
           >
-            📥 Import
+            <FontAwesomeIcon icon={faUpload} /> Import
           </button>
         </div>
 
@@ -100,14 +103,14 @@ const DataManager: React.FC<DataManagerProps> = ({
             onClick={onExportRekordbox}
             title="View your tag stats"
           >
-            📊 Stats
+            <i className="fa-solid fa-chart-simple"></i> Stats
           </button>
           <button
             className={`${styles.pillButton} ${styles.infoButton}`}
             onClick={() => setShowInfoModal(true)}
             title="Help & Tutorial"
           >
-            ❓ Info
+            <i className="fa-solid fa-info"></i> Info
           </button>
         </div>
       </div>
@@ -121,16 +124,20 @@ const DataManager: React.FC<DataManagerProps> = ({
       />
 
       {lastSaved && (
-        <div className={styles.saveStatus}>✓ Last backup: {lastSaved.toLocaleString()}</div>
+        <div className={styles.saveStatus}>
+          ✓ Last backup: {lastSaved.toLocaleString()}
+        </div>
       )}
       <button
-        className={styles.iconOnlyButton}
+        className={styles.settingsButton}
         onClick={() => setShowMainSettings(true)}
         title="Settings"
       >
-        ⚙️
+        <Settings size={20} />
       </button>
-      {showMainSettings && <MainSettingsModal onClose={() => setShowMainSettings(false)} />}
+      {showMainSettings && (
+        <MainSettingsModal onClose={() => setShowMainSettings(false)} />
+      )}
       {showInfoModal && <InfoModal onClose={() => setShowInfoModal(false)} />}
     </div>
   );

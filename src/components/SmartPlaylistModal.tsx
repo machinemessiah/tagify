@@ -401,7 +401,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                   onClick={handleExportClick}
                   title="Backup your smart playlists"
                 >
-                  ↗ Export
+                  ↗ Backup
                 </button>
 
                 <button
