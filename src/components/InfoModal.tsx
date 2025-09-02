@@ -31,10 +31,10 @@ import {
   faChartBar,
   faBullhorn,
   faBolt,
+  faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
-
 
 interface InfoModalProps {
   onClose: () => void;
@@ -43,7 +43,7 @@ interface InfoModalProps {
 const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
   const [activeSection, setActiveSection] = useState("whats-new");
 
-    const sections = [
+  const sections = [
     { id: "whats-new", title: "What's New", icon: faBullhorn },
     { id: "overview", title: "Overview", icon: faBook },
     { id: "getting-started", title: "Getting Started", icon: faBaby },
@@ -52,9 +52,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
     { id: "roadmap", title: "What's Coming", icon: faRocket },
   ];
 
-    const getReleaseUrl = (version: string) => {
+  const getReleaseUrl = (version: string) => {
     return `https://github.com/alexk218/tagify/releases/tag/v${version}`;
-  }
+  };
 
   return (
     <Portal>
@@ -81,14 +81,18 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     key={section.id}
                     className={`${styles.navButton} ${
                       activeSection === section.id ? styles.navButtonActive : ""
-                    } ${section.id === "whats-new" ? styles.whatsNewButton : ""}`}
+                    } ${
+                      section.id === "whats-new" ? styles.whatsNewButton : ""
+                    }`}
                     onClick={() => setActiveSection(section.id)}
                   >
                     <span className={styles.navIcon}>
                       <FontAwesomeIcon icon={section.icon} />
                     </span>
                     <span className={styles.navText}>{section.title}</span>
-                    {section.id === "whats-new" && <span className={styles.newIndicator}>NEW</span>}
+                    {section.id === "whats-new" && (
+                      <span className={styles.newIndicator}>NEW</span>
+                    )}
                   </button>
                 ))}
               </nav>
@@ -100,12 +104,14 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                 <div className={styles.section}>
                   <h3 className={styles.sectionTitle}>Welcome to Tagify!</h3>
                   <p className={styles.text}>
-                    Tagify is a powerful music organization tool that transforms how you manage your
-                    Spotify library.
+                    Tagify is a powerful music organization tool that transforms
+                    how you manage your Spotify library.
                     <br />
-                    Tag your tracks with a star rating, energy rating, and your own custom tags.
+                    Tag your tracks with a star rating, energy rating, and your
+                    own custom tags.
                     <br />
-                    Create playlists by filtering your tagged tracks based on your own custom tags.
+                    Create playlists by filtering your tagged tracks based on
+                    your own custom tags.
                   </p>
 
                   <div className={styles.featureGrid}>
@@ -115,7 +121,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       </div>
                       <h4>Custom Tagging</h4>
                       <p>
-                        Organize tracks with custom categories like mood, genre, energy, and context
+                        Organize tracks with custom categories like mood, genre,
+                        energy, and context
                       </p>
                     </div>
                     <div className={styles.featureCard}>
@@ -123,21 +130,30 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <FontAwesomeIcon icon={faStar} />
                       </div>
                       <h4>Rating System</h4>
-                      <p>Rate tracks from 1-5 stars and set energy levels from 1-10</p>
+                      <p>
+                        Rate tracks from 1-5 stars and set energy levels from
+                        1-10
+                      </p>
                     </div>
                     <div className={styles.featureCard}>
                       <div className={styles.featureIcon}>
                         <FontAwesomeIcon icon={faSearch} />
                       </div>
                       <h4>Advanced Filtering</h4>
-                      <p>Find the perfect tracks using multiple filters and smart search</p>
+                      <p>
+                        Find the perfect tracks using multiple filters and smart
+                        search
+                      </p>
                     </div>
                     <div className={styles.featureCard}>
                       <div className={styles.featureIcon}>
                         <FontAwesomeIcon icon={faBrain} />
                       </div>
                       <h4>Smart Playlists</h4>
-                      <p>Automatically sync tracks to playlists based on your tags and criteria</p>
+                      <p>
+                        Automatically sync tracks to playlists based on your
+                        tags and criteria
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -147,7 +163,11 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                 <div className={styles.section}>
                   <div className={styles.whatsNewHeader}>
                     <h3 className={styles.sectionTitle}>
-                      <a href={getReleaseUrl("2.0.0")} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={getReleaseUrl("2.0.0")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         What's New in Tagify 2.0.0
                       </a>
                     </h3>
@@ -164,9 +184,10 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <span className={styles.newBadge}>NEW</span>
                     </div>
                     <p className={styles.featureDescription}>
-                      Create playlists that automatically stay up-to-date. Set your criteria once,
-                      and every track you tag that matches will be <strong>instantly added</strong>{" "}
-                      - no manual playlist management needed!.
+                      Create playlists that automatically stay up-to-date. Set
+                      your criteria once, and every track you tag that matches
+                      will be <strong>instantly added</strong> - no manual
+                      playlist management needed!.
                     </p>
 
                     {/* Visual Tutorial */}
@@ -178,12 +199,14 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <div className={styles.stepInfo}>
                           <div className={styles.stepBadge}>Step 1</div>
                           <div className={styles.stepDetails}>
-                            <h6 className={styles.stepTitle}>Define Your Smart Playlist</h6>
+                            <h6 className={styles.stepTitle}>
+                              Define Your Smart Playlist
+                            </h6>
                             <p className={styles.stepDesc}>
-                              Choose your filters: star ratings, custom tags, energy levels, or BPM
-                              ranges. <br />
-                              This example uses <strong>5 star</strong> tracks tagged{" "}
-                              <strong>Disco</strong>.
+                              Choose your filters: star ratings, custom tags,
+                              energy levels, or BPM ranges. <br />
+                              This example uses <strong>5 star</strong> tracks
+                              tagged <strong>Disco</strong>.
                             </p>
                           </div>
                         </div>
@@ -205,11 +228,14 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <div className={styles.stepInfo}>
                           <div className={styles.stepBadge}>Step 2</div>
                           <div className={styles.stepDetails}>
-                            <h6 className={styles.stepTitle}>Watch the Magic Happen</h6>
+                            <h6 className={styles.stepTitle}>
+                              Watch the Magic Happen
+                            </h6>
                             <p className={styles.stepDesc}>
-                              Now, when tagging any track with <strong>5 stars</strong> and the{" "}
-                              <strong>Disco</strong> tag - it jumps into your playlist
-                              automatically.
+                              Now, when tagging any track with{" "}
+                              <strong>5 stars</strong> and the{" "}
+                              <strong>Disco</strong> tag - it jumps into your
+                              playlist automatically.
                             </p>
                           </div>
                         </div>
@@ -221,7 +247,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                             loading="lazy"
                           />
                           <div className={styles.gifCaption}>
-                            Track automatically added to playlist when criteria are satisfied
+                            Track automatically added to playlist when criteria
+                            are satisfied
                           </div>
                         </div>
                       </div>
@@ -242,8 +269,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                           <FontAwesomeIcon icon={faLock} />
                         </span>
                         <div>
-                          <strong>Lock state persistence:</strong> Fixed issue where lock state
-                          didn't persist after exiting the app
+                          <strong>Lock state persistence:</strong> Fixed issue
+                          where lock state didn't persist after exiting the app
                         </div>
                       </div>
                       <div className={styles.bugFix}>
@@ -251,8 +278,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                           <FontAwesomeIcon icon={faBolt} />
                         </span>
                         <div>
-                          <strong>Instant tag application:</strong> Tags are now applied immediately
-                          - no more waiting or losing changes when quickly leaving the app
+                          <strong>Instant tag application:</strong> Tags are now
+                          applied immediately - no more waiting or losing
+                          changes when quickly leaving the app
                         </div>
                       </div>
                     </div>
@@ -272,7 +300,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                           <FontAwesomeIcon icon={faWandMagicSparkles} />
                         </span>
                         <div>
-                          <strong>Visual enhancements:</strong> Tagify is prettier
+                          <strong>Visual enhancements:</strong> Tagify is
+                          prettier
                         </div>
                       </div>
                       <div className={styles.improvement}>
@@ -280,9 +309,10 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                           <FontAwesomeIcon icon={faChartBar} />
                         </span>
                         <div>
-                          <strong>Real-time tracklist updates:</strong> Fixed persistent orange
-                          bullets for empty tracks. The tracklist column extension now shows
-                          accurate, up-to-date tag data
+                          <strong>Real-time tracklist updates:</strong> Fixed
+                          persistent orange bullets for empty tracks. The
+                          tracklist column extension now shows accurate,
+                          up-to-date tag data
                         </div>
                       </div>
                       <div className={styles.improvement}>
@@ -290,9 +320,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                           <FontAwesomeIcon icon={faMusic} />
                         </span>
                         <div>
-                          <strong>Live playbar updates:</strong> Playbar enhancer now updates in
-                          real-time based on track tags, ratings, and energy. No more page refreshes
-                          needed!
+                          <strong>Live playbar updates:</strong> Playbar
+                          enhancer now updates in real-time based on track tags,
+                          ratings, and energy. No more page refreshes needed!
                         </div>
                       </div>
                     </div>
@@ -310,8 +340,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <div className={styles.stepContent}>
                         <h4>Start with a Track</h4>
                         <p>
-                          Play any song in Spotify, or use the context menu (right-click) "Tag with
-                          Tagify" on any track to begin tagging.
+                          Play any song in Spotify, or use the context menu
+                          (right-click) "Tag with Tagify" on any track to begin
+                          tagging.
                         </p>
                       </div>
                     </div>
@@ -321,8 +352,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <div className={styles.stepContent}>
                         <h4>Add Your First Tags</h4>
                         <p>
-                          Use the tag selector to categorize your track. Try adding a genre, mood,
-                          or energy level to start.
+                          Use the tag selector to categorize your track. Try
+                          adding a genre, mood, or energy level to start.
                         </p>
                       </div>
                     </div>
@@ -332,8 +363,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <div className={styles.stepContent}>
                         <h4>Set Ratings & Energy</h4>
                         <p>
-                          Rate the track with stars (1-5) and set an energy level (1-10) to help
-                          with filtering later.
+                          Rate the track with stars (1-5) and set an energy
+                          level (1-10) to help with filtering later.
                         </p>
                       </div>
                     </div>
@@ -343,8 +374,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <div className={styles.stepContent}>
                         <h4>Filter & Create Playlists</h4>
                         <p>
-                          Use the Track List to see all your tagged music and experiment with
-                          filters to create playlists based on your tags.
+                          Use the Track List to see all your tagged music and
+                          experiment with filters to create playlists based on
+                          your tags.
                         </p>
                       </div>
                     </div>
@@ -353,7 +385,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <div className={styles.stepNumber}>5</div>
                       <div className={styles.stepContent}>
                         <h4>Create Custom Tags</h4>
-                        <p>Press "Manage Tags" to create your own custom tags!</p>
+                        <p>
+                          Press "Manage Tags" to create your own custom tags!
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -363,21 +397,24 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     <div className={styles.stepContent}>
                       <h4>Protect Your Work - Backup Regularly</h4>
                       <p>
-                        Your tags and smart playlists are stored locally in your browser. While this
-                        is normally very reliable, it's smart to periodically backup your data to
-                        ensure you never lose your hard work. <br />
-                        Backup your <strong>tag data</strong> using the <FontAwesomeIcon icon={faDownload} /> Backup button in the main
-                        menu. <br />
-                        Backup your <strong>smart playlist data</strong> using the <FontAwesomeIcon icon={faArrowUpRightFromSquare} /> Backup button
-                        in the Smart Playlist menu.
+                        Your tags and smart playlists are stored locally in your
+                        browser. While this is normally very reliable, it's
+                        smart to periodically backup your data to ensure you
+                        never lose your hard work. <br />
+                        Backup your <strong>tag data</strong> using the{" "}
+                        <FontAwesomeIcon icon={faDownload} /> Backup button in
+                        the main menu. <br />
+                        Backup your <strong>smart playlist data</strong> using
+                        the <FontAwesomeIcon icon={faArrowUpRightFromSquare} />{" "}
+                        Backup button in the Smart Playlist menu.
                       </p>
                     </div>
                   </div>
 
                   <div className={styles.tip}>
-                    <strong>First-time tip:</strong> Start by tagging 10-15 songs with basic
-                    categories like genre and mood. This will give you enough data to see how
-                    filtering works!
+                    <strong>First-time tip:</strong> Start by tagging 10-15
+                    songs with basic categories like genre and mood. This will
+                    give you enough data to see how filtering works!
                   </div>
                 </div>
               )}
@@ -400,7 +437,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       </div>
                       <div className={styles.hierarchyLevel}>
                         <strong>Tag</strong> →{" "}
-                        <span className={styles.example}>Happy, Sad, Romantic</span>
+                        <span className={styles.example}>
+                          Happy, Sad, Romantic
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -409,20 +448,35 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     <h4>Default Categories</h4>
                     <div className={styles.categoryList}>
                       <div className={styles.categoryItem}>
-                        <h5><FontAwesomeIcon icon={faMusic} /> Genre & Style</h5>
-                        <p>Primary genres, sub-genres, and era classifications</p>
+                        <h5>
+                          <FontAwesomeIcon icon={faMusic} /> Genre & Style
+                        </h5>
+                        <p>
+                          Primary genres, sub-genres, and era classifications
+                        </p>
                       </div>
                       <div className={styles.categoryItem}>
-                        <h5><FontAwesomeIcon icon={faSmile} /> Mood & Energy</h5>
-                        <p>Energy levels, emotional tones, and atmospheric qualities</p>
+                        <h5>
+                          <FontAwesomeIcon icon={faSmile} /> Mood & Energy
+                        </h5>
+                        <p>
+                          Energy levels, emotional tones, and atmospheric
+                          qualities
+                        </p>
                       </div>
                       <div className={styles.categoryItem}>
-                        <h5><FontAwesomeIcon icon={faGuitar} /> Musical Elements</h5>
+                        <h5>
+                          <FontAwesomeIcon icon={faGuitar} /> Musical Elements
+                        </h5>
                         <p>Vocals, instruments, and production styles</p>
                       </div>
                       <div className={styles.categoryItem}>
-                        <h5><FontAwesomeIcon icon={faBullseye} /> Usage & Context</h5>
-                        <p>Activities, timing, and social contexts for listening</p>
+                        <h5>
+                          <FontAwesomeIcon icon={faBullseye} /> Usage & Context
+                        </h5>
+                        <p>
+                          Activities, timing, and social contexts for listening
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -447,10 +501,11 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <h4>1. Create & Manage Tags</h4>
                       </div>
                       <p>
-                        Click <strong>"Manage Tags"</strong> to build your custom tagging system.
-                        Create categories (e.g., "Mood"), subcategories (e.g., "Happy"), and
-                        individual tags (e.g., "Upbeat"). This forms the foundation of your music
-                        organization.
+                        Click <strong>"Manage Tags"</strong> to build your
+                        custom tagging system. Create categories (e.g., "Mood"),
+                        subcategories (e.g., "Happy"), and individual tags
+                        (e.g., "Upbeat"). This forms the foundation of your
+                        music organization.
                       </p>
                     </div>
 
@@ -464,9 +519,10 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       </div>
                       <p>
                         For any track, set <strong>star ratings (1-5)</strong>,{" "}
-                        <strong>energy levels (1-10)</strong>, and apply your custom tags. Use the
-                        tag selector interface to quickly tag tracks by mood, genre, activity, or
-                        any system you create.
+                        <strong>energy levels (1-10)</strong>, and apply your
+                        custom tags. Use the tag selector interface to quickly
+                        tag tracks by mood, genre, activity, or any system you
+                        create.
                       </p>
                     </div>
 
@@ -481,9 +537,10 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <p>
                         Sometimes Spotify doesn't get the BPM right...
                         <br />
-                        Click any BPM value to edit manually, or use the refresh button (<FontAwesomeIcon icon={faRocket} />) to fetch
-                        updated BPM from Spotify's audio analysis. Perfect for creating
-                        tempo-specific playlists.
+                        Click any BPM value to edit manually, or use the refresh
+                        button (<FontAwesomeIcon icon={faRocket} />) to fetch
+                        updated BPM from Spotify's audio analysis. Perfect for
+                        creating tempo-specific playlists.
                       </p>
                     </div>
 
@@ -496,8 +553,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <h4>4. Track Locking</h4>
                       </div>
                       <p>
-                        Lock to a specific track to prevent automatic switching when Spotify changes
-                        songs. Essential for focused tagging sessions without interruption.
+                        Lock to a specific track to prevent automatic switching
+                        when Spotify changes songs. Essential for focused
+                        tagging sessions without interruption.
                       </p>
                     </div>
 
@@ -510,8 +568,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <h4>5. Bulk Tagging</h4>
                       </div>
                       <p>
-                        Select multiple tracks in any Spotify playlist (Ctrl+A for all),
-                        right-click, and choose
+                        Select multiple tracks in any Spotify playlist (Ctrl+A
+                        for all), right-click, and choose
                         <strong>"Bulk Tag"</strong> to tag them simultaneously.
                       </p>
                     </div>
@@ -525,21 +583,24 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <h4>6. Backup your data!</h4>
                       </div>
                       <p>
-                        <strong>Tag Data Export/Import:</strong> Download your complete tag library
-                        as JSON backup. Import to restore all tags, ratings, and metadata across
-                        devices.
+                        <strong>Tag Data Export/Import:</strong> Download your
+                        complete tag library as JSON backup. Import to restore
+                        all tags, ratings, and metadata across devices.
                         <br />
-                        <strong>Smart Playlist Export/Import:</strong> Backup your smart playlist
-                        configurations (criteria, filters, settings) separately from the Smart
-                        Playlists panel.
+                        <strong>Smart Playlist Export/Import:</strong> Backup
+                        your smart playlist configurations (criteria, filters,
+                        settings) separately from the Smart Playlists panel.
                         <br />
-                        <strong>Why backup both?</strong> Tag data contains your music ratings and
-                        tags, while smart playlist data contains your automation rules. Both are
-                        essential for a complete restore (in case something goes wrong...). Also
+                        <strong>Why backup both?</strong> Tag data contains your
+                        music ratings and tags, while smart playlist data
+                        contains your automation rules. Both are essential for a
+                        complete restore (in case something goes wrong...). Also
                         allows you to share data between devices!
                         <br />
-                        <FontAwesomeIcon icon={faLightbulb} /> <strong>Best Practice:</strong> Export both monthly and before major
-                        changes like deleting tag categories or modifying smart playlist criteria.
+                        <FontAwesomeIcon icon={faLightbulb} />{" "}
+                        <strong>Best Practice:</strong> Export both monthly and
+                        before major changes like deleting tag categories or
+                        modifying smart playlist criteria.
                       </p>
                     </div>
 
@@ -552,20 +613,23 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <h4>7. Smart Filtering & Playlist Creation</h4>
                       </div>
                       <p>
-                        Filter by any combination of tags (include/exclude), ratings, energy levels,
-                        and BPM ranges.
+                        Filter by any combination of tags (include/exclude),
+                        ratings, energy levels, and BPM ranges.
                         <br />
-                        Click tags once for <span className={styles.includeTag}>include</span>,
+                        Click tags once for{" "}
+                        <span className={styles.includeTag}>include</span>,
                         twice for
                         <span className={styles.excludeTag}>exclude</span>.
                         <br />
                         <strong>Filter Logic:</strong>{" "}
-                        <span className={styles.filterMode}>ALL</span> = tracks must have ALL
-                        selected tags, <span className={styles.filterMode}>ANY</span> = tracks need
-                        at least ONE selected tag.
+                        <span className={styles.filterMode}>ALL</span> = tracks
+                        must have ALL selected tags,{" "}
+                        <span className={styles.filterMode}>ANY</span> = tracks
+                        need at least ONE selected tag.
                         <br />
                         Then click <strong>"Create Playlist"</strong>
-                        or <strong>"Play All"</strong> to enjoy your filtered results.
+                        or <strong>"Play All"</strong> to enjoy your filtered
+                        results.
                       </p>
                     </div>
 
@@ -578,7 +642,10 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <h4>8. Visual Tag Indicators</h4>
                       </div>
                       <div className={styles.indicatorDemo}>
-                        <p>Track status indicators appear in playlists and the playbar:</p>
+                        <p>
+                          Track status indicators appear in playlists and the
+                          playbar:
+                        </p>
                         <div className={styles.indicatorExamples}>
                           <div className={styles.indicatorExample}>
                             <span className={styles.orangeBullet}>●</span>
@@ -590,11 +657,13 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                           </div>
                         </div>
                         <p className={styles.indicatorTip}>
-                          <strong>Click</strong> any indicator to tag that track instantly.
+                          <strong>Click</strong> any indicator to tag that track
+                          instantly.
                           <br />
                           <strong>Hover</strong> to see current tags.
                           <br />
-                          You can disable both tracklist & playbar indicators in settings.
+                          You can disable both tracklist & playbar indicators in
+                          settings.
                         </p>
                       </div>
                     </div>
@@ -605,7 +674,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
               {activeSection === "roadmap" && (
                 <div className={styles.section}>
                   <h3 className={styles.sectionTitle}>What's Coming Next...</h3>
-                  <p className={styles.text}>Here's what's planned for future releases:</p>
+                  <p className={styles.text}>
+                    Here's what's planned for future releases:
+                  </p>
 
                   {/* Upcoming Features */}
                   <div className={styles.roadmapList}>
@@ -614,12 +685,35 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <span className={styles.roadmapIcon}>
                           <FontAwesomeIcon icon={faStar} />
                         </span>
-                        <h4 className={styles.roadmapTitle}>Bulk Ratings & Energy</h4>
-                        <span className={styles.comingSoonBadge}>Coming Soon</span>
+                        <h4 className={styles.roadmapTitle}>
+                          Tag & Rate Playlists
+                        </h4>
+                        <span className={styles.comingSoonBadge}>
+                          Coming Soon
+                        </span>
                       </div>
                       <p className={styles.roadmapDescription}>
-                        Apply star ratings and energy ratings in bulk within the bulk tagging menu.
-                        Perfect for quickly organizing large collections of tracks.
+                        In addition to tagging and rating individual tracks,
+                        you'll be able to tag and rate your entire playlists.
+                        Perfect for quickly organizing your collections at a
+                        higher level.
+                      </p>
+                    </div>
+
+                    <div className={styles.roadmapItem}>
+                      <div className={styles.roadmapHeader}>
+                        <span className={styles.roadmapIcon}>
+                          <FontAwesomeIcon icon={faFilter} />
+                        </span>
+                        <h4 className={styles.roadmapTitle}>
+                          Advanced Filtering
+                        </h4>
+                        <span className={styles.plannedBadge}>Planned</span>
+                      </div>
+                      <p className={styles.roadmapDescription}>
+                        Mix AND/OR in a single formula (e.g., Tag1 && (Tag2 ||
+                        Tag3)) for more powerful and flexible filtering of your
+                        tracks and playlists.
                       </p>
                     </div>
 
@@ -628,11 +722,14 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <span className={styles.roadmapIcon}>
                           <FontAwesomeIcon icon={faHeadphones} />
                         </span>
-                        <h4 className={styles.roadmapTitle}>Rekordbox Integration</h4>
+                        <h4 className={styles.roadmapTitle}>
+                          Rekordbox Integration
+                        </h4>
                         <span className={styles.plannedBadge}>Planned</span>
                       </div>
                       <p className={styles.roadmapDescription}>
-                        Sync your tags and star ratings between rekordbox and Tagify.
+                        Sync your tags and star ratings between rekordbox and
+                        Tagify.
                       </p>
                     </div>
 
@@ -645,7 +742,8 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         <span className={styles.plannedBadge}>Planned</span>
                       </div>
                       <p className={styles.roadmapDescription}>
-                        Download tracks directly within Spotify for offline organization!
+                        Download tracks directly within Spotify for offline
+                        organization!
                       </p>
                     </div>
                   </div>
@@ -656,10 +754,13 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       <span className={styles.communityIcon}>
                         <FontAwesomeIcon icon={faComments} />
                       </span>
-                      <h4 className={styles.communityTitle}>Join the Community</h4>
+                      <h4 className={styles.communityTitle}>
+                        Join the Community
+                      </h4>
                     </div>
                     <p className={styles.communityDescription}>
-                      Want to influence Tagify's development? Join our GitHub Discussions to:
+                      Want to influence Tagify's development? Join our GitHub
+                      Discussions to:
                     </p>
                     <div className={styles.communityFeatures}>
                       <div className={styles.communityFeature}>
@@ -706,7 +807,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
           <div className={styles.modalFooter}>
             <div className={styles.footerContent}>
               <div className={styles.footerInfo}>
-                <span className={styles.version}>Tagify v{packageJson.version}</span>
+                <span className={styles.version}>
+                  Tagify v{packageJson.version}
+                </span>
                 <span className={styles.divider}>•</span>
                 <a
                   href="https://github.com/alexk218/tagify"
