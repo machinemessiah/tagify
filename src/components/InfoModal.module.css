@@ -971,14 +971,6 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.tutorialSubheading {
-  margin: 0 0 20px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--spice-text);
-  text-align: center;
-}
-
 .tutorialStep {
   margin-bottom: 32px;
   display: flex;

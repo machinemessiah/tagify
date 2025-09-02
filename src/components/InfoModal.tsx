@@ -3,6 +3,39 @@ import Portal from "../utils/Portal";
 import styles from "./InfoModal.module.css";
 import packageJson from "../../package.json";
 
+import {
+  faBook,
+  faBaby,
+  faTag,
+  faStar,
+  faRocket,
+  faTimes,
+  faBrain,
+  faBug,
+  faWandMagicSparkles,
+  faMusic,
+  faLock,
+  faBox,
+  faHardDrive,
+  faSearch,
+  faBullseye,
+  faComments,
+  faSmile,
+  faGuitar,
+  faDownload,
+  faHeadphones,
+  faCheckCircle,
+  faCommentDots,
+  faArrowUpRightFromSquare,
+  faLightbulb,
+  faChartBar,
+  faBullhorn,
+  faBolt,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
+
+
 interface InfoModalProps {
   onClose: () => void;
 }
@@ -10,16 +43,16 @@ interface InfoModalProps {
 const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
   const [activeSection, setActiveSection] = useState("whats-new");
 
-  const sections = [
-    { id: "whats-new", title: "What's New", icon: "👀" },
-    { id: "overview", title: "Overview", icon: "📖" },
-    { id: "getting-started", title: "Getting Started", icon: "👶" },
-    { id: "tagging", title: "Tagging System", icon: "🏷️" },
-    { id: "features", title: "Features", icon: "⭐" },
-    { id: "roadmap", title: "What's Coming", icon: "🚀" },
+    const sections = [
+    { id: "whats-new", title: "What's New", icon: faBullhorn },
+    { id: "overview", title: "Overview", icon: faBook },
+    { id: "getting-started", title: "Getting Started", icon: faBaby },
+    { id: "tagging", title: "Tagging System", icon: faTag },
+    { id: "features", title: "Features", icon: faStar },
+    { id: "roadmap", title: "What's Coming", icon: faRocket },
   ];
 
-  const getReleaseUrl = (version: string) => {
+    const getReleaseUrl = (version: string) => {
     return `https://github.com/alexk218/tagify/releases/tag/v${version}`;
   }
 
@@ -29,11 +62,13 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           <div className={styles.modalHeader}>
             <h2 className={styles.modalTitle}>
-              <span className={styles.titleIcon}>🏷️</span>
+              <span className={styles.titleIcon}>
+                <FontAwesomeIcon icon={faTag} />
+              </span>
               Tagify Guide
             </h2>
             <button className={styles.closeButton} onClick={onClose}>
-              ×
+              <FontAwesomeIcon icon={faTimes} />
             </button>
           </div>
 
@@ -44,11 +79,14 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                 {sections.map((section) => (
                   <button
                     key={section.id}
-                    className={`${styles.navButton} ${activeSection === section.id ? styles.navButtonActive : ""
-                      } ${section.id === "whats-new" ? styles.whatsNewButton : ""}`}
+                    className={`${styles.navButton} ${
+                      activeSection === section.id ? styles.navButtonActive : ""
+                    } ${section.id === "whats-new" ? styles.whatsNewButton : ""}`}
                     onClick={() => setActiveSection(section.id)}
                   >
-                    <span className={styles.navIcon}>{section.icon}</span>
+                    <span className={styles.navIcon}>
+                      <FontAwesomeIcon icon={section.icon} />
+                    </span>
                     <span className={styles.navText}>{section.title}</span>
                     {section.id === "whats-new" && <span className={styles.newIndicator}>NEW</span>}
                   </button>
@@ -72,24 +110,32 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
 
                   <div className={styles.featureGrid}>
                     <div className={styles.featureCard}>
-                      <div className={styles.featureIcon}>🏷️</div>
+                      <div className={styles.featureIcon}>
+                        <FontAwesomeIcon icon={faTag} />
+                      </div>
                       <h4>Custom Tagging</h4>
                       <p>
                         Organize tracks with custom categories like mood, genre, energy, and context
                       </p>
                     </div>
                     <div className={styles.featureCard}>
-                      <div className={styles.featureIcon}>⭐</div>
+                      <div className={styles.featureIcon}>
+                        <FontAwesomeIcon icon={faStar} />
+                      </div>
                       <h4>Rating System</h4>
                       <p>Rate tracks from 1-5 stars and set energy levels from 1-10</p>
                     </div>
                     <div className={styles.featureCard}>
-                      <div className={styles.featureIcon}>🔍</div>
+                      <div className={styles.featureIcon}>
+                        <FontAwesomeIcon icon={faSearch} />
+                      </div>
                       <h4>Advanced Filtering</h4>
                       <p>Find the perfect tracks using multiple filters and smart search</p>
                     </div>
                     <div className={styles.featureCard}>
-                      <div className={styles.featureIcon}>🧠</div>
+                      <div className={styles.featureIcon}>
+                        <FontAwesomeIcon icon={faBrain} />
+                      </div>
                       <h4>Smart Playlists</h4>
                       <p>Automatically sync tracks to playlists based on your tags and criteria</p>
                     </div>
@@ -111,7 +157,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   {/* Smart Playlists Feature */}
                   <div className={styles.featureGroup}>
                     <div className={styles.featureHeader}>
-                      <span className={styles.featureIcon}>🧠</span>
+                      <span className={styles.featureIcon}>
+                        <FontAwesomeIcon icon={faBrain} />
+                      </span>
                       <h4 className={styles.featureTitle}>Smart Playlists</h4>
                       <span className={styles.newBadge}>NEW</span>
                     </div>
@@ -123,7 +171,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
 
                     {/* Visual Tutorial */}
                     <div className={styles.visualTutorial}>
-                      <h5 className={styles.tutorialSubheading}>CHECK IT 😎</h5>
+                      {/* <h5 className={styles.tutorialSubheading}>CHECK IT <FontAwesomeIcon icon={faSparkles} /></h5> */}
 
                       {/* Step 1: Creating Smart Playlist */}
                       <div className={styles.tutorialStep}>
@@ -183,19 +231,25 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   {/* Bug Fixes */}
                   <div className={styles.featureGroup}>
                     <div className={styles.featureHeader}>
-                      <span className={styles.featureIcon}>🐛</span>
+                      <span className={styles.featureIcon}>
+                        <FontAwesomeIcon icon={faBug} />
+                      </span>
                       <h4 className={styles.featureTitle}>Bug Fixes</h4>
                     </div>
                     <div className={styles.bugFixList}>
                       <div className={styles.bugFix}>
-                        <span className={styles.bugFixIcon}>🔒</span>
+                        <span className={styles.bugFixIcon}>
+                          <FontAwesomeIcon icon={faLock} />
+                        </span>
                         <div>
                           <strong>Lock state persistence:</strong> Fixed issue where lock state
                           didn't persist after exiting the app
                         </div>
                       </div>
                       <div className={styles.bugFix}>
-                        <span className={styles.bugFixIcon}>⚡</span>
+                        <span className={styles.bugFixIcon}>
+                          <FontAwesomeIcon icon={faBolt} />
+                        </span>
                         <div>
                           <strong>Instant tag application:</strong> Tags are now applied immediately
                           - no more waiting or losing changes when quickly leaving the app
@@ -207,18 +261,24 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   {/* Improvements */}
                   <div className={styles.featureGroup}>
                     <div className={styles.featureHeader}>
-                      <span className={styles.featureIcon}>✨</span>
+                      <span className={styles.featureIcon}>
+                        <FontAwesomeIcon icon={faWandMagicSparkles} />
+                      </span>
                       <h4 className={styles.featureTitle}>Improvements</h4>
                     </div>
                     <div className={styles.improvementList}>
                       <div className={styles.improvement}>
-                        <span className={styles.improvementIcon}>💅</span>
+                        <span className={styles.improvementIcon}>
+                          <FontAwesomeIcon icon={faWandMagicSparkles} />
+                        </span>
                         <div>
                           <strong>Visual enhancements:</strong> Tagify is prettier
                         </div>
                       </div>
                       <div className={styles.improvement}>
-                        <span className={styles.improvementIcon}>📊</span>
+                        <span className={styles.improvementIcon}>
+                          <FontAwesomeIcon icon={faChartBar} />
+                        </span>
                         <div>
                           <strong>Real-time tracklist updates:</strong> Fixed persistent orange
                           bullets for empty tracks. The tracklist column extension now shows
@@ -226,48 +286,15 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         </div>
                       </div>
                       <div className={styles.improvement}>
-                        <span className={styles.improvementIcon}>🎵</span>
+                        <span className={styles.improvementIcon}>
+                          <FontAwesomeIcon icon={faMusic} />
+                        </span>
                         <div>
                           <strong>Live playbar updates:</strong> Playbar enhancer now updates in
                           real-time based on track tags, ratings, and energy. No more page refreshes
                           needed!
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className={styles.communitySection}>
-                    <div className={styles.communityHeader}>
-                      <span className={styles.communityIcon}>💬</span>
-                      <h4 className={styles.communityTitle}>Join the Community</h4>
-                    </div>
-                    <p className={styles.communityDescription}>
-                      Want to influence Tagify's development? Join our GitHub Discussions to:
-                    </p>
-                    <div className={styles.communityFeatures}>
-                      <div className={styles.communityFeature}>
-                        <span className={styles.featureCheckmark}>✓</span>
-                        <span>See the detailed roadmap</span>
-                      </div>
-                      <div className={styles.communityFeature}>
-                        <span className={styles.featureCheckmark}>✓</span>
-                        <span>Post ideas & feature requests</span>
-                      </div>
-                      <div className={styles.communityFeature}>
-                        <span className={styles.featureCheckmark}>✓</span>
-                        <span>Vote on which features you want most</span>
-                      </div>
-                    </div>
-                    <div className={styles.communityAction}>
-                      <a
-                        href="https://github.com/alexk218/tagify/discussions"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.discussionsLink}
-                      >
-                        <span className={styles.discussionsIcon}>🗨️</span>
-                        Visit GitHub Discussions
-                        <span className={styles.externalLinkIcon}>↗</span>
-                      </a>
                     </div>
                   </div>
                 </div>
@@ -339,9 +366,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         Your tags and smart playlists are stored locally in your browser. While this
                         is normally very reliable, it's smart to periodically backup your data to
                         ensure you never lose your hard work. <br />
-                        Backup your <strong>tag data</strong> using the 📤 Export button in the main
+                        Backup your <strong>tag data</strong> using the <FontAwesomeIcon icon={faDownload} /> Backup button in the main
                         menu. <br />
-                        Backup your <strong>smart playlist data</strong> using the ↗ Export button
+                        Backup your <strong>smart playlist data</strong> using the <FontAwesomeIcon icon={faArrowUpRightFromSquare} /> Backup button
                         in the Smart Playlist menu.
                       </p>
                     </div>
@@ -382,19 +409,19 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     <h4>Default Categories</h4>
                     <div className={styles.categoryList}>
                       <div className={styles.categoryItem}>
-                        <h5>🎵 Genre & Style</h5>
+                        <h5><FontAwesomeIcon icon={faMusic} /> Genre & Style</h5>
                         <p>Primary genres, sub-genres, and era classifications</p>
                       </div>
                       <div className={styles.categoryItem}>
-                        <h5>😊 Mood & Energy</h5>
+                        <h5><FontAwesomeIcon icon={faSmile} /> Mood & Energy</h5>
                         <p>Energy levels, emotional tones, and atmospheric qualities</p>
                       </div>
                       <div className={styles.categoryItem}>
-                        <h5>🎸 Musical Elements</h5>
+                        <h5><FontAwesomeIcon icon={faGuitar} /> Musical Elements</h5>
                         <p>Vocals, instruments, and production styles</p>
                       </div>
                       <div className={styles.categoryItem}>
-                        <h5>🎯 Usage & Context</h5>
+                        <h5><FontAwesomeIcon icon={faBullseye} /> Usage & Context</h5>
                         <p>Activities, timing, and social contexts for listening</p>
                       </div>
                     </div>
@@ -414,7 +441,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     {/* 1. Create/Manage Tags */}
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
-                        <span className={styles.featureIcon}>🏷️</span>
+                        <span className={styles.featureIcon}>
+                          <FontAwesomeIcon icon={faTag} />
+                        </span>
                         <h4>1. Create & Manage Tags</h4>
                       </div>
                       <p>
@@ -428,7 +457,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     {/* 2. Apply ratings, energy, and tags */}
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
-                        <span className={styles.featureIcon}>⭐</span>
+                        <span className={styles.featureIcon}>
+                          <FontAwesomeIcon icon={faStar} />
+                        </span>
                         <h4>2. Rate, Tag & Set Energy</h4>
                       </div>
                       <p>
@@ -442,13 +473,15 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     {/* 3. Update BPM */}
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
-                        <span className={styles.featureIcon}>🎵</span>
+                        <span className={styles.featureIcon}>
+                          <FontAwesomeIcon icon={faMusic} />
+                        </span>
                         <h4>3. BPM Management</h4>
                       </div>
                       <p>
                         Sometimes Spotify doesn't get the BPM right...
                         <br />
-                        Click any BPM value to edit manually, or use the refresh button (↻) to fetch
+                        Click any BPM value to edit manually, or use the refresh button (<FontAwesomeIcon icon={faRocket} />) to fetch
                         updated BPM from Spotify's audio analysis. Perfect for creating
                         tempo-specific playlists.
                       </p>
@@ -457,7 +490,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     {/* 4. Lock tracks */}
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
-                        <span className={styles.featureIcon}>🔒</span>
+                        <span className={styles.featureIcon}>
+                          <FontAwesomeIcon icon={faLock} />
+                        </span>
                         <h4>4. Track Locking</h4>
                       </div>
                       <p>
@@ -469,7 +504,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     {/* 5. Bulk tagging */}
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
-                        <span className={styles.featureIcon}>📦</span>
+                        <span className={styles.featureIcon}>
+                          <FontAwesomeIcon icon={faBox} />
+                        </span>
                         <h4>5. Bulk Tagging</h4>
                       </div>
                       <p>
@@ -482,7 +519,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     {/* 6. Import/Export */}
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
-                        <span className={styles.featureIcon}>💾</span>
+                        <span className={styles.featureIcon}>
+                          <FontAwesomeIcon icon={faHardDrive} />
+                        </span>
                         <h4>6. Backup your data!</h4>
                       </div>
                       <p>
@@ -499,7 +538,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         essential for a complete restore (in case something goes wrong...). Also
                         allows you to share data between devices!
                         <br />
-                        💡 <strong>Best Practice:</strong> Export both monthly and before major
+                        <FontAwesomeIcon icon={faLightbulb} /> <strong>Best Practice:</strong> Export both monthly and before major
                         changes like deleting tag categories or modifying smart playlist criteria.
                       </p>
                     </div>
@@ -507,7 +546,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     {/* 7. Smart filtering + playlist creation */}
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
-                        <span className={styles.featureIcon}>🔍</span>
+                        <span className={styles.featureIcon}>
+                          <FontAwesomeIcon icon={faSearch} />
+                        </span>
                         <h4>7. Smart Filtering & Playlist Creation</h4>
                       </div>
                       <p>
@@ -531,7 +572,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     {/* 8. Tracklist/playbar icons */}
                     <div className={styles.featureItem}>
                       <div className={styles.featureHeader}>
-                        <span className={styles.featureIcon}>🎯</span>
+                        <span className={styles.featureIcon}>
+                          <FontAwesomeIcon icon={faBullseye} />
+                        </span>
                         <h4>8. Visual Tag Indicators</h4>
                       </div>
                       <div className={styles.indicatorDemo}>
@@ -568,7 +611,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   <div className={styles.roadmapList}>
                     <div className={styles.roadmapItem}>
                       <div className={styles.roadmapHeader}>
-                        <span className={styles.roadmapIcon}>⭐</span>
+                        <span className={styles.roadmapIcon}>
+                          <FontAwesomeIcon icon={faStar} />
+                        </span>
                         <h4 className={styles.roadmapTitle}>Bulk Ratings & Energy</h4>
                         <span className={styles.comingSoonBadge}>Coming Soon</span>
                       </div>
@@ -580,7 +625,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
 
                     <div className={styles.roadmapItem}>
                       <div className={styles.roadmapHeader}>
-                        <span className={styles.roadmapIcon}>🎧</span>
+                        <span className={styles.roadmapIcon}>
+                          <FontAwesomeIcon icon={faHeadphones} />
+                        </span>
                         <h4 className={styles.roadmapTitle}>Rekordbox Integration</h4>
                         <span className={styles.plannedBadge}>Planned</span>
                       </div>
@@ -591,7 +638,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
 
                     <div className={styles.roadmapItem}>
                       <div className={styles.roadmapHeader}>
-                        <span className={styles.roadmapIcon}>⬇️</span>
+                        <span className={styles.roadmapIcon}>
+                          <FontAwesomeIcon icon={faDownload} />
+                        </span>
                         <h4 className={styles.roadmapTitle}>Download Tracks</h4>
                         <span className={styles.plannedBadge}>Planned</span>
                       </div>
@@ -604,7 +653,9 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   {/* Community Section */}
                   <div className={styles.communitySection}>
                     <div className={styles.communityHeader}>
-                      <span className={styles.communityIcon}>💬</span>
+                      <span className={styles.communityIcon}>
+                        <FontAwesomeIcon icon={faComments} />
+                      </span>
                       <h4 className={styles.communityTitle}>Join the Community</h4>
                     </div>
                     <p className={styles.communityDescription}>
@@ -612,15 +663,21 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                     </p>
                     <div className={styles.communityFeatures}>
                       <div className={styles.communityFeature}>
-                        <span className={styles.featureCheckmark}>✓</span>
+                        <span className={styles.featureCheckmark}>
+                          <FontAwesomeIcon icon={faCheckCircle} />
+                        </span>
                         <span>See the detailed roadmap</span>
                       </div>
                       <div className={styles.communityFeature}>
-                        <span className={styles.featureCheckmark}>✓</span>
+                        <span className={styles.featureCheckmark}>
+                          <FontAwesomeIcon icon={faCheckCircle} />
+                        </span>
                         <span>Post ideas & feature requests</span>
                       </div>
                       <div className={styles.communityFeature}>
-                        <span className={styles.featureCheckmark}>✓</span>
+                        <span className={styles.featureCheckmark}>
+                          <FontAwesomeIcon icon={faCheckCircle} />
+                        </span>
                         <span>Vote on which features you want most</span>
                       </div>
                     </div>
@@ -631,9 +688,13 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         rel="noopener noreferrer"
                         className={styles.discussionsLink}
                       >
-                        <span className={styles.discussionsIcon}>🗨️</span>
+                        <span className={styles.discussionsIcon}>
+                          <FontAwesomeIcon icon={faCommentDots} />
+                        </span>
                         Visit GitHub Discussions
-                        <span className={styles.externalLinkIcon}>↗</span>
+                        <span className={styles.externalLinkIcon}>
+                          <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                        </span>
                       </a>
                     </div>
                   </div>
@@ -651,26 +712,11 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   href="https://github.com/alexk218/tagify"
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="Give Tagify a star :). More support = more development!"
+                  title="Give it a star :)"
                   className={styles.githubLink}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 98 96"
-                    fill="currentColor"
-                    aria-hidden="true"
-                    focusable="false"
-                    role="img"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"
-                      fill="#fff"
-                    />
-                  </svg>
+                  <FontAwesomeIcon icon={faGithub} size="lg" spin />
+                  {/* <FontAwesomeIcon icon={faGithub} size="lg" /> */}
                 </a>
               </div>
               <button className={styles.primaryButton} onClick={onClose}>
