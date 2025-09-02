@@ -32,10 +32,14 @@ echo -e "${CYAN}✅ Spicetify found${NC}"
 mkdir -p "$CUSTOM_APPS_DIR"
 
 # Remove existing installation
-if [ -d "$CUSTOM_APP_DIR" ]; then
+if [ -e "$CUSTOM_APP_DIR" ]; then
     echo -e "${CYAN}🔄 Removing existing installation...${NC}"
     rm -rf "$CUSTOM_APP_DIR"
 fi
+
+# Clean and create temp directory
+rm -rf "$TEMP_DIR"
+mkdir -p "$TEMP_DIR"
 
 # Download the zip file
 echo -e "${CYAN}📥 Downloading Tagify...${NC}"
@@ -53,13 +57,25 @@ fi
 
 echo -e "${CYAN}✅ Download completed ($(du -h "$ZIP_FILE" | cut -f1))${NC}"
 
-# Create temp directory and unzip
-mkdir -p "$TEMP_DIR"
+# Extract files
 echo -e "${CYAN}📦 Extracting files...${NC}"
-unzip -q "$ZIP_FILE" -d "$TEMP_DIR"
+if ! unzip -o -q "$ZIP_FILE" -d "$TEMP_DIR"; then
+    echo -e "${RED}❌ Failed to extract files${NC}"
+    exit 1
+fi
 
-# Move the unzipped folder to the correct location
-mv "$TEMP_DIR"/* "$CUSTOM_APP_DIR"
+# Find what was extracted and move it properly
+cd "$TEMP_DIR"
+EXTRACTED_ITEMS=(*)
+
+if [ ${#EXTRACTED_ITEMS[@]} -eq 1 ] && [ -d "${EXTRACTED_ITEMS[0]}" ]; then
+    # Single directory extracted - move it to the target location
+    mv "${EXTRACTED_ITEMS[0]}" "$CUSTOM_APP_DIR"
+else
+    # Multiple items or files - create target dir and move everything into it
+    mkdir -p "$CUSTOM_APP_DIR"
+    mv * "$CUSTOM_APP_DIR/"
+fi
 
 # Apply Spicetify configuration
 echo -e "${CYAN}⚙️  Configuring Spicetify...${NC}"
