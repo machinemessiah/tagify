@@ -335,6 +335,8 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
     }
   };
 
+  const currentEnergy = getCurrentEnergy();
+
   return (
     <div className={styles.container}>
       {/* HEADER */}
@@ -432,15 +434,17 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
                 type="range"
                 min="1"
                 max="10"
-                value={getCurrentEnergy() || 5}
+                value={currentEnergy || 5}
                 data-is-set={getEnergyIsSetValue()}
-                className={styles.energySlider}
+                className={`${styles.energySlider} ${
+                  currentEnergy === 0 ? styles.energySliderUnset : ""
+                }`}
                 onChange={(e) => {
                   const value = parseInt(e.target.value);
                   handleBulkEnergyClick(value);
                 }}
                 onClick={(e) => {
-                  const shouldSetValue = getCurrentEnergy() === 0;
+                  const shouldSetValue = currentEnergy === 0;
                   if (shouldSetValue) {
                     const value = parseInt(
                       (e.target as HTMLInputElement).value
