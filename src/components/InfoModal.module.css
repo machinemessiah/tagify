@@ -787,7 +787,11 @@
 /* Community Section */
 .communitySection {
   padding: 24px;
-  background: linear-gradient(135deg, rgba(29, 185, 84, 0.1), rgba(30, 215, 96, 0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(29, 185, 84, 0.1),
+    rgba(30, 215, 96, 0.05)
+  );
   border-radius: 16px;
   border: 1px solid rgba(29, 185, 84, 0.2);
 }
@@ -915,7 +919,11 @@
 }
 
 .whatsNewButton.navButtonActive {
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(255, 142, 83, 0.3)) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 107, 0.3),
+    rgba(255, 142, 83, 0.3)
+  ) !important;
   border-color: rgba(255, 107, 107, 0.6) !important;
   box-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
 }
@@ -1046,4 +1054,15 @@
   font-size: 13px;
   font-weight: 500;
   text-align: center;
+}
+
+.usageInstructions {
+  background: rgba(30, 144, 255, 0.08);
+  border: 1px solid rgba(30, 144, 255, 0.2);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 16px 0;
+  font-size: 14px;
+  color: var(--spice-text);
+  line-height: 1.4;
 }
