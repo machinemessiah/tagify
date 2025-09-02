@@ -297,22 +297,8 @@
   cursor: pointer;
 }
 
-.energySlider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #1e90ff; /* Match the blue used for stars */
-  cursor: pointer;
-  border: none;
-}
-
 /* Styles for when energy is not set */
 .energySliderUnset::-webkit-slider-thumb {
-  background: var(--spice-button-disabled);
-  border: 1px solid var(--spice-subtext);
-}
-
-.energySliderUnset::-moz-range-thumb {
   background: var(--spice-button-disabled);
   border: 1px solid var(--spice-subtext);
 }

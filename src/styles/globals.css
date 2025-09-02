@@ -444,15 +444,6 @@
   cursor: pointer;
 }
 
-.slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #1e90ff;
-  cursor: pointer;
-  border: none;
-}
-
 /* ===== ENERGY & BPM INDICATORS ===== */
 
 /* ===== ALBUM COVER SYSTEM ===== */
