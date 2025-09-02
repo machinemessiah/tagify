@@ -21,6 +21,8 @@ import { useUpdateChecker } from "./hooks/useUpdateChecker";
 import UpdateBanner from "./components/UpdateBanner";
 import { useMultiTrackTagging } from "./hooks/useMultiTrackTagging";
 import { useSmartPlaylists } from "./hooks/useSmartPlaylists";
+import { useDiscoverySurvey } from "./hooks/useDiscoverySurvey";
+import DiscoverySurvey from "./components/DiscoverySurvey";
 
 function App() {
   const [showTagManager, setShowTagManager] = useState<boolean>(false);
@@ -124,6 +126,10 @@ function App() {
     delayMs: 2000,
   });
 
+  const { shouldShowSurvey, completeSurvey, skipSurvey, skipCount } = useDiscoverySurvey(
+    packageJson.version
+  );
+
   useFontAwesome();
 
   const playTrack = trackService.playTrack;
@@ -221,6 +227,13 @@ function App() {
         <UpdateBanner updateInfo={updateInfo} onDismiss={dismissUpdate} />
       )}
 
+      {shouldShowSurvey && (
+        <DiscoverySurvey
+          onCompleteSurvey={completeSurvey}
+          onSkipSurvey={skipSurvey}
+        />
+      )}
+
       <DataManager
         onExportTagData={exportTagData}
         onImportTagData={importTagData}
@@ -249,7 +262,9 @@ function App() {
               onApplyBatchTagUpdates={applyBatchTagUpdates}
               onFindCommonTagsFromDraft={findCommonTagsFromDraft}
               onFindCommonStarRatingFromDraft={findCommonStarRatingFromDraft}
-              onFindCommonEnergyRatingFromDraft={findCommonEnergyRatingFromDraft}
+              onFindCommonEnergyRatingFromDraft={
+                findCommonEnergyRatingFromDraft
+              }
               onToggleStarRatingDraft={toggleStarRatingDraft}
               onToggleEnergyRatingDraft={toggleEnergyRatingDraft}
               onFindTagName={findTagName}
