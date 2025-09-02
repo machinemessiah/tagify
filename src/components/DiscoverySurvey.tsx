@@ -108,6 +108,8 @@ const DiscoverySurvey: React.FC<DiscoverySurveyProps> = ({
       selectedSource,
       selectedSource === "other" ? otherDetails : undefined
     );
+
+    Spicetify.showNotification("Thanks for your feedback!");
   };
 
   const handleSkip = () => {

@@ -9,7 +9,13 @@ import MainSettingsModal from "./MainSettingsModal";
 import InfoModal from "./InfoModal";
 import { Settings } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChartSimple, faDownload, faInfo, faUpload } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChartSimple,
+  faDownload,
+  faInfo,
+  faLightbulb,
+  faUpload,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface DataManagerProps {
   onExportTagData: () => void;
@@ -111,6 +117,16 @@ const DataManager: React.FC<DataManagerProps> = ({
             title="Help & Tutorial"
           >
             <FontAwesomeIcon icon={faInfo} /> Info
+          </button>
+          <button
+            className={`${styles.pillButton} ${styles.surveyButton} `}
+            onClick={() => {
+              const formUrl = `https://forms.gle/H4xMyNC2zVAHowPF6`;
+              window.open(formUrl, "_blank", "noopener,noreferrer");
+            }}
+            title="Help improve Tagify with your feedback"
+          >
+            <FontAwesomeIcon icon={faLightbulb} /> Feedback
           </button>
         </div>
       </div>

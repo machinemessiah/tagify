@@ -788,58 +788,72 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                         organization!
                       </p>
                     </div>
-                  </div>
+                    {/* Community Section */}
+                    <div className={styles.communitySection}>
+                      <div className={styles.communityHeader}>
+                        <span className={styles.communityIcon}>
+                          <FontAwesomeIcon icon={faComments} />
+                        </span>
+                        <h4 className={styles.communityTitle}>
+                          Join the Community
+                        </h4>
+                      </div>
+                      <p className={styles.communityDescription}>
+                        Want to influence Tagify's development? Join our GitHub
+                        Discussions to:
+                      </p>
+                      <div className={styles.communityFeatures}>
+                        <div className={styles.communityFeature}>
+                          <span className={styles.featureCheckmark}>
+                            <FontAwesomeIcon icon={faCheckCircle} />
+                          </span>
+                          <span>See the detailed roadmap</span>
+                        </div>
+                        <div className={styles.communityFeature}>
+                          <span className={styles.featureCheckmark}>
+                            <FontAwesomeIcon icon={faCheckCircle} />
+                          </span>
+                          <span>Post ideas & feature requests</span>
+                        </div>
+                        <div className={styles.communityFeature}>
+                          <span className={styles.featureCheckmark}>
+                            <FontAwesomeIcon icon={faCheckCircle} />
+                          </span>
+                          <span>Vote on which features you want most</span>
+                        </div>
+                      </div>
 
-                  {/* Community Section */}
-                  <div className={styles.communitySection}>
-                    <div className={styles.communityHeader}>
-                      <span className={styles.communityIcon}>
-                        <FontAwesomeIcon icon={faComments} />
+                      <div className={styles.communityAction}>
+                        <a
+                          href="https://github.com/alexk218/tagify/discussions"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.discussionsLink}
+                        >
+                          <span className={styles.discussionsIcon}>
+                            <FontAwesomeIcon icon={faCommentDots} />
+                          </span>
+                          Visit GitHub Discussions
+                          <span className={styles.externalLinkIcon}>
+                            <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                          </span>
+                        </a>
+                      </div>
+                    </div>
+                    <a
+                      href="https://forms.gle/UoAFsHnWjzieUQFm8"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.surveyLink}
+                    >
+                      <span className={styles.surveyIcon}>
+                        <FontAwesomeIcon icon={faLightbulb} />
                       </span>
-                      <h4 className={styles.communityTitle}>
-                        Join the Community
-                      </h4>
-                    </div>
-                    <p className={styles.communityDescription}>
-                      Want to influence Tagify's development? Join our GitHub
-                      Discussions to:
-                    </p>
-                    <div className={styles.communityFeatures}>
-                      <div className={styles.communityFeature}>
-                        <span className={styles.featureCheckmark}>
-                          <FontAwesomeIcon icon={faCheckCircle} />
-                        </span>
-                        <span>See the detailed roadmap</span>
-                      </div>
-                      <div className={styles.communityFeature}>
-                        <span className={styles.featureCheckmark}>
-                          <FontAwesomeIcon icon={faCheckCircle} />
-                        </span>
-                        <span>Post ideas & feature requests</span>
-                      </div>
-                      <div className={styles.communityFeature}>
-                        <span className={styles.featureCheckmark}>
-                          <FontAwesomeIcon icon={faCheckCircle} />
-                        </span>
-                        <span>Vote on which features you want most</span>
-                      </div>
-                    </div>
-                    <div className={styles.communityAction}>
-                      <a
-                        href="https://github.com/alexk218/tagify/discussions"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.discussionsLink}
-                      >
-                        <span className={styles.discussionsIcon}>
-                          <FontAwesomeIcon icon={faCommentDots} />
-                        </span>
-                        Visit GitHub Discussions
-                        <span className={styles.externalLinkIcon}>
-                          <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-                        </span>
-                      </a>
-                    </div>
+                      Share Feedback & Ideas. Help shape Tagify's roadmap.
+                      <span className={styles.externalLinkIcon}>
+                        <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                      </span>
+                    </a>
                   </div>
                 </div>
               )}
