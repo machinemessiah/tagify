@@ -2,18 +2,19 @@ import React, { useEffect, useRef } from "react";
 import styles from "./TagSelector.module.css";
 import { TagCategory, TrackTag } from "../hooks/useTagData";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { Lightbulb, Lock, Tag } from "lucide-react";
 
 interface TagSelectorProps {
-  track: {
-    uri: string;
-    name: string;
-  };
   categories: TagCategory[];
   trackTags: TrackTag[];
-  onToggleTag: (categoryId: string, subcategoryId: string, tagId: string) => void;
+  onToggleTag: (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => void;
   onOpenTagManager: () => void;
-  isMultiTagging?: boolean;
-  isLockedTrack?: boolean;
+  isMultiTagging: boolean;
+  isLockedTrack: boolean;
 }
 
 const TagSelector: React.FC<TagSelectorProps> = ({
@@ -25,19 +26,20 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   isLockedTrack = false,
 }) => {
   // Store arrays in localStorage and convert to Sets when needed
-  const [expandedCategoryIds, setExpandedCategoryIds] = useLocalStorage<string[]>(
-    "tagify:expandedCategories",
-    []
-  );
-  const [expandedSubcategoryIds, setExpandedSubcategoryIds] = useLocalStorage<string[]>(
-    "tagify:expandedSubcategories",
-    []
-  );
+  const [expandedCategoryIds, setExpandedCategoryIds] = useLocalStorage<
+    string[]
+  >("tagify:expandedCategories", []);
+  const [expandedSubcategoryIds, setExpandedSubcategoryIds] = useLocalStorage<
+    string[]
+  >("tagify:expandedSubcategories", []);
   const [areAllExpanded, setAreAllExpanded] = useLocalStorage<boolean>(
     "tagify:areAllExpanded",
     false
   );
-  const [searchTerm, setSearchTerm] = useLocalStorage<string>("tagify:tagSearchTerm", "");
+  const [searchTerm, setSearchTerm] = useLocalStorage<string>(
+    "tagify:tagSearchTerm",
+    ""
+  );
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Create Set objects from the stored arrays for efficient lookups
@@ -95,10 +97,16 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   };
 
   // Check if a tag is applied to the track
-  const isTagApplied = (categoryId: string, subcategoryId: string, tagId: string) => {
+  const isTagApplied = (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ) => {
     return trackTags.some(
       (tag) =>
-        tag.categoryId === categoryId && tag.subcategoryId === subcategoryId && tag.tagId === tagId
+        tag.categoryId === categoryId &&
+        tag.subcategoryId === subcategoryId &&
+        tag.tagId === tagId
     );
   };
 
@@ -138,21 +146,29 @@ const TagSelector: React.FC<TagSelectorProps> = ({
     // Expand matching categories and subcategories
     setExpandedCategoryIds(matchingCategoryIds);
     setExpandedSubcategoryIds(matchingSubcategoryIds);
-  }, [searchTerm, categories, setExpandedCategoryIds, setExpandedSubcategoryIds]);
+  }, [
+    searchTerm,
+    categories,
+    setExpandedCategoryIds,
+    setExpandedSubcategoryIds,
+  ]);
 
   return (
     <div className={styles.container} ref={containerRef}>
       <div className={styles.header}>
         <div className={styles.titleContainer}>
           <h2 className={styles.title}>
-            {isMultiTagging ? "Add tags to all selected tracks" : "Tag your tracks"}
+            {isMultiTagging
+              ? "Add tags to all selected tracks"
+              : "Tag your tracks"}
           </h2>
 
           <div className={styles.helpTooltip}>
             ?
             <div className={styles.tooltipContent}>
-              <strong>💡 Pro tip:</strong> Select multiple tracks in any playlist, right-click, and
-              choose "Bulk Tag" to tag multiple tracks at once!
+              <Lightbulb size={16} />{" "}
+              <strong>Pro tip:</strong> Select multiple tracks in any playlist,
+              right-click, and choose "Bulk Tag" to tag multiple tracks at once!
             </div>
           </div>
         </div>
@@ -160,9 +176,15 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           <button
             className={styles.expandCollapseButton}
             onClick={toggleExpandAll}
-            title={areAllExpanded ? "Collapse all categories" : "Expand all categories"}
+            title={
+              areAllExpanded
+                ? "Collapse all categories"
+                : "Expand all categories"
+            }
           >
-            <span className={styles.expandCollapseIcon}>{areAllExpanded ? "▼" : "►"}</span>
+            <span className={styles.expandCollapseIcon}>
+              {areAllExpanded ? "▼" : "►"}
+            </span>
             {areAllExpanded ? "Collapse All" : "Expand All"}
           </button>
 
@@ -188,8 +210,14 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       </div>
 
       {isMultiTagging && (
-        <div className={styles.multiTaggingBanner}>
-          <span className={styles.multiTaggingIcon}>{isLockedTrack ? "🔒" : "🏷️"}</span>
+        <div
+          className={`${styles.multiTaggingBanner} ${
+            isLockedTrack ? styles.locked : ""
+          }`}
+        >
+          <span className={styles.multiTaggingIcon}>
+            {isLockedTrack ? <Lock size={16} /> : <Tag size={16} />}
+          </span>
           <span className={styles.multiTaggingText}>
             {isLockedTrack
               ? "Tags will be applied to the locked track only"
@@ -210,21 +238,28 @@ const TagSelector: React.FC<TagSelectorProps> = ({
 
           return (
             <div key={category.id} className={styles.category}>
-              <div className={styles.categoryHeader} onClick={() => toggleCategory(category.id)}>
-                <span className={styles.categoryToggle}>{isCategoryExpanded ? "▼" : "►"}</span>
+              <div
+                className={styles.categoryHeader}
+                onClick={() => toggleCategory(category.id)}
+              >
+                <span className={styles.categoryToggle}>
+                  {isCategoryExpanded ? "▼" : "►"}
+                </span>
                 <h3 className={styles.categoryTitle}>{category.name}</h3>
               </div>
 
               {isCategoryExpanded && (
                 <div className={styles.subcategoryList}>
                   {category.subcategories?.map((subcategory) => {
-                    const hasMatchingSubcategoryTags = subcategory.tags.some((tag) =>
-                      filterTag(tag.name)
+                    const hasMatchingSubcategoryTags = subcategory.tags.some(
+                      (tag) => filterTag(tag.name)
                     );
 
                     if (searchTerm && !hasMatchingSubcategoryTags) return null;
 
-                    const isSubcategoryExpanded = expandedSubcategories.has(subcategory.id);
+                    const isSubcategoryExpanded = expandedSubcategories.has(
+                      subcategory.id
+                    );
 
                     return (
                       <div key={subcategory.id} className={styles.subcategory}>
@@ -235,7 +270,9 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                           <span className={styles.subcategoryToggle}>
                             {isSubcategoryExpanded ? "▼" : "►"}
                           </span>
-                          <h4 className={styles.subcategoryTitle}>{subcategory.name}</h4>
+                          <h4 className={styles.subcategoryTitle}>
+                            {subcategory.name}
+                          </h4>
                         </div>
 
                         {isSubcategoryExpanded && (
@@ -246,11 +283,21 @@ const TagSelector: React.FC<TagSelectorProps> = ({
                                 <button
                                   key={tag.id}
                                   className={`${styles.tagButton} ${
-                                    isTagApplied(category.id, subcategory.id, tag.id)
+                                    isTagApplied(
+                                      category.id,
+                                      subcategory.id,
+                                      tag.id
+                                    )
                                       ? styles.tagApplied
                                       : ""
                                   }`}
-                                  onClick={() => onToggleTag(category.id, subcategory.id, tag.id)}
+                                  onClick={() =>
+                                    onToggleTag(
+                                      category.id,
+                                      subcategory.id,
+                                      tag.id
+                                    )
+                                  }
                                 >
                                   {tag.name}
                                 </button>

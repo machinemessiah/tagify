@@ -4,6 +4,20 @@ import Portal from "../utils/Portal";
 import { SmartPlaylistCriteria, TagCategory } from "../hooks/useTagData";
 import { formatCondensedDate, formatTimestamp } from "../utils/formatters";
 import { spotifyApiService } from "../services/SpotifyApiService";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowUpRightFromSquare,
+  faBan,
+  faBolt,
+  faCheckCircle,
+  faExclamationTriangle,
+  faMagnifyingGlass,
+  faMusic,
+  faQuestionCircle,
+  faTag,
+  faTrophy,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 
 const PLAYLIST_SORT_OPTIONS = {
   ALPHABETICAL: "alphabetical",
@@ -16,7 +30,8 @@ const SORT_ORDERS = {
   DESC: "desc",
 } as const;
 
-type PlaylistSortOption = (typeof PLAYLIST_SORT_OPTIONS)[keyof typeof PLAYLIST_SORT_OPTIONS];
+type PlaylistSortOption =
+  (typeof PLAYLIST_SORT_OPTIONS)[keyof typeof PLAYLIST_SORT_OPTIONS];
 type SortOrder = (typeof SORT_ORDERS)[keyof typeof SORT_ORDERS];
 
 interface SmartPlaylistModalProps {
@@ -26,6 +41,7 @@ interface SmartPlaylistModalProps {
   onSyncPlaylist: (playlist: SmartPlaylistCriteria) => Promise<void>;
   onExportSmartPlaylists: () => void;
   onImportSmartPlaylists: (data: SmartPlaylistCriteria[]) => void;
+  onCleanupDeletedSmartPlaylists: () => Promise<void>;
   onClose: () => void;
 }
 
@@ -36,17 +52,26 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
   onSyncPlaylist,
   onExportSmartPlaylists,
   onImportSmartPlaylists,
+  onCleanupDeletedSmartPlaylists,
   onClose,
 }) => {
-  const [syncingPlaylists, setSyncingPlaylists] = useState<Set<string>>(new Set());
-  const [playlistTrackCounts, setPlaylistTrackCounts] = useState<Record<string, number>>({});
+  const [syncingPlaylists, setSyncingPlaylists] = useState<Set<string>>(
+    new Set()
+  );
+  const [playlistTrackCounts, setPlaylistTrackCounts] = useState<
+    Record<string, number>
+  >({});
   const [isLoadingCounts, setIsLoadingCounts] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [sortBy, setSortBy] = useState<PlaylistSortOption>(PLAYLIST_SORT_OPTIONS.ALPHABETICAL);
+  const [sortBy, setSortBy] = useState<PlaylistSortOption>(
+    PLAYLIST_SORT_OPTIONS.ALPHABETICAL
+  );
   const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_ORDERS.ASC);
 
-  const getSyncStatus = (playlist: SmartPlaylistCriteria): "synced" | "needsSync" | "unknown" => {
+  const getSyncStatus = (
+    playlist: SmartPlaylistCriteria
+  ): "synced" | "needsSync" | "unknown" => {
     const actualCount = playlistTrackCounts[playlist.playlistId];
     const expectedCount = playlist.smartPlaylistTrackUris.length;
 
@@ -60,7 +85,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
   const handleExportClick = () => {
     onClose();
     onExportSmartPlaylists();
-  }
+  };
 
   const handleImportClick = () => {
     if (fileInputRef.current) {
@@ -95,7 +120,10 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
           Spicetify.showNotification("Smart playlists imported successfully!");
         } else {
           console.error("Invalid smart playlist backup structure:", data);
-          Spicetify.showNotification("Invalid smart playlist backup file format", true);
+          Spicetify.showNotification(
+            "Invalid smart playlist backup file format",
+            true
+          );
         }
       } catch (error) {
         console.error("Error parsing backup file:", error);
@@ -144,7 +172,10 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
           // Prioritize playlists that need sync
           if (syncStatusA === "needsSync" && syncStatusB !== "needsSync") {
             comparison = -1; // A comes first
-          } else if (syncStatusA !== "needsSync" && syncStatusB === "needsSync") {
+          } else if (
+            syncStatusA !== "needsSync" &&
+            syncStatusB === "needsSync"
+          ) {
             comparison = 1; // B comes first
           } else {
             // If both have same sync status, sort alphabetically
@@ -174,6 +205,10 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
   }, []);
 
   useEffect(() => {
+    onCleanupDeletedSmartPlaylists();
+  }, []);
+
+  useEffect(() => {
     const syncPlaylistNames = async () => {
       let hasUpdates = false;
       const updatedPlaylists = await Promise.all(
@@ -193,7 +228,10 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
 
             return playlist;
           } catch (error) {
-            console.error(`Failed to fetch metadata for playlist ${playlist.playlistId}:`, error);
+            console.error(
+              `Failed to fetch metadata for playlist ${playlist.playlistId}:`,
+              error
+            );
             return playlist;
           }
         })
@@ -215,7 +253,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
 
       setIsLoadingCounts(true);
       const playlistIds = smartPlaylists.map((p) => p.playlistId);
-      const counts = await spotifyApiService.getPlaylistTrackCounts(playlistIds);
+      const counts = await spotifyApiService.getPlaylistTrackCounts(
+        playlistIds
+      );
       setPlaylistTrackCounts(counts);
       setIsLoadingCounts(false);
     };
@@ -247,7 +287,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
       setSyncingPlaylists((prev) => new Set(prev).add(playlistId));
 
       try {
-        const updatedPlaylist = updatedPlaylists.find((p) => p.playlistId === playlistId)!;
+        const updatedPlaylist = updatedPlaylists.find(
+          (p) => p.playlistId === playlistId
+        )!;
         await onSyncPlaylist(updatedPlaylist);
       } catch (error) {
         console.error("Failed to sync playlist after activation:", error);
@@ -286,11 +328,17 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
     }
   };
 
-  const findTagName = (categoryId: string, subcategoryId: string, tagId: string): string => {
+  const findTagName = (
+    categoryId: string,
+    subcategoryId: string,
+    tagId: string
+  ): string => {
     const category = tagCategories.find((c) => c.id === categoryId);
     if (!category) return "Unknown Tag";
 
-    const subcategory = category.subcategories.find((s) => s.id === subcategoryId);
+    const subcategory = category.subcategories.find(
+      (s) => s.id === subcategoryId
+    );
     if (!subcategory) return "Unknown Tag";
 
     const tag = subcategory.tags.find((t) => t.id === tagId);
@@ -308,7 +356,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
     return `${logicMode} of: ${tagNames.join(", ")}`;
   };
 
-  const formatExcludedTagFilters = (playlist: SmartPlaylistCriteria): string => {
+  const formatExcludedTagFilters = (
+    playlist: SmartPlaylistCriteria
+  ): string => {
     if (playlist.criteria.excludedTagFilters.length === 0) return "";
 
     const tagNames = playlist.criteria.excludedTagFilters.map((filter) =>
@@ -323,7 +373,10 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
     return `${ratingFilters.sort((a, b) => a - b).join(", ")} ★`;
   };
 
-  const formatEnergyRange = (min: number | null, max: number | null): string => {
+  const formatEnergyRange = (
+    min: number | null,
+    max: number | null
+  ): string => {
     if (min === null && max === null) return "";
     if (min !== null && max !== null) {
       return min === max ? `Energy: ${min}` : `Energy: ${min} - ${max}`;
@@ -352,7 +405,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
         <div className={styles.modalOverlay} onClick={onClose}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>Smart Playlists ({smartPlaylists.length})</h2>
+              <h2 className={styles.modalTitle}>
+                Smart Playlists ({smartPlaylists.length})
+              </h2>
 
               <div className={styles.headerActions}>
                 <button
@@ -360,7 +415,8 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                   onClick={handleExportClick}
                   title="Backup your smart playlists"
                 >
-                  ↗ Export
+                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} size="sm" />{" "}
+                  Backup
                 </button>
 
                 <button
@@ -368,11 +424,16 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                   onClick={handleImportClick}
                   title="Import smart playlists"
                 >
-                  ↙ Import
+                  <FontAwesomeIcon
+                    icon={faArrowUpRightFromSquare}
+                    rotation={180}
+                    size="sm"
+                  />{" "}
+                  Import
                 </button>
 
                 <button className="modal-close-button" onClick={onClose}>
-                  ×
+                  <FontAwesomeIcon icon={faXmark} />
                 </button>
               </div>
             </div>
@@ -393,7 +454,7 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                     onClick={() => setSearchQuery("")}
                     title="Clear search"
                   >
-                    ×
+                    <FontAwesomeIcon icon={faXmark} />
                   </button>
                 )}
               </div>
@@ -402,12 +463,20 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                 <label className={styles.sortLabel}>Sort by:</label>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as PlaylistSortOption)}
+                  onChange={(e) =>
+                    setSortBy(e.target.value as PlaylistSortOption)
+                  }
                   className={styles.sortSelect}
                 >
-                  <option value={PLAYLIST_SORT_OPTIONS.ALPHABETICAL}>Name</option>
-                  <option value={PLAYLIST_SORT_OPTIONS.DATE_CREATED}>Date Created</option>
-                  <option value={PLAYLIST_SORT_OPTIONS.NEEDS_SYNC}>Needs Sync</option>
+                  <option value={PLAYLIST_SORT_OPTIONS.ALPHABETICAL}>
+                    Name
+                  </option>
+                  <option value={PLAYLIST_SORT_OPTIONS.DATE_CREATED}>
+                    Date Created
+                  </option>
+                  <option value={PLAYLIST_SORT_OPTIONS.NEEDS_SYNC}>
+                    Needs Sync
+                  </option>
                 </select>
 
                 {sortBy !== PLAYLIST_SORT_OPTIONS.NEEDS_SYNC && (
@@ -415,10 +484,14 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                     className={styles.sortOrderButton}
                     onClick={() =>
                       setSortOrder(
-                        sortOrder === SORT_ORDERS.ASC ? SORT_ORDERS.DESC : SORT_ORDERS.ASC
+                        sortOrder === SORT_ORDERS.ASC
+                          ? SORT_ORDERS.DESC
+                          : SORT_ORDERS.ASC
                       )
                     }
-                    title={`Sort ${sortOrder === SORT_ORDERS.ASC ? "descending" : "ascending"}`}
+                    title={`Sort ${
+                      sortOrder === SORT_ORDERS.ASC ? "descending" : "ascending"
+                    }`}
                   >
                     {sortOrder === SORT_ORDERS.ASC ? "↑" : "↓"}
                   </button>
@@ -431,16 +504,21 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                 <div className={styles.emptyState}>
                   {searchQuery ? (
                     <>
-                      <div className={styles.emptyIcon}>🔍</div>
+                      <div className={styles.emptyIcon}>
+                        <FontAwesomeIcon icon={faMagnifyingGlass} />
+                      </div>
                       <h3>No playlists found</h3>
                       <p>No playlists match "{searchQuery}"</p>
                     </>
                   ) : (
                     <>
-                      <div className={styles.emptyIcon}>🎵</div>
+                      <div className={styles.emptyIcon}>
+                        <FontAwesomeIcon icon={faMusic} />
+                      </div>
                       <h3>No Smart Playlists Yet</h3>
                       <p>
-                        Create a playlist with filters and enable "Smart Playlist" to get started!
+                        Create a playlist with filters and enable "Smart
+                        Playlist" to get started!
                       </p>
                     </>
                   )}
@@ -450,7 +528,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                   {filteredAndSortedPlaylists.map((playlist) => {
                     const activeTagsText = formatActiveTagFilters(playlist);
                     const excludedTagsText = formatExcludedTagFilters(playlist);
-                    const ratingText = formatRatingFilters(playlist.criteria.ratingFilters);
+                    const ratingText = formatRatingFilters(
+                      playlist.criteria.ratingFilters
+                    );
                     const energyText = formatEnergyRange(
                       playlist.criteria.energyMinFilter,
                       playlist.criteria.energyMaxFilter
@@ -460,7 +540,11 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                       playlist.criteria.bpmMaxFilter
                     );
                     const hasCriteria =
-                      activeTagsText || excludedTagsText || ratingText || energyText || bpmText;
+                      activeTagsText ||
+                      excludedTagsText ||
+                      ratingText ||
+                      energyText ||
+                      bpmText;
                     return (
                       <div
                         key={playlist.playlistId}
@@ -473,13 +557,17 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                           <div className={styles.playlistTitleSection}>
                             <h3
                               className={styles.playlistName}
-                              onClick={() => navigateToPlaylist(playlist.playlistId)}
+                              onClick={() =>
+                                navigateToPlaylist(playlist.playlistId)
+                              }
                             >
                               {playlist.playlistName}
                             </h3>
                             <div className={styles.playlistStatus}>
                               {!playlist.isActive && (
-                                <span className={styles.inactiveLabel}>Inactive</span>
+                                <span className={styles.inactiveLabel}>
+                                  Inactive
+                                </span>
                               )}
                             </div>
                           </div>
@@ -487,7 +575,9 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                           <div className={styles.playlistMetadata}>
                             <span
                               className={styles.timeStamp}
-                              title={`Created: ${formatTimestamp(playlist.createdAt)}`}
+                              title={`Created: ${formatTimestamp(
+                                playlist.createdAt
+                              )}`}
                             >
                               {formatCondensedDate(playlist.createdAt, "short")}
                             </span>
@@ -501,30 +591,45 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                                 ? "..."
                                 : playlistTrackCounts[playlist.playlistId] || 0}
                             </div>
-                            <div className={styles.trackCountLabel}>In Playlist</div>
+                            <div className={styles.trackCountLabel}>
+                              In Playlist
+                            </div>
                           </div>
                           <div className={styles.trackRowItem}>
                             <div className={styles.trackCountNumber}>
                               {playlist.smartPlaylistTrackUris.length}
                             </div>
-                            <div className={styles.trackCountLabel}>Expected</div>
+                            <div className={styles.trackCountLabel}>
+                              Expected
+                            </div>
                           </div>
                           {/* Sync Status Indicator */}
                           {!isLoadingCounts && (
                             <div className={styles.trackRowItem}>
                               {getSyncStatus(playlist) === "synced" && (
-                                <span className={`${styles.syncIndicator} ${styles.synced}`}>
-                                  ✓ In Sync
+                                <span
+                                  className={`${styles.syncIndicator} ${styles.synced}`}
+                                >
+                                  <FontAwesomeIcon icon={faCheckCircle} /> In
+                                  Sync
                                 </span>
                               )}
                               {getSyncStatus(playlist) === "needsSync" && (
-                                <span className={`${styles.syncIndicator} ${styles.needsSync}`}>
-                                  ⚠ Needs Sync
+                                <span
+                                  className={`${styles.syncIndicator} ${styles.needsSync}`}
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faExclamationTriangle}
+                                  />{" "}
+                                  Needs Sync
                                 </span>
                               )}
                               {getSyncStatus(playlist) === "unknown" && (
-                                <span className={`${styles.syncIndicator} ${styles.unknown}`}>
-                                  ? Unknown
+                                <span
+                                  className={`${styles.syncIndicator} ${styles.unknown}`}
+                                >
+                                  <FontAwesomeIcon icon={faQuestionCircle} />{" "}
+                                  Unknown
                                 </span>
                               )}
                             </div>
@@ -534,37 +639,59 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                         {hasCriteria ? (
                           <div className={styles.criteriaSection}>
                             <div className={styles.criteriaHeader}>
-                              <h4 className={styles.criteriaTitle}>Filter Criteria</h4>
+                              <h4 className={styles.criteriaTitle}>
+                                Filter Criteria
+                              </h4>
                             </div>
                             <div className={styles.criteriaList}>
                               {activeTagsText && (
                                 <div className={styles.criteriaItem}>
-                                  <span className={styles.criteriaLabel}>🏷️ Tags:</span>
-                                  <span className={styles.criteriaValue}>{activeTagsText}</span>
+                                  <span className={styles.criteriaLabel}>
+                                    <FontAwesomeIcon icon={faTag} /> Tags:
+                                  </span>
+                                  <span className={styles.criteriaValue}>
+                                    {activeTagsText}
+                                  </span>
                                 </div>
                               )}
                               {excludedTagsText && (
                                 <div className={styles.criteriaItem}>
-                                  <span className={styles.criteriaLabel}>🚫 Excluded:</span>
-                                  <span className={styles.criteriaValue}>{excludedTagsText}</span>
+                                  <span className={styles.criteriaLabel}>
+                                    <FontAwesomeIcon icon={faBan} /> Excluded:
+                                  </span>
+                                  <span className={styles.criteriaValue}>
+                                    {excludedTagsText}
+                                  </span>
                                 </div>
                               )}
                               {ratingText && (
                                 <div className={styles.criteriaItem}>
-                                  <span className={styles.criteriaLabel}>🏆 Rating:</span>
-                                  <span className={styles.criteriaValue}>{ratingText}</span>
+                                  <span className={styles.criteriaLabel}>
+                                    <FontAwesomeIcon icon={faTrophy} /> Rating:
+                                  </span>
+                                  <span className={styles.criteriaValue}>
+                                    {ratingText}
+                                  </span>
                                 </div>
                               )}
                               {energyText && (
                                 <div className={styles.criteriaItem}>
-                                  <span className={styles.criteriaLabel}>⚡ Energy:</span>
-                                  <span className={styles.criteriaValue}>{energyText}</span>
+                                  <span className={styles.criteriaLabel}>
+                                    <FontAwesomeIcon icon={faBolt} /> Energy:
+                                  </span>
+                                  <span className={styles.criteriaValue}>
+                                    {energyText}
+                                  </span>
                                 </div>
                               )}
                               {bpmText && (
                                 <div className={styles.criteriaItem}>
-                                  <span className={styles.criteriaLabel}>🎵 BPM:</span>
-                                  <span className={styles.criteriaValue}>{bpmText}</span>
+                                  <span className={styles.criteriaLabel}>
+                                    <FontAwesomeIcon icon={faMusic} /> BPM:
+                                  </span>
+                                  <span className={styles.criteriaValue}>
+                                    {bpmText}
+                                  </span>
                                 </div>
                               )}
                             </div>
@@ -577,23 +704,33 @@ const SmartPlaylistModal: React.FC<SmartPlaylistModalProps> = ({
                         {/* ACTIONS: Stay at bottom */}
                         <div className={styles.playlistActions}>
                           <button
-                            className={`${styles.actionButton} ${styles.syncToggleButton} ${
-                              !playlist.isActive ? styles.inactive : ""
-                            }`}
-                            onClick={() => toggleSmartPlaylistActive(playlist.playlistId)}
+                            className={`${styles.actionButton} ${
+                              styles.syncToggleButton
+                            } ${!playlist.isActive ? styles.inactive : ""}`}
+                            onClick={() =>
+                              toggleSmartPlaylistActive(playlist.playlistId)
+                            }
                             disabled={syncingPlaylists.has(playlist.playlistId)}
                           >
                             {playlist.isActive ? "Disable Sync" : "Enable Sync"}
                           </button>
                           {playlist.isActive && (
                             <button
-                              className={`${styles.actionButton} ${styles.syncButton} ${
+                              className={`${styles.actionButton} ${
+                                styles.syncButton
+                              } ${
                                 getSyncStatus(playlist) === "needsSync"
                                   ? styles.syncButtonUrgent
                                   : ""
-                              } ${syncingPlaylists.has(playlist.playlistId) ? styles.syncing : ""}`}
+                              } ${
+                                syncingPlaylists.has(playlist.playlistId)
+                                  ? styles.syncing
+                                  : ""
+                              }`}
                               onClick={() => handleManualSync(playlist)}
-                              disabled={syncingPlaylists.has(playlist.playlistId)}
+                              disabled={syncingPlaylists.has(
+                                playlist.playlistId
+                              )}
                             >
                               {syncingPlaylists.has(playlist.playlistId)
                                 ? "Syncing..."

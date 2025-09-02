@@ -236,11 +236,6 @@
   color: var(--spice-text);
 }
 
-.ratingSection,
-.energySection {
-  margin-bottom: 0;
-}
-
 .tagsSection {
   margin-bottom: 0;
   border-top: 1px solid var(--spice-button-disabled);
@@ -267,28 +262,6 @@
   display: flex;
 }
 
-.starsWrapper {
-  display: flex;
-  flex-direction: row;
-}
-
-.starsDisplay {
-  display: flex;
-  gap: 4px;
-}
-
-.ratingSymbol {
-  font-size: 24px;
-  color: var(--spice-button-disabled);
-  cursor: pointer;
-  transition: color 0.2s ease;
-  user-select: none;
-}
-
-.ratingSymbol.active {
-  color: #ffd700;
-}
-
 .star {
   background: transparent;
   border: none;
@@ -299,8 +272,7 @@
   transition: color 0.2s ease;
 }
 
-.star:hover,
-.starActive {
+.star:hover {
   color: #ffd700;
 }
 
@@ -325,22 +297,8 @@
   cursor: pointer;
 }
 
-.energySlider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #1e90ff; /* Match the blue used for stars */
-  cursor: pointer;
-  border: none;
-}
-
 /* Styles for when energy is not set */
 .energySliderUnset::-webkit-slider-thumb {
-  background: var(--spice-button-disabled);
-  border: 1px solid var(--spice-subtext);
-}
-
-.energySliderUnset::-moz-range-thumb {
   background: var(--spice-button-disabled);
   border: 1px solid var(--spice-subtext);
 }
@@ -364,21 +322,6 @@
 }
 
 .clearButton:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.setEnergyButton {
-  background: rgba(0, 0, 0, 0.2);
-  color: var(--spice-text);
-  border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.setEnergyButton:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -497,47 +440,12 @@
 }
 
 /* Playlists section */
-.playlistsSection {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--spice-button-disabled);
-}
-
-.playlistSectionHeader {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
 
 .sectionTitle {
   font-size: 14px;
   font-weight: 600;
   margin: 0;
   color: var(--spice-text);
-}
-
-.playlistWarning {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #ffcc00;
-  font-weight: 500;
-  cursor: help;
-  padding: 2px 6px;
-  background: rgba(255, 204, 0, 0.1);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 204, 0, 0.3);
-  transition: background-color 0.2s ease;
-}
-
-.playlistWarning:hover {
-  background: rgba(255, 204, 0, 0.15);
-}
-
-.playlistWarningIcon {
-  font-size: 12px;
 }
 
 .playlistList {
@@ -566,25 +474,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.noPlaylists {
-  font-size: 13px;
-  color: var(--spice-subtext);
-  font-style: italic;
-  margin: 8px 0;
-}
-
-.playlistOwner {
-  font-size: 11px;
-  color: var(--spice-subtext);
-}
-
-.playlistsLoading {
-  font-size: 13px;
-  color: var(--spice-subtext);
-  font-style: italic;
-  margin: 8px 0;
 }
 
 .albumSection {
@@ -678,25 +567,6 @@
 
 .lockButton:hover {
   background-color: rgba(255, 255, 255, 0.1);
-}
-
-.lockedTrackInfo {
-  font-size: 14px;
-  color: var(--spice-subtext);
-  margin: 12px 0;
-  background: var(--spice-card);
-  padding: 8px 12px;
-  border-radius: 4px;
-  border-left: 3px solid #5aa9e6;
-}
-
-.lockedTrackName {
-  font-weight: 700;
-  color: var(--spice-text);
-}
-
-.lockedTrackArtist {
-  font-style: italic;
 }
 
 /* Timestamp metadata container */

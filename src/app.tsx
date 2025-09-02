@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./app.module.css";
 import "./styles/globals.css";
 import TrackDetails from "./components/TrackDetails";
@@ -6,63 +6,62 @@ import TagSelector from "./components/TagSelector";
 import TrackList from "./components/TrackList";
 import TagManager from "./components/TagManager";
 import DataManager from "./components/DataManager";
-import MultiTrackDetails, { DraftTagState } from "./components/MultiTrackDetails";
+import MultiTrackDetails from "./components/MultiTrackDetails";
 import LocalTracksModal from "./components/LocalTracksModal";
-import { TrackTag, useTagData } from "./hooks/useTagData";
+import { useTagData } from "./hooks/useTagData";
 import { useTrackState } from "./hooks/useTrackState";
 import { useFilterState } from "./hooks/useFilterState";
 import { usePlaylistState } from "./hooks/usePlaylistState";
 import { useFontAwesome } from "./hooks/useFontAwesome";
-// import { checkAndUpdateCacheIfNeeded } from "./utils/PlaylistCache";
 import { trackService } from "./services/TrackService";
 import { useSpicetifyHistory } from "./hooks/useSpicetifyHistory";
-import { SpotifyTrack } from "./types/SpotifyTypes";
 import ExportPanel from "./components/ExportPanel";
 import packageJson from "../package.json";
 import { useUpdateChecker } from "./hooks/useUpdateChecker";
 import UpdateBanner from "./components/UpdateBanner";
+import { useMultiTrackTagging } from "./hooks/useMultiTrackTagging";
+import { useSmartPlaylists } from "./hooks/useSmartPlaylists";
+import { useDiscoverySurvey } from "./hooks/useDiscoverySurvey";
+import DiscoverySurvey from "./components/DiscoverySurvey";
 
 function App() {
   const [showTagManager, setShowTagManager] = useState<boolean>(false);
   const [showExport, setShowExport] = useState<boolean>(false);
-  const [isMultiTagging, setIsMultiTagging] = useState<boolean>(false);
-  const [lockedMultiTrackUri, setLockedMultiTrackUri] = useState<string | null>(null);
-
-  const [multiTrackDraftTags, setMultiTrackDraftTags] = useState<DraftTagState | null>(null);
-  const [multiTagTracks, setMultiTagTracks] = useState<SpotifyTrack[]>([]);
 
   const {
     tagData,
     lastSaved,
     isLoading,
-    toggleTagForTrack,
+    toggleTagSingleTrack,
     setRating,
     setEnergy,
     setBpm,
-    toggleTagForMultipleTracks,
     replaceCategories,
     exportTagData,
     importTagData,
-    exportSmartPlaylists,
-    importSmartPlaylists,
-    findCommonTags,
     updateBpm,
     applyBatchTagUpdates,
     exportData,
-    storeSmartPlaylist,
+    findTagName,
+  } = useTagData();
+
+  const {
+    syncSmartPlaylistFull,
+    createSmartPlaylist,
+    cleanupDeletedSmartPlaylists,
     smartPlaylists,
     setSmartPlaylists,
-    syncSmartPlaylistFull,
-    cleanupDeletedSmartPlaylists,
-  } = useTagData();
+    exportSmartPlaylists,
+    importSmartPlaylists,
+  } = useSmartPlaylists({ tagData });
 
   const {
     activeTagFilters,
     excludedTagFilters,
-    handleRemoveFilter,
-    handleToggleFilterType,
-    onFilterByTag,
-    onFilterByTagOnOff,
+    removeTagFilter,
+    toggleTagIncludeExclude,
+    toggleTagIncludeExcludeOff,
+    toggleTagIncludeOff,
     clearTagFilters,
     createTagId,
     parseTagId,
@@ -78,15 +77,36 @@ function App() {
   } = usePlaylistState();
 
   const {
-    currentTrack,
+    currentlyPlayingTrack,
     setLockedTrack,
     isLocked,
     setIsLocked,
     toggleLock,
-    handleTagTrack,
-    cancelMultiTagging,
+    handleSelectTrackForTagging,
     activeTrack,
-  } = useTrackState({ setMultiTagTracks, setIsMultiTagging, setLockedMultiTrackUri });
+  } = useTrackState();
+
+  const {
+    isMultiTagging,
+    lockedMultiTrackUri,
+    multiTagTracks,
+    multiTrackDraftTags,
+    setIsMultiTagging,
+    setMultiTagTracks,
+    setLockedMultiTrackUri,
+    setMultiTrackDraftTags,
+    cancelMultiTagging,
+    selectedTagsForSelector,
+    findCommonTagsFromDraft,
+    findCommonStarRatingFromDraft,
+    findCommonEnergyRatingFromDraft,
+    toggleTagMultiTrackDraft,
+    toggleStarRatingDraft,
+    toggleEnergyRatingDraft,
+    toggleCommonTagDraft,
+    toggleTagForSpecificTrackDraft,
+    calculateBatchChanges,
+  } = useMultiTrackTagging();
 
   // Set up history tracking and URL param handling
   useSpicetifyHistory({
@@ -106,270 +126,94 @@ function App() {
     delayMs: 2000,
   });
 
+  const { shouldShowSurvey, completeSurvey, skipSurvey, skipCount } = useDiscoverySurvey(
+    packageJson.version
+  );
+
   useFontAwesome();
 
-  // Check playlist cache on mount
-  // useEffect(() => {
-  //   checkAndUpdateCacheIfNeeded().catch((error) => {
-  //     console.error("Error checking/updating playlist cache:", error);
-  //   });
-  // }, []);
-
-  const handleUpdateDismiss = (permanently: boolean = false) => {
-    dismissUpdate(permanently);
-  };
-
-  useEffect(() => {
-    cleanupDeletedSmartPlaylists().catch((error) => {
-      console.error("Error during smart playlist cleanup:", error);
-    });
-  }, []);
-
-  const playTrackViaQueue = trackService.playTrackViaQueue;
-  const getTracksWithResolvedTags = () => trackService.getTracksWithResolvedTags(tagData);
+  const playTrack = trackService.playTrack;
+  const getTracksWithResolvedTags = () =>
+    trackService.getTracksWithResolvedTags(tagData);
 
   // Hide topbar when app mounts - restore when app unmounts
   useEffect(() => {
-    const topbar = document.querySelector(".main-topBar-container") as HTMLElement;
+    const topbar = document.querySelector(
+      ".main-topBar-container"
+    ) as HTMLElement;
     if (topbar) {
       topbar.style.visibility = "hidden";
     }
 
     return () => {
-      const topbar = document.querySelector(".main-topBar-container") as HTMLElement;
+      const topbar = document.querySelector(
+        ".main-topBar-container"
+      ) as HTMLElement;
       if (topbar) {
         topbar.style.visibility = "";
       }
     };
   }, []);
 
-  const findCommonTagsFromDraft = (
-    draftTags: DraftTagState,
-    tracks: SpotifyTrack[]
-  ): TrackTag[] => {
-    if (tracks.length === 0) return [];
+  const trackTags = isMultiTagging
+    ? selectedTagsForSelector || []
+    : tagData.tracks[activeTrack?.uri || ""]?.tags || [];
 
-    const firstTrackUri = tracks[0].uri;
-    const firstTrackTags = draftTags[firstTrackUri] || [];
-
-    if (tracks.length === 1) return firstTrackTags;
-
-    return firstTrackTags.filter((tag) => {
-      return tracks.every((track) => {
-        const trackTags = draftTags[track.uri] || [];
-        return trackTags.some(
-          (t) =>
-            t.categoryId === tag.categoryId &&
-            t.subcategoryId === tag.subcategoryId &&
-            t.tagId === tag.tagId
-        );
-      });
-    });
-  };
-
-  // Render appropriate UI based on state
-  const renderContent = () => {
-    if (isLoading) {
-      return (
-        <div className={styles.loadingContainer}>
-          <p className={styles.loadingText}>Loading tag data...</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className={styles.content}>
-        {isMultiTagging && multiTagTracks.length > 0 ? (
-          <MultiTrackDetails
-            tracks={multiTagTracks}
-            trackTagsMap={Object.fromEntries(
-              multiTagTracks.map((track) => [track.uri, tagData.tracks[track.uri]?.tags || []])
-            )}
-            categories={tagData.categories}
-            onTagAllTracks={handleTagAllTracks}
-            onTagSingleTrack={toggleTagForSingleTrack}
-            onCancelTagging={() => {
-              setMultiTrackDraftTags(null);
-              cancelMultiTagging();
-            }}
-            onPlayTrack={playTrackViaQueue}
-            lockedTrackUri={lockedMultiTrackUri}
-            onLockTrack={setLockedMultiTrackUri}
-            draftTags={multiTrackDraftTags}
-            onDraftTagsChange={setMultiTrackDraftTags}
-            onBatchUpdate={applyBatchTagUpdates}
-          />
-        ) : (
-          activeTrack && (
-            <TrackDetails
-              displayedTrack={activeTrack}
-              nowPlayingTrack={currentTrack}
-              trackData={
-                tagData.tracks[activeTrack.uri] || {
-                  rating: 0,
-                  energy: 0,
-                  bpm: null,
-                  tags: [],
-                }
-              }
-              categories={tagData.categories}
-              activeTagFilters={activeTagFilters}
-              excludedTagFilters={excludedTagFilters}
-              onSetRating={(rating) => setRating(activeTrack.uri, rating)}
-              onSetEnergy={(energy) => setEnergy(activeTrack.uri, energy)}
-              onSetBpm={(bpm) => setBpm(activeTrack.uri, bpm)}
-              onRemoveTag={(categoryId, subcategoryId, tagId) =>
-                toggleTagForTrack(activeTrack.uri, categoryId, subcategoryId, tagId)
-              }
-              onFilterByTagOnOff={onFilterByTagOnOff}
-              onPlayTrack={playTrackViaQueue}
-              isLocked={isLocked}
-              onToggleLock={toggleLock}
-              onSwitchToCurrentTrack={setLockedTrack}
-              onUpdateBpm={updateBpm}
-              createTagId={createTagId}
-            />
-          )
-        )}
-
-        {renderTagSelector()}
-
-        <TrackList
-          tracks={getTracksWithResolvedTags()}
-          categories={tagData.categories}
-          activeTagFilters={activeTagFilters}
-          excludedTagFilters={excludedTagFilters}
-          activeTrackUri={activeTrack?.uri || null}
-          onRemoveFilter={handleRemoveFilter}
-          onToggleFilterType={handleToggleFilterType}
-          onFilterByTag={onFilterByTag}
-          onTrackListTagClick={onFilterByTagOnOff}
-          onClearTagFilters={clearTagFilters}
-          onPlayTrack={playTrackViaQueue}
-          onTagTrack={handleTagTrack}
-          onCreatePlaylist={createPlaylistFromFilters}
-          onStoreSmartPlaylist={storeSmartPlaylist}
-          parseTagId={parseTagId}
-          smartPlaylists={smartPlaylists}
-          onSetSmartPlaylists={setSmartPlaylists}
-          onSyncPlaylist={syncSmartPlaylistFull}
-          cleanupDeletedSmartPlaylists={cleanupDeletedSmartPlaylists}
-          onExportSmartPlaylists={exportSmartPlaylists}
-          onImportSmartPlaylists={importSmartPlaylists}
-        />
-      </div>
-    );
-  };
-
-  const renderTagSelector = () => {
-    if (!activeTrack && !(isMultiTagging && multiTagTracks.length > 0)) {
-      return null;
-    }
-
-    return (
-      <TagSelector
-        track={
-          isMultiTagging && lockedMultiTrackUri
-            ? multiTagTracks.find((t) => t.uri === lockedMultiTrackUri) || multiTagTracks[0]
-            : activeTrack || multiTagTracks[0]
-        }
-        categories={tagData.categories}
-        trackTags={
-          isMultiTagging && multiTrackDraftTags
-            ? lockedMultiTrackUri
-              ? multiTrackDraftTags[lockedMultiTrackUri] || []
-              : findCommonTagsFromDraft(multiTrackDraftTags, multiTagTracks)
-            : isMultiTagging
-            ? lockedMultiTrackUri
-              ? tagData.tracks[lockedMultiTrackUri]?.tags || []
-              : findCommonTags(multiTagTracks.map((track) => track.uri))
-            : tagData.tracks[activeTrack?.uri || ""]?.tags || []
-        }
-        onToggleTag={handleToggleTag}
-        onOpenTagManager={() => setShowTagManager(true)}
-        isMultiTagging={isMultiTagging}
-        isLockedTrack={!!lockedMultiTrackUri}
-      />
-    );
-  };
-
-  const handleToggleTag = (categoryId: string, subcategoryId: string, tagId: string) => {
-    if (isMultiTagging && multiTrackDraftTags) {
-      // When in multi-tagging mode with draft state, update the draft instead
-      const newDraft: DraftTagState = { ...multiTrackDraftTags };
-
-      if (lockedMultiTrackUri) {
-        // Toggle for single track
-        const trackTags = newDraft[lockedMultiTrackUri] || [];
-        const tagIndex: number = trackTags.findIndex(
-          (t) =>
-            t.categoryId === categoryId && t.subcategoryId === subcategoryId && t.tagId === tagId
-        );
-
-        if (tagIndex >= 0) {
-          newDraft[lockedMultiTrackUri] = trackTags.filter((_, i) => i !== tagIndex);
-        } else {
-          newDraft[lockedMultiTrackUri] = [...trackTags, { categoryId, subcategoryId, tagId }];
-        }
-      } else {
-        // Toggle for all tracks
-        const allHaveTag = multiTagTracks.every((track) => {
-          const tags = newDraft[track.uri] || [];
-          return tags.some(
-            (t) =>
-              t.categoryId === categoryId && t.subcategoryId === subcategoryId && t.tagId === tagId
-          );
-        });
-
-        multiTagTracks.forEach((track) => {
-          const trackTags = newDraft[track.uri] || [];
-          const tagIndex = trackTags.findIndex(
-            (t) =>
-              t.categoryId === categoryId && t.subcategoryId === subcategoryId && t.tagId === tagId
-          );
-
-          if (allHaveTag && tagIndex >= 0) {
-            newDraft[track.uri] = trackTags.filter((_, i) => i !== tagIndex);
-          } else if (!allHaveTag && tagIndex < 0) {
-            newDraft[track.uri] = [...trackTags, { categoryId, subcategoryId, tagId }];
-          }
-        });
-      }
-
-      setMultiTrackDraftTags(newDraft);
-    } else if (isMultiTagging) {
-      // Original multi-tagging logic without draft
-      if (lockedMultiTrackUri) {
-        toggleTagForSingleTrack(lockedMultiTrackUri, categoryId, subcategoryId, tagId);
-      } else {
-        handleTagAllTracks(categoryId, subcategoryId, tagId);
-      }
-    } else if (activeTrack) {
-      // Single track mode
-      toggleTagForTrack(activeTrack.uri, categoryId, subcategoryId, tagId);
-    }
-  };
-
-  // Handler for toggling a tag on a single track
-  const toggleTagForSingleTrack = (
-    trackUri: string,
+  const handleToggleTag = (
     categoryId: string,
     subcategoryId: string,
     tagId: string
   ) => {
-    toggleTagForTrack(trackUri, categoryId, subcategoryId, tagId);
+    if (isMultiTagging) {
+      toggleTagMultiTrackDraft(categoryId, subcategoryId, tagId);
+    } else if (activeTrack) {
+      toggleTagSingleTrack(activeTrack.uri, categoryId, subcategoryId, tagId);
+    }
   };
 
-  // Handler for toggling a tag on all tracks
-  const handleTagAllTracks = (categoryId: string, subcategoryId: string, tagId: string) => {
-    // Use the batch update function to apply to all selected tracks
-    toggleTagForMultipleTracks(
-      multiTagTracks.map((track) => track.uri),
-      categoryId,
-      subcategoryId,
-      tagId
+  const trackDataMap = useMemo(() => {
+    return Object.fromEntries(
+      multiTagTracks.map((track) => [
+        track.uri,
+        {
+          tags: tagData.tracks[track.uri]?.tags || [],
+          rating: tagData.tracks[track.uri]?.rating || 0,
+          energy: tagData.tracks[track.uri]?.energy || 0,
+        },
+      ])
     );
-  };
+  }, [multiTagTracks, tagData.tracks]);
+
+  useEffect(() => {
+    // This creates a global reference for debugging in browser console
+    (window as any).__TAGIFY_DEBUG__ = {
+      multiTrackDraftTags,
+      isMultiTagging,
+      lockedMultiTrackUri,
+      multiTagTracks,
+      tagData,
+      smartPlaylists,
+      activeTagFilters,
+      excludedTagFilters,
+      currentlyPlayingTrack,
+      activeTrack,
+      selectedTagsForSelector,
+      trackDataMap,
+    };
+  }, [
+    multiTrackDraftTags,
+    isMultiTagging,
+    lockedMultiTrackUri,
+    multiTagTracks,
+    tagData,
+    smartPlaylists,
+    activeTagFilters,
+    excludedTagFilters,
+    currentlyPlayingTrack,
+    activeTrack,
+    selectedTagsForSelector,
+    trackDataMap,
+  ]);
 
   return (
     <div className={styles.container}>
@@ -380,7 +224,14 @@ function App() {
       </div>
 
       {updateInfo?.hasUpdate && (
-        <UpdateBanner updateInfo={updateInfo} onDismiss={handleUpdateDismiss} />
+        <UpdateBanner updateInfo={updateInfo} onDismiss={dismissUpdate} />
+      )}
+
+      {shouldShowSurvey && (
+        <DiscoverySurvey
+          onCompleteSurvey={completeSurvey}
+          onSkipSurvey={skipSurvey}
+        />
       )}
 
       <DataManager
@@ -390,8 +241,110 @@ function App() {
         lastSaved={lastSaved}
       />
 
-      {renderContent()}
+      {isLoading ? (
+        <div className={styles.loadingContainer}>
+          <p className={styles.loadingText}>Loading tag data...</p>
+        </div>
+      ) : (
+        <div className={styles.content}>
+          {isMultiTagging &&
+          multiTagTracks.length > 0 &&
+          multiTrackDraftTags ? (
+            <MultiTrackDetails
+              tracks={multiTagTracks}
+              trackDataMap={trackDataMap}
+              onCancelTagging={cancelMultiTagging}
+              onPlayTrack={playTrack}
+              lockedTrackUri={lockedMultiTrackUri}
+              onLockTrack={setLockedMultiTrackUri}
+              multiTrackDraftTags={multiTrackDraftTags}
+              onSetMultiTrackDraftTags={setMultiTrackDraftTags}
+              onApplyBatchTagUpdates={applyBatchTagUpdates}
+              onFindCommonTagsFromDraft={findCommonTagsFromDraft}
+              onFindCommonStarRatingFromDraft={findCommonStarRatingFromDraft}
+              onFindCommonEnergyRatingFromDraft={
+                findCommonEnergyRatingFromDraft
+              }
+              onToggleStarRatingDraft={toggleStarRatingDraft}
+              onToggleEnergyRatingDraft={toggleEnergyRatingDraft}
+              onFindTagName={findTagName}
+              onToggleCommonTagDraft={toggleCommonTagDraft}
+              onToggleTagForSpecificTrackDraft={toggleTagForSpecificTrackDraft}
+              onCalculateBatchChanges={calculateBatchChanges}
+            />
+          ) : (
+            activeTrack && (
+              <TrackDetails
+                displayedTrack={activeTrack}
+                currentlyPlayingTrack={currentlyPlayingTrack}
+                trackData={
+                  tagData.tracks[activeTrack.uri] || {
+                    rating: 0,
+                    energy: 0,
+                    bpm: null,
+                    tags: [],
+                  }
+                }
+                categories={tagData.categories}
+                activeTagFilters={activeTagFilters}
+                excludedTagFilters={excludedTagFilters}
+                onSetRating={(rating) => setRating(activeTrack.uri, rating)}
+                onSetEnergy={(energy) => setEnergy(activeTrack.uri, energy)}
+                onSetBpm={(bpm) => setBpm(activeTrack.uri, bpm)}
+                onRemoveTag={(categoryId, subcategoryId, tagId) =>
+                  toggleTagSingleTrack(
+                    activeTrack.uri,
+                    categoryId,
+                    subcategoryId,
+                    tagId
+                  )
+                }
+                onToggleTagIncludeOff={toggleTagIncludeOff}
+                onPlayTrack={playTrack}
+                isLocked={isLocked}
+                onToggleLock={toggleLock}
+                onSwitchToCurrentTrack={setLockedTrack}
+                onUpdateBpm={updateBpm}
+                createTagId={createTagId}
+              />
+            )
+          )}
 
+          {(activeTrack || (isMultiTagging && multiTagTracks.length > 0)) && (
+            <TagSelector
+              categories={tagData.categories}
+              trackTags={trackTags}
+              onToggleTag={handleToggleTag}
+              onOpenTagManager={() => setShowTagManager(true)}
+              isMultiTagging={isMultiTagging}
+              isLockedTrack={!!lockedMultiTrackUri}
+            />
+          )}
+          <TrackList
+            tracks={getTracksWithResolvedTags()}
+            categories={tagData.categories}
+            activeTagFilters={activeTagFilters}
+            excludedTagFilters={excludedTagFilters}
+            activeTrackUri={activeTrack?.uri || null}
+            onRemoveTagFilter={removeTagFilter}
+            onToggleTagIncludeExclude={toggleTagIncludeExclude}
+            onToggleTagIncludeExcludeOff={toggleTagIncludeExcludeOff} // ON OFF EXCLUDE
+            onToggleTagIncludeOff={toggleTagIncludeOff} // ON OFF
+            onClearTagFilters={clearTagFilters}
+            onPlayTrack={playTrack}
+            onTagTrack={handleSelectTrackForTagging}
+            onCreatePlaylist={createPlaylistFromFilters}
+            onCreateSmartPlaylist={createSmartPlaylist}
+            parseTagId={parseTagId}
+            smartPlaylists={smartPlaylists}
+            onSetSmartPlaylists={setSmartPlaylists}
+            onSyncPlaylist={syncSmartPlaylistFull}
+            onCleanupDeletedSmartPlaylists={cleanupDeletedSmartPlaylists}
+            onExportSmartPlaylists={exportSmartPlaylists}
+            onImportSmartPlaylists={importSmartPlaylists}
+          />
+        </div>
+      )}
       {showTagManager && (
         <TagManager
           categories={tagData.categories}
@@ -400,7 +353,9 @@ function App() {
         />
       )}
 
-      {showExport && <ExportPanel data={exportData()} onClose={() => setShowExport(false)} />}
+      {showExport && (
+        <ExportPanel data={exportData()} onClose={() => setShowExport(false)} />
+      )}
 
       {showLocalTracksModal && (
         <LocalTracksModal

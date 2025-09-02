@@ -58,15 +58,6 @@
   gap: 24px;
 }
 
-.exportSection,
-.tagDistributionSection,
-.infoSection,
-.instructionsSection {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .sectionTitle {
   margin: 0;
   font-size: 16px;
@@ -156,50 +147,6 @@
   color: var(--spice-subtext);
 }
 
-.infoList,
-.instructionsList {
-  margin: 0;
-  padding-left: 20px;
-}
-
-.infoList li,
-.instructionsList li {
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: var(--spice-subtext);
-}
-
-.note {
-  font-size: 13px;
-  color: var(--spice-notification);
-  padding: 12px;
-  background: rgba(var(--spice-rgb-notification), 0.1);
-  border-radius: 4px;
-  margin: 0;
-}
-
-.exportActions {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-}
-
-.downloadButton {
-  background: var(--spice-button-active);
-  color: var(--spice-text);
-  border: none;
-  border-radius: 4px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.downloadButton:hover {
-  background: var(--spice-button);
-}
-
 .chartSection {
   display: flex;
   flex-direction: column;
@@ -265,11 +212,6 @@
   font-size: 14px;
 }
 
-.success {
-  background-color: rgba(0, 255, 0, 0.1);
-  color: #3aa757;
-}
-
 .error {
   background-color: rgba(255, 0, 0, 0.1);
   color: #e74c3c;
@@ -307,66 +249,6 @@
 }
 
 /* Primary action at the top */
-.primaryActionContainer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.primaryActionButton {
-  background-color: #1e90ff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 14px 28px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.primaryActionButton:hover:not(:disabled) {
-  background-color: #1a7ee0;
-  opacity: 0.95;
-}
-
-.primaryActionButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.serverStatusContainer {
-  display: flex;
-  align-items: center;
-}
-
-.serverStatus {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  font-weight: 500;
-  margin-right: 8px;
-}
-
-.statusDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-
-.connected .statusDot {
-  background-color: #2ecc71;
-}
-
-.disconnected .statusDot {
-  background-color: #e74c3c;
-}
-
-.unknown .statusDot {
-  background-color: #f39c12;
-}
 
 .info {
   margin: 0;
@@ -524,12 +406,4 @@
   padding: 12px;
   border-radius: 4px;
   font-size: 14px;
-}
-
-.pathCode {
-  font-family: monospace;
-  background-color: rgba(var(--spice-rgb-card), 0.3);
-  padding: 2px 4px;
-  border-radius: 3px;
-  word-break: break-all;
 }

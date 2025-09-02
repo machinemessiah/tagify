@@ -1,0 +1,342 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; /* Higher than other modals */
+  overflow: auto;
+}
+
+.modal {
+  background: var(--spice-card);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header Styles */
+.modalHeader {
+  padding: 24px 24px 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(
+    135deg,
+    rgba(29, 185, 84, 0.1),
+    rgba(30, 144, 255, 0.1)
+  );
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon {
+  font-size: 32px;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--spice-text);
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: var(--spice-subtext);
+  font-weight: 400;
+}
+
+/* Body Styles */
+.modalBody {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.questionSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.questionTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--spice-text);
+}
+
+.questionSubtext {
+  margin: 0;
+  font-size: 14px;
+  color: var(--spice-subtext);
+  line-height: 1.5;
+}
+
+/* Options Grid */
+.optionsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.optionButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-size: 15px;
+  color: var(--spice-text);
+}
+
+.optionButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(30, 144, 255, 0.3);
+}
+
+.optionSelected {
+  background: rgba(30, 144, 255, 0.15) !important;
+  border-color: #1e90ff !important;
+}
+
+.optionText {
+  flex: 1;
+  font-weight: 500;
+}
+
+.radioIndicator {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.optionSelected .radioIndicator {
+  border-color: #1e90ff;
+}
+
+.radioSelected {
+  width: 10px;
+  height: 10px;
+  background: #1e90ff;
+  border-radius: 50%;
+  animation: radioPopIn 0.2s ease-out;
+}
+
+@keyframes radioPopIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Other Input Section */
+.otherInputSection {
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.otherLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--spice-text);
+}
+
+.otherInput {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--spice-card);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: var(--spice-text);
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.otherInput:focus {
+  outline: none;
+  border-color: #1e90ff;
+  box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+}
+
+.otherInput::placeholder {
+  color: var(--spice-subtext);
+}
+
+/* Footer Styles */
+.modalFooter {
+	padding: 16px 24px 24px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.skipButton {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: var(--spice-subtext);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.skipButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--spice-text);
+}
+
+.skipButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submitButton {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1db954, #1ed760);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1ed760, #1db954);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+}
+
+.submitButton:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--spice-subtext);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Loading Spinner */
+.loadingSpinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal {
+    width: 95%;
+    margin: 20px auto;
+  }
+
+  .modalHeader {
+    padding: 20px 20px 16px 20px;
+  }
+
+  .modalBody {
+    padding: 20px;
+  }
+
+  .modalFooter {
+    padding: 16px 20px 20px 20px;
+  }
+
+  .titleSection {
+    gap: 12px;
+  }
+
+  .icon {
+    font-size: 28px;
+  }
+
+  .modalTitle {
+    font-size: 20px;
+  }
+
+  .optionButton {
+    padding: 14px 16px;
+  }
+
+  .footerActions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .skipButton,
+  .submitButton {
+    width: 100%;
+    justify-content: center;
+  }
+}

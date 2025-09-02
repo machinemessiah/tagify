@@ -41,29 +41,7 @@
   flex-grow: 1;
 }
 
-.categoryActions {
-  /* Using flex gap pattern */
-  display: flex;
-  gap: 8px;
-}
-
-.categoryContent {
-  /* Using flex column pattern */
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-left: 8px;
-}
-
 /* Subcategories */
-.subcategoriesList {
-  /* Using flex column pattern */
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
 .subcategorySection {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
@@ -93,12 +71,6 @@
   margin: 0;
   color: var(--spice-text);
   flex-grow: 1;
-}
-
-.subcategoryActions {
-  /* Using flex gap pattern */
-  display: flex;
-  gap: 4px;
 }
 
 .subcategoryContent {
@@ -208,33 +180,6 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.deleteButton {
-  /* Using btn--danger pattern */
-  background: rgba(255, 0, 0, 0.2);
-  color: var(--spice-text);
-}
-
-.deleteButton:hover {
-  background: rgba(255, 0, 0, 0.3);
-}
-
-.addButton {
-  /* Using btn pattern */
-  background: rgba(0, 0, 0, 0.2);
-  color: var(--spice-text);
-  border: none;
-  border-radius: 4px;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.addButton:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 .saveButton {
   /* Using btn--primary pattern */
   background: #1e90ff;
@@ -290,15 +235,6 @@
 .input:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.3);
-}
-
-.addTagForm,
-.addSubcategoryForm,
-.addCategoryForm {
-  /* Using form-row pattern */
-  display: flex;
-  gap: 8px;
-  align-items: center;
 }
 
 .addCategorySection {
@@ -423,10 +359,6 @@
   background: #ff4c4c;
 }
 
-.modalNotification.success {
-  background: #1e90ff;
-}
-
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -466,29 +398,6 @@
 
 .dragHandle:hover {
   opacity: 1;
-  color: var(--spice-text);
-}
-
-.tagDropZone {
-  /* Using drop-zone pattern */
-  padding: 8px;
-  margin: 4px 0;
-  border: 2px dashed transparent;
-  border-radius: 4px;
-  text-align: center;
-  color: var(--spice-subtext);
-  font-size: 12px;
-  transition: all 0.2s ease;
-  min-height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tagDropZone.tagDropTarget {
-  /* Using drop-zone--active pattern */
-  border-color: #1e90ff;
-  background: rgba(30, 144, 255, 0.1);
   color: var(--spice-text);
 }
 

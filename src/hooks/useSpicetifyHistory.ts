@@ -7,15 +7,55 @@ import {
 } from "../types/SpotifyTypes";
 import { parseLocalFileUri } from "../utils/LocalFileParser";
 
-interface UseSpicetifyHistoryProps {
+/**
+ * Props for {@link useSpicetifyHistory}.
+ */
+export interface UseSpicetifyHistoryProps {
+  /** Current multi-tagging state. */
   isMultiTagging: boolean;
+
+  /** Setter for multi-tagging state. */
   setIsMultiTagging: (isMultiTagging: boolean) => void;
+
+  /** Setter for the list of tracks to multi-tag. */
   setMultiTagTracks: (tracks: SpotifyTrack[]) => void;
+
+  /** Setter for the currently locked single track. */
   setLockedTrack: (track: SpotifyTrack | null) => void;
+
+  /** Setter for locked state. */
   setIsLocked: (isLocked: boolean) => void;
+
+  /** Setter for the locked multi-track URI. */
   setLockedMultiTrackUri: (uri: string | null) => void;
 }
-
+/**
+ * SPICETIFY HISTORY INTERGRATION HOOK
+ *
+ * @remarks
+ * This hook **listens for navigation changes** in `Spicetify.Platform.History`
+ * and extracts track URIs from URL parameters to initialize multi-track
+ * tagging sessions.
+ *
+ * ### Responsibilities
+ * - Monitor `Spicetify.Platform.History` for navigation changes.
+ * - Parse track URIs from URL search params and navigation state.
+ * - Fetch track metadata from the Spotify Web API - to populate MultiTrackDetails.
+ *
+ * ### Integration Flow
+ * ```
+ * extension.js → Spicetify.Platform.History.push()
+ *              ↓
+ * useSpicetifyHistory → detects URL change
+ *                     ↓
+ * setMultiTagTracks() → triggers MultiTrackDetails render
+ * ```
+ *
+ * ### URL Formats
+ * - Single track: `/tagify?uri=spotify%3Atrack%3A123`
+ * - Multi track:  `/tagify?uris=%5B%22spotify%3Atrack%3A123%22%2C%22spotify%3Atrack%3A456%22%5D`
+ *
+ */
 export function useSpicetifyHistory({
   isMultiTagging,
   setIsMultiTagging,
@@ -29,7 +69,8 @@ export function useSpicetifyHistory({
       let trackUri = null;
 
       if (!trackUri && Spicetify.Platform.History.location) {
-        const location = Spicetify.Platform.History.location as SpicetifyHistoryLocation;
+        const location = Spicetify.Platform.History
+          .location as SpicetifyHistoryLocation;
 
         const historyParams = new URLSearchParams(location.search || "");
         if (historyParams.has("uri")) {
@@ -46,9 +87,13 @@ export function useSpicetifyHistory({
       let trackUris = null;
 
       if (Spicetify.Platform.History.location) {
-        const location = Spicetify.Platform.History.location as SpicetifyHistoryLocation;
+        const location = Spicetify.Platform.History
+          .location as SpicetifyHistoryLocation;
 
-        if (location.state?.trackUris && Array.isArray(location.state.trackUris)) {
+        if (
+          location.state?.trackUris &&
+          Array.isArray(location.state.trackUris)
+        ) {
           trackUris = location.state.trackUris;
         }
       }
@@ -85,9 +130,10 @@ export function useSpicetifyHistory({
           }
 
           // Fetch track info using Spicetify's Cosmos API
-          const response: SpotifyTrackResponse = await Spicetify.CosmosAsync.get(
-            `https://api.spotify.com/v1/tracks/${trackId}`
-          );
+          const response: SpotifyTrackResponse =
+            await Spicetify.CosmosAsync.get(
+              `https://api.spotify.com/v1/tracks/${trackId}`
+            );
 
           if (response) {
             // Format the track info
@@ -112,7 +158,10 @@ export function useSpicetifyHistory({
             }
           }
         } catch (error) {
-          console.error("Tagify: Error loading track from URI parameter:", error);
+          console.error(
+            "Tagify: Error loading track from URI parameter:",
+            error
+          );
           Spicetify.showNotification("Error loading track for tagging", true);
         }
       }
@@ -163,17 +212,20 @@ export function useSpicetifyHistory({
                   const trackId = uri.split(":").pop();
                   if (!trackId) continue;
 
-                  const response: SpotifyTrackResponse = await Spicetify.CosmosAsync.get(
-                    `https://api.spotify.com/v1/tracks/${trackId}`
-                  );
+                  const response: SpotifyTrackResponse =
+                    await Spicetify.CosmosAsync.get(
+                      `https://api.spotify.com/v1/tracks/${trackId}`
+                    );
 
                   if (response) {
                     updatedTrack = {
                       uri,
                       name: response.name,
-                      artists: response.artists.map((artist: SpotifyArtist) => ({
-                        name: artist.name,
-                      })),
+                      artists: response.artists.map(
+                        (artist: SpotifyArtist) => ({
+                          name: artist.name,
+                        })
+                      ),
                       album: { name: response.album?.name || "Unknown Album" },
                       duration_ms: response.duration_ms,
                     };
@@ -182,7 +234,9 @@ export function useSpicetifyHistory({
                   }
                 }
 
-                const trackIndex = currentTracks.findIndex((track) => track.uri === uri);
+                const trackIndex = currentTracks.findIndex(
+                  (track) => track.uri === uri
+                );
                 if (trackIndex !== -1) {
                   currentTracks[trackIndex] = updatedTrack;
 
@@ -197,7 +251,9 @@ export function useSpicetifyHistory({
                   album: { name: "Error" },
                   duration_ms: 0,
                 };
-                const trackIndex = currentTracks.findIndex((track) => track.uri === uri);
+                const trackIndex = currentTracks.findIndex(
+                  (track) => track.uri === uri
+                );
                 if (trackIndex !== -1) {
                   currentTracks[trackIndex] = errorTrack;
                   setMultiTagTracks([...currentTracks]);
@@ -245,7 +301,9 @@ export function useSpicetifyHistory({
         if (typeof unlistenFunc === "function") {
           unlisten = unlistenFunc;
         } else {
-          console.warn("Tagify: History.listen did not return a cleanup function");
+          console.warn(
+            "Tagify: History.listen did not return a cleanup function"
+          );
           unlisten = () => {
             console.log("Tagify: Using fallback cleanup for history listener");
           };

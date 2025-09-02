@@ -26,11 +26,6 @@
   color: var(--spice-text);
 }
 
-.actions {
-  display: flex;
-  gap: 8px;
-}
-
 .actionButton {
   background-color: rgba(0, 0, 0, 0.2);
   color: var(--spice-text);
@@ -50,14 +45,6 @@
 .actionButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.trackLockControl {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 100;
-  position: relative;
 }
 
 .lockButton {
@@ -112,25 +99,6 @@
 
 .buttonIcon {
   font-size: 16px;
-}
-
-.lockedTrackInfo {
-  font-size: 14px;
-  color: var(--spice-subtext);
-  margin-top: 4px;
-  background: var(--spice-card);
-  padding: 8px 12px;
-  border-radius: 4px;
-  display: inline-block;
-}
-
-.lockedTrackName {
-  font-weight: 700;
-  color: var(--spice-text);
-}
-
-.lockedTrackArtist {
-  font-style: italic;
 }
 
 .content {

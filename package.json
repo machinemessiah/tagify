@@ -1,6 +1,6 @@
 {
   "name": "tagify",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "build": "spicetify-creator",
@@ -18,7 +18,8 @@
     "test:smart-playlist": "vitest run src/test/hooks/useTagData.test.ts",
     "test:components": "vitest run src/test/components/ --reporter=verbose",
     "test:services": "vitest run src/test/services/ --reporter=verbose",
-    "test:version": "vitest run src/services/__tests__/VersionCheckerService.test.js --reporter=verbose"
+    "test:version": "vitest run src/services/__tests__/VersionCheckerService.test.js --reporter=verbose",
+    "clean:css": "purgecss --css src/**/*.css --content src/**/*.tsx --output cleaned-css/"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
@@ -43,6 +44,11 @@
     "vitest": "^1.6.1"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.0.0",
+    "@fortawesome/free-brands-svg-icons": "^7.0.0",
+    "@fortawesome/free-solid-svg-icons": "^7.0.0",
+    "@fortawesome/react-fontawesome": "^3.0.2",
+    "lucide-react": "^0.542.0",
     "prop-types": "^15.8.1",
     "react-rating-stars-component": "^2.2.0"
   }
