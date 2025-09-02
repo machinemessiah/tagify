@@ -3,6 +3,7 @@ import styles from "./MultiTrackDetails.module.css";
 import { BatchTagUpdate, TrackTag } from "../hooks/useTagData";
 import { DraftTagState } from "../hooks/useMultiTrackTagging";
 import ReactStars from "react-rating-stars-component";
+import { Lock, Tag } from "lucide-react";
 
 interface MultiTrackDetailsProps {
   tracks: Array<{
@@ -334,43 +335,47 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>Bulk Tagging</h2>
-        <div className={styles.summary}>
-          <span className={styles.trackCount}>
-            {tracks.length} tracks selected
-          </span>
-          {hasUnsavedChanges && (
-            <span className={styles.unsavedIndicator}>• Unsaved changes</span>
-          )}
-          <div className={styles.actionButtons}>
-            <button
-              className={styles.saveButton}
-              onClick={handleSaveChanges}
-              disabled={!hasUnsavedChanges}
-            >
-              Save Changes
-            </button>
-            <button
-              className={styles.discardButton}
-              onClick={handleCancelChanges}
-              disabled={!hasUnsavedChanges}
-            >
-              Discard
-            </button>
-            <button
-              className={styles.cancelButton}
-              onClick={handleCancelTagging}
-            >
-              {"Cancel Bulk Tagging"}
-            </button>
+      {/* HEADER */}
+      <div className={styles.headerSection}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>Bulk Tagging</h2>
+          <div className={styles.summary}>
+            <span className={styles.trackCount}>
+              {tracks.length} tracks selected
+            </span>
+            {hasUnsavedChanges && (
+              <span className={styles.unsavedIndicator}>• Unsaved changes</span>
+            )}
+            <div className={styles.actionButtons}>
+              <button
+                className={styles.saveButton}
+                onClick={handleSaveChanges}
+                disabled={!hasUnsavedChanges}
+              >
+                Save Changes
+              </button>
+              <button
+                className={styles.discardButton}
+                onClick={handleCancelChanges}
+                disabled={!hasUnsavedChanges}
+              >
+                Discard
+              </button>
+              <button
+                className={styles.cancelButton}
+                onClick={handleCancelTagging}
+              >
+                {"Cancel Bulk Tagging"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className={styles.bulkControlsSection}>
+      {/* RATING CONTROLS */}
+      <div className={styles.controlsWithContextSection}>
         <div className={styles.controlsContainer}>
-          {/* Rating Control */}
+          {/* Star rating control */}
           <div className={styles.controlSection}>
             <label className={styles.label}>
               Rating: {getRatingDisplayValue()}
@@ -410,7 +415,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
             </div>
           </div>
 
-          {/* Energy Control */}
+          {/* Energy control */}
           <div className={styles.controlSection}>
             <label className={styles.label}>
               Energy:{" "}
@@ -459,49 +464,42 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
             </div>
           </div>
         </div>
-      </div>
 
-      {lockedTrackUri ? (
-        <div className={styles.lockingBanner}>
-          <span className={styles.lockingIcon}>🔒</span>
-          <span className={styles.lockingText}>
-            Tags will be applied to the locked track only. Click the track again
-            to revert to bulk tagging.
-          </span>
-        </div>
-      ) : (
-        <div className={styles.multiTaggingBanner}>
-          <span className={styles.multiTaggingIcon}>🏷️</span>
-          <span className={styles.multiTaggingText}>
-            Tags will be applied to all selected tracks.{" "}
-            <span role="img" aria-label="pointer">
-              👉
-            </span>{" "}
-            <strong>Click on a track</strong> to lock tagging to that track
-            only.
-          </span>
-        </div>
-      )}
-
-      <div className={styles.commonTagsSection}>
-        <h3 className={styles.sectionTitle}>Common Tags</h3>
-        {commonTags.length > 0 ? (
-          <div className={styles.tagList}>
-            {commonTags.map((tag, index) => (
-              <div
-                key={index}
-                className={styles.tagItem}
-                onClick={() => handleRemoveCommonTagsClick(tag)}
-                title="Click to remove this tag from all tracks"
-              >
-                {onFindTagName(tag.categoryId, tag.subcategoryId, tag.tagId)}
-                <span className={styles.removeTagIcon}>×</span>
-              </div>
-            ))}
+        <div className={styles.contextBar}>
+          <div className={styles.contextContent}>
+            {lockedTrackUri ? (
+              <>
+                <Lock size={14} />
+                <span>Changes apply to locked track only</span>
+              </>
+            ) : (
+              <>
+                <Tag size={14} />
+                <span>Changes apply to all {tracks.length} tracks</span>
+              </>
+            )}
           </div>
-        ) : (
-          <p className={styles.noTags}>No common tags</p>
-        )}
+        </div>
+        <div className={styles.commonTagsSection}>
+          <h3 className={styles.sectionTitle}>Common Tags</h3>
+          {commonTags.length > 0 ? (
+            <div className={styles.tagList}>
+              {commonTags.map((tag, index) => (
+                <div
+                  key={index}
+                  className={styles.tagItem}
+                  onClick={() => handleRemoveCommonTagsClick(tag)}
+                  title="Click to remove this tag from all tracks"
+                >
+                  {onFindTagName(tag.categoryId, tag.subcategoryId, tag.tagId)}
+                  <span className={styles.removeTagIcon}>×</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className={styles.noTags}>No common tags</p>
+          )}
+        </div>
       </div>
 
       <div className={styles.trackListContainer}>
@@ -522,7 +520,7 @@ const MultiTrackDetails: React.FC<MultiTrackDetailsProps> = ({
               >
                 <div className={styles.lockColumn}>
                   {lockedTrackUri === track.uri && (
-                    <span className={styles.lockIcon}>🔒</span>
+                    <Lock size={16} strokeWidth={1.25} absoluteStrokeWidth />
                   )}
                 </div>
                 <div className={styles.trackInfo}>
