@@ -15,6 +15,7 @@ import {
   faSearch,
   faCircleQuestion,
   faChampagneGlasses,
+  faCartShopping,
 } from "@fortawesome/free-solid-svg-icons";
 
 interface DiscoverySurveyProps {
@@ -31,6 +32,15 @@ const DiscoverySurvey: React.FC<DiscoverySurveyProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const discoveryOptions = [
+    {
+      id: "marketplace",
+      label: (
+        <>
+          <FontAwesomeIcon icon={faCartShopping} /> Spicetify Marketplace
+        </>
+      ),
+      value: "marketplace",
+    },
     {
       id: "github",
       label: (
@@ -106,7 +116,9 @@ const DiscoverySurvey: React.FC<DiscoverySurveyProps> = ({
 
     onCompleteSurvey(
       selectedSource,
-      selectedSource === "other" ? otherDetails : undefined
+      selectedSource === "other" || selectedSource === "search"
+        ? otherDetails
+        : undefined
     );
 
     Spicetify.showNotification("Thanks for your feedback!");
@@ -114,6 +126,13 @@ const DiscoverySurvey: React.FC<DiscoverySurveyProps> = ({
 
   const handleSkip = () => {
     onSkipSurvey();
+  };
+
+  const isSubmitDisabled = () => {
+    if (!selectedSource) return true;
+    if (selectedSource === "other" && !otherDetails.trim()) return true;
+    if (selectedSource === "search" && !otherDetails.trim()) return true;
+    return isSubmitting;
   };
 
   return (
@@ -146,41 +165,65 @@ const DiscoverySurvey: React.FC<DiscoverySurveyProps> = ({
 
               <div className={styles.optionsGrid}>
                 {discoveryOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    className={`${styles.optionButton} ${
-                      selectedSource === option.value
-                        ? styles.optionSelected
-                        : ""
-                    }`}
-                    onClick={() => setSelectedSource(option.value)}
-                  >
-                    <span className={styles.optionText}>{option.label}</span>
-                    <div className={styles.radioIndicator}>
-                      {selectedSource === option.value && (
-                        <div className={styles.radioSelected}></div>
+                  <div key={option.id} className={styles.optionContainer}>
+                    <button
+                      className={`${styles.optionButton} ${
+                        selectedSource === option.value
+                          ? styles.optionSelected
+                          : ""
+                      }`}
+                      onClick={() => setSelectedSource(option.value)}
+                    >
+                      <span className={styles.optionText}>{option.label}</span>
+                      <div className={styles.radioIndicator}>
+                        {selectedSource === option.value && (
+                          <div className={styles.radioSelected}></div>
+                        )}
+                      </div>
+                    </button>
+
+                    {selectedSource === option.value &&
+                      option.value === "search" && (
+                        <div className={styles.inlineInputSection}>
+                          <label
+                            htmlFor="search-details"
+                            className={styles.inlineLabel}
+                          >
+                            What were you searching for?
+                          </label>
+                          <input
+                            id="search-details"
+                            type="text"
+                            className={styles.inlineInput}
+                            value={otherDetails}
+                            onChange={(e) => setOtherDetails(e.target.value)}
+                            maxLength={100}
+                          />
+                        </div>
                       )}
-                    </div>
-                  </button>
+                    {selectedSource === option.value &&
+                      option.value === "other" && (
+                        <div className={styles.inlineInputSection}>
+                          <label
+                            htmlFor="other-details"
+                            className={styles.inlineLabel}
+                          >
+                            Please specify:
+                          </label>
+                          <input
+                            id="other-details"
+                            type="text"
+                            className={styles.inlineInput}
+                            value={otherDetails}
+                            onChange={(e) => setOtherDetails(e.target.value)}
+                            placeholder="e.g., blog post, tutorial, etc."
+                            maxLength={100}
+                          />
+                        </div>
+                      )}
+                  </div>
                 ))}
               </div>
-
-              {selectedSource === "other" && (
-                <div className={styles.otherInputSection}>
-                  <label htmlFor="other-details" className={styles.otherLabel}>
-                    Please specify:
-                  </label>
-                  <input
-                    id="other-details"
-                    type="text"
-                    className={styles.otherInput}
-                    value={otherDetails}
-                    onChange={(e) => setOtherDetails(e.target.value)}
-                    placeholder="e.g., blog post, tutorial, etc."
-                    maxLength={100}
-                  />
-                </div>
-              )}
             </div>
           </div>
 
@@ -196,7 +239,7 @@ const DiscoverySurvey: React.FC<DiscoverySurveyProps> = ({
               <button
                 className={styles.submitButton}
                 onClick={handleSubmit}
-                disabled={!selectedSource || isSubmitting}
+                disabled={isSubmitDisabled()}
               >
                 {isSubmitting ? (
                   <>
