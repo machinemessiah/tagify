@@ -2,6 +2,13 @@ import React, { useEffect, useState } from "react";
 import styles from "./CreatePlaylistModal.module.css";
 import Portal from "../utils/Portal";
 import { Lightbulb } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBolt,
+  faMusic,
+  faTag,
+  faTrophy,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface CreatePlaylistModalProps {
   trackCount: number;
@@ -101,7 +108,9 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
     }
 
     if (activeTagDisplayNames.length > 0) {
-      filterParts.push(`Tags (${filterMode}): ${activeTagDisplayNames.join(", ")}`);
+      filterParts.push(
+        `Tags (${filterMode}): ${activeTagDisplayNames.join(", ")}`
+      );
     }
 
     if (excludedTagDisplayNames.length > 0) {
@@ -109,7 +118,9 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
     }
 
     if (ratingFilters.length > 0) {
-      filterParts.push(`Rating: ${ratingFilters.sort((a, b) => a - b).join(", ")} ★`);
+      filterParts.push(
+        `Rating: ${ratingFilters.sort((a, b) => a - b).join(", ")} ★`
+      );
     }
 
     if (energyMinFilter !== null || energyMaxFilter !== null) {
@@ -140,7 +151,10 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
       }
     }
 
-    let description = filterParts.length > 0 ? `${filterParts.join(" | ")}` : "Created with Tagify";
+    let description =
+      filterParts.length > 0
+        ? `${filterParts.join(" | ")}`
+        : "Created with Tagify";
 
     // Truncate if too long
     if (description.length > 300) {
@@ -150,14 +164,17 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
     return description;
   };
 
-  const [playlistName, setPlaylistName] = useState(() => getDefaultPlaylistName());
+  const [playlistName, setPlaylistName] = useState(() =>
+    getDefaultPlaylistName()
+  );
   const [playlistDescription, setPlaylistDescription] = useState(() =>
     getDefaultPlaylistDescription()
   );
   const [isPublic, setIsPublic] = useState(false);
   // const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
 
-  const hasActiveSearchTerm = currentSearchTerm && currentSearchTerm.trim() !== "";
+  const hasActiveSearchTerm =
+    currentSearchTerm && currentSearchTerm.trim() !== "";
   const showSearchTermWarning = isSmartPlaylist && hasActiveSearchTerm;
 
   useEffect(() => {
@@ -193,7 +210,8 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
               </p>
               {localTrackCount > 0 && (
                 <p className={styles.warning}>
-                  Note: {localTrackCount} local tracks cannot be added automatically
+                  Note: {localTrackCount} local tracks cannot be added
+                  automatically
                 </p>
               )}
             </div>
@@ -249,17 +267,18 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                   <div className={styles.helpTooltip}>
                     ?
                     <div className={styles.tooltipContent}>
-                      <Lightbulb size={16} /> When new tracks match the filter criteria, they'll be
-                      automatically added to this playlist!
+                      <Lightbulb size={16} /> When new tracks match the filter
+                      criteria, they'll be automatically added to this playlist!
                     </div>
                   </div>
                 </label>
                 {showSearchTermWarning && (
                   <div className={styles.warningBox}>
                     <p className={styles.warning}>
-                      <strong>Note:</strong> Search term "{currentSearchTerm}" will not be included
-                      in smart playlist criteria. The smart playlist will only use tag, rating,
-                      energy, and BPM filters for automatic updates.
+                      <strong>Note:</strong> Search term "{currentSearchTerm}"
+                      will not be included in smart playlist criteria. The smart
+                      playlist will only use tag, rating, energy, and BPM
+                      filters for automatic updates.
                     </p>
                   </div>
                 )}
@@ -274,14 +293,19 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                 bpmMinFilter === null &&
                 bpmMaxFilter === null ? (
                   <div className={styles.filterRow}>
-                    <span className={styles.filterLabel}>No filters applied</span>
+                    <span className={styles.filterLabel}>
+                      No filters applied
+                    </span>
                   </div>
                 ) : (
                   <>
                     {/* Tags on their own row if they exist */}
-                    {(activeTagDisplayNames.length > 0 || excludedTagDisplayNames.length > 0) && (
+                    {(activeTagDisplayNames.length > 0 ||
+                      excludedTagDisplayNames.length > 0) && (
                       <div className={styles.filterRow}>
-                        <span className={styles.filterLabel}>🏷️ Tags:</span>
+                        <span className={styles.filterLabel}>
+                          <FontAwesomeIcon icon={faTag} /> Tags:
+                        </span>
                         <div className={styles.tags}>
                           {activeTagDisplayNames.map((displayName) => (
                             <span key={displayName} className={styles.tag}>
@@ -289,7 +313,10 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                             </span>
                           ))}
                           {excludedTagDisplayNames.map((displayName) => (
-                            <span key={displayName} className={styles.excludedTag}>
+                            <span
+                              key={displayName}
+                              className={styles.excludedTag}
+                            >
                               {displayName}
                             </span>
                           ))}
@@ -305,14 +332,18 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                       <div className={styles.compactFilterRow}>
                         {ratingFilters.length > 0 && (
                           <span className={styles.compactFilter}>
-                            <strong>🏆 Rating:</strong>{" "}
+                            <FontAwesomeIcon icon={faTrophy} />{" "}
+                            <strong>Rating: </strong>
                             {ratingFilters.sort((a, b) => a - b).join(", ")} ★
                           </span>
                         )}
-                        {(energyMinFilter !== null || energyMaxFilter !== null) && (
+                        {(energyMinFilter !== null ||
+                          energyMaxFilter !== null) && (
                           <span className={styles.compactFilter}>
-                            <strong>⚡ Energy:</strong>{" "}
-                            {energyMinFilter !== null && energyMaxFilter !== null
+                            <FontAwesomeIcon icon={faBolt} />
+                            <strong>Energy:</strong>{" "}
+                            {energyMinFilter !== null &&
+                            energyMaxFilter !== null
                               ? energyMinFilter === energyMaxFilter
                                 ? energyMinFilter
                                 : `${energyMinFilter} - ${energyMaxFilter}`
@@ -323,7 +354,8 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
                         )}
                         {(bpmMinFilter !== null || bpmMaxFilter !== null) && (
                           <span className={styles.compactFilter}>
-                            <strong>🎵 BPM:</strong>{" "}
+                            <FontAwesomeIcon icon={faMusic} />
+                            <strong>BPM:</strong>{" "}
                             {bpmMinFilter !== null && bpmMaxFilter !== null
                               ? `${bpmMinFilter} - ${bpmMaxFilter}`
                               : bpmMinFilter !== null
@@ -338,7 +370,11 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
               </div>
 
               <div className={styles.formActions}>
-                <button type="button" className={styles.cancelButton} onClick={onClose}>
+                <button
+                  type="button"
+                  className={styles.cancelButton}
+                  onClick={onClose}
+                >
                   Cancel
                 </button>
                 <button type="submit" className={styles.createButton}>
