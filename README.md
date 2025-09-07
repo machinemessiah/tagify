@@ -1,4 +1,4 @@
-# Tagify 🏷️
+# Tagify
 
 Tagify is a powerful [Spicetify](https://github.com/spicetify/cli) custom app that brings advanced music tagging and organization capabilities to Spotify.
 
@@ -6,10 +6,9 @@ Tagify is a powerful [Spicetify](https://github.com/spicetify/cli) custom app th
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/alexk218/tagify.svg)](https://github.com/alexk218/tagify/stargazers)
 
-## 🎬 Demo
+## Demo
 
-Check out a video walkthrough of Tagify in action:  
-🔗 [YouTube demo](https://www.youtube.com/watch?v=0N1yp8--mTQ)
+Check out a video walkthrough of Tagify in action: [YouTube demo](https://www.youtube.com/watch?v=0N1yp8--mTQ)
 
 ## Motivation
 
@@ -111,9 +110,9 @@ curl -fsSL "https://raw.githubusercontent.com/alexk218/tagify/main/install.sh" |
 - Look for "Tagify" in your Spotify **top navigation bar** (next to the Spicetify Marketplace button)
 - Click it to open Tagify!
 
-## 💬 Community & Support
+## Community & Support
 
-- **💡 Feature Requests**: [Share your ideas](https://github.com/alexk218/tagify/discussions/categories/ideas-feature-requests)
-- **❓ Get Help**: [Ask questions](https://github.com/alexk218/tagify/discussions/categories/q-a)
-- **🐛 Report Bugs**: [Bug reports](https://github.com/alexk218/tagify/discussions/categories/bug-report)
-- **📢 Announcements**: [Latest updates](https://github.com/alexk218/tagify/discussions/categories/announcements)
+- **Feature Requests**: [Share your ideas](https://github.com/alexk218/tagify/discussions/categories/ideas-feature-requests)
+- **Get Help**: [Ask questions](https://github.com/alexk218/tagify/discussions/categories/q-a)
+- **Report Bugs**: [Bug reports](https://github.com/alexk218/tagify/discussions/categories/bug-report)
+- **Announcements**: [Latest updates](https://github.com/alexk218/tagify/discussions/categories/announcements)
