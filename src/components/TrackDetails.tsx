@@ -923,6 +923,7 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                     )}
                   </div>
 
+                  {/* Separate div for source context, so it can take up full width of container */}
                   {trackMetadata.sourceContext && (
                     <div className={styles.metadataContext}>
                       <span className={styles.metadataLabel}>
@@ -937,7 +938,6 @@ const TrackDetails: React.FC<TrackDetailsProps> = ({
                       </span>
                     </div>
                   )}
-
                   {/* Spotify genre tags */}
                   {/* {trackMetadata.genres.length > 0 && (
                     <div className={styles.metadataGenres}>

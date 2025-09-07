@@ -30,7 +30,7 @@
   flex-direction: column;
   gap: 16px;
   flex: 1;
-  max-width: 400px;
+  max-width: 40rem;
 }
 
 .controlSection {
@@ -168,8 +168,8 @@
 .metadataGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6px 16px;
-  margin-bottom: 6px;
+  gap: 2px 12px;
+  max-width: 35rem;
 }
 
 .metadataItem {
@@ -199,10 +199,10 @@
 }
 
 .metadataContext {
-  margin-top: 6px;
+  margin-top: 2px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .metadataGenres {
@@ -668,7 +668,6 @@
 .editableBpm {
   cursor: pointer;
   transition: all 0.2s ease;
-  padding: 4px 8px;
   border-radius: 4px;
   border: 1px solid transparent;
   display: inline-flex;
