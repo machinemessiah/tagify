@@ -12,9 +12,7 @@ Check out a video walkthrough of Tagify in action: [YouTube demo](https://www.yo
 
 ## Motivation
 
-As a DJ and obsessive music organizer, I spent _years_ searching for a good music tagging system - with no luck.
-So I built what I wished existed.
-After several months of development and daily use in my own workflow, I'm excited to share Tagify with fellow music lovers who want to take control of their libraries.
+After years of failed attempts to organize my 10,000+ track collection, I built what every music lover actually needs: a way to tag, rate, and find music the way your brain thinks about it.
 
 ---
 
