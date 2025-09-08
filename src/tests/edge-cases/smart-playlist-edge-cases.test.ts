@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useTagData, SmartPlaylistCriteria, TrackData } from "../../hooks/useTagData";
+import { useTagData, SmartPlaylistCriteria, TrackData } from "@/hooks/data/useTagData";
 import { spotifyApiService } from "../../services/SpotifyApiService";
 import {
   createMockSmartPlaylist,
@@ -8,7 +8,7 @@ import {
   simulateNetworkError,
   simulateRateLimitError,
 } from "../utils/test-helpers";
-import { useSmartPlaylists } from "../../hooks/useSmartPlaylists";
+import { useSmartPlaylists } from "../../hooks/data/useSmartPlaylists";
 
 vi.mock("../../services/SpotifyApiService", () => ({
   spotifyApiService: {

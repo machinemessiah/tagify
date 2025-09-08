@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TagDataStructure, TrackData } from "./useTagData";
-import { spotifyApiService } from "../services/SpotifyApiService";
+import { TagDataStructure, TrackData } from "@/hooks/data/useTagData";
+import { spotifyApiService } from "@/services/SpotifyApiService";
 
 interface SyncOperation {
   id: string;

@@ -1,5 +1,5 @@
 import { expect, vi } from "vitest";
-import { SmartPlaylistCriteria, TrackData, TagCategory, TrackTag } from "../../hooks/useTagData";
+import { SmartPlaylistCriteria, TrackData, TagCategory, TrackTag } from "@/hooks/data/useTagData";
 
 // Mock data factories for consistent test data
 export const createMockTrackData = (overrides: Partial<TrackData> = {}): TrackData => ({

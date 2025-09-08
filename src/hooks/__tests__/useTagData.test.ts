@@ -1,4 +1,4 @@
-import { useTagData, SmartPlaylistCriteria, TrackData } from "../useTagData";
+import { useTagData, SmartPlaylistCriteria, TrackData } from "../data/useTagData";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { spotifyApiService } from "../../services/SpotifyApiService";

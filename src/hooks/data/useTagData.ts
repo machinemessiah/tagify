@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { TrackInfoCacheManager } from "../utils/TrackInfoCache";
-import { spotifyApiService } from "../services/SpotifyApiService";
-import { defaultTagData } from "../constants/defaultTagData";
-import { needsMigrations, runMigrations } from "../utils/migration";
-import packageJson from "../../package.json";
-import { useSmartPlaylists } from "./useSmartPlaylists";
+import { TrackInfoCacheManager } from "@/utils/TrackInfoCache";
+import { spotifyApiService } from "@/services/SpotifyApiService";
+import { defaultTagData } from "@/constants/defaultTagData";
+import { needsMigrations, runMigrations } from "@/utils/migration";
+import packageJson from "@/package";
+import { useSmartPlaylists } from "@/hooks/data/useSmartPlaylists";
 
 export interface Tag {
   name: string;

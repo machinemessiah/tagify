@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./CreatePlaylistModal.module.css";
-import Portal from "../utils/Portal";
+import Portal from "@/components/ui/Portal";
 import { Lightbulb } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

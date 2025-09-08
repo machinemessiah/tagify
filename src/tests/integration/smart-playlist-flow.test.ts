@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { act } from "react";
-import { useTagData, SmartPlaylistCriteria, TrackData } from "../../hooks/useTagData";
+import { useTagData, SmartPlaylistCriteria, TrackData } from "@/hooks/data/useTagData";
 import { spotifyApiService } from "../../services/SpotifyApiService";
 
 // Mock the entire SpotifyApiService

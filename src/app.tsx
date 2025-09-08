@@ -1,28 +1,30 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "./app.module.css";
 import "./styles/globals.css";
-import TrackDetails from "./components/TrackDetails";
-import TagSelector from "./components/TagSelector";
-import TrackList from "./components/TrackList";
-import TagManager from "./components/TagManager";
-import DataManager from "./components/DataManager";
-import MultiTrackDetails from "./components/MultiTrackDetails";
-import LocalTracksModal from "./components/LocalTracksModal";
-import { useTagData } from "./hooks/useTagData";
-import { useTrackState } from "./hooks/useTrackState";
-import { useFilterState } from "./hooks/useFilterState";
-import { usePlaylistState } from "./hooks/usePlaylistState";
-import { useFontAwesome } from "./hooks/useFontAwesome";
+import packageJson from "@/package";
+import { useTagData } from "./hooks/data/useTagData";
+import { useTrackState } from "./hooks/data/useTrackState";
+import { useFilterState } from "./hooks/data/useFilterState";
+import { usePlaylistState } from "./hooks/data/usePlaylistState";
+import { useFontAwesome } from "./hooks/shared/useFontAwesome";
 import { trackService } from "./services/TrackService";
-import { useSpicetifyHistory } from "./hooks/useSpicetifyHistory";
-import ExportPanel from "./components/ExportPanel";
-import packageJson from "../package.json";
-import { useUpdateChecker } from "./hooks/useUpdateChecker";
-import UpdateBanner from "./components/UpdateBanner";
-import { useMultiTrackTagging } from "./hooks/useMultiTrackTagging";
-import { useSmartPlaylists } from "./hooks/useSmartPlaylists";
-import { useDiscoverySurvey } from "./hooks/useDiscoverySurvey";
-import DiscoverySurvey from "./components/DiscoverySurvey";
+import { useSpicetifyHistory } from "./hooks/data/useSpicetifyHistory";
+import { useUpdateChecker } from "./hooks/data/useUpdateChecker";
+import { useMultiTrackTagging } from "./hooks/data/useMultiTrackTagging";
+import { useSmartPlaylists } from "./hooks/data/useSmartPlaylists";
+import { useDiscoverySurvey } from "./hooks/data/useDiscoverySurvey";
+import {
+  TrackDetails,
+  TrackList,
+  MultiTrackDetails,
+  TagSelector,
+  TagManager,
+  DataManager,
+  UpdateBanner,
+  LocalTracksModal,
+  ExportModal,
+  DiscoverySurveyModal,
+} from "@/components";
 
 function App() {
   const [showTagManager, setShowTagManager] = useState<boolean>(false);
@@ -126,9 +128,8 @@ function App() {
     delayMs: 2000,
   });
 
-  const { shouldShowSurvey, completeSurvey, skipSurvey, skipCount } = useDiscoverySurvey(
-    packageJson.version
-  );
+  const { shouldShowSurvey, completeSurvey, skipSurvey, skipCount } =
+    useDiscoverySurvey(packageJson.version);
 
   useFontAwesome();
 
@@ -228,7 +229,7 @@ function App() {
       )}
 
       {shouldShowSurvey && (
-        <DiscoverySurvey
+        <DiscoverySurveyModal
           onCompleteSurvey={completeSurvey}
           onSkipSurvey={skipSurvey}
         />
@@ -354,7 +355,7 @@ function App() {
       )}
 
       {showExport && (
-        <ExportPanel data={exportData()} onClose={() => setShowExport(false)} />
+        <ExportModal data={exportData()} onClose={() => setShowExport(false)} />
       )}
 
       {showLocalTracksModal && (

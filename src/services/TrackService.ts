@@ -1,5 +1,5 @@
-import { TagDataStructure } from "../hooks/useTagData";
-import { TrackData } from "../components/TrackList";
+import { TagDataStructure } from "@/hooks/data/useTagData";
+import { TrackData } from "@/components/track/TrackList";
 
 class TrackService {
   playTrack = async (uri: string): Promise<void> => {

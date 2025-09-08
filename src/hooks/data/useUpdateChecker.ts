@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { VersionCheckerService, UpdateInfo } from "../services/VersionCheckerService";
+import { VersionCheckerService, UpdateInfo } from "@/services/VersionCheckerService";
 
 interface UseUpdateCheckerProps {
   currentVersion: string;

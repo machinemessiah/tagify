@@ -4,8 +4,8 @@ import {
   SpotifyArtist,
   SpotifyTrack,
   SpotifyTrackResponse,
-} from "../types/SpotifyTypes";
-import { parseLocalFileUri } from "../utils/LocalFileParser";
+} from "@/types/SpotifyTypes";
+import { parseLocalFileUri } from "@/utils/LocalFileParser";
 
 /**
  * Props for {@link useSpicetifyHistory}.

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./MultiTrackDetails.module.css";
-import { BatchTagUpdate, TrackTag } from "../hooks/useTagData";
-import { DraftTagState } from "../hooks/useMultiTrackTagging";
+import { BatchTagUpdate, TrackTag } from "@/hooks/data/useTagData";
+import { DraftTagState } from "@/hooks/data/useMultiTrackTagging";
 import ReactStars from "react-rating-stars-component";
 import { Lock, Tag } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -1,30 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./TrackList.module.css";
-import { parseLocalFileUri } from "../utils/LocalFileParser";
+import { parseLocalFileUri } from "@/utils/LocalFileParser";
 import {
   TagCategory,
   SmartPlaylistCriteria,
   TrackTag,
-} from "../hooks/useTagData";
-import CreatePlaylistModal from "./CreatePlaylistModal";
-import ReactStars from "react-rating-stars-component";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { TrackInfoCacheManager } from "../utils/TrackInfoCache";
-import { trackService } from "../services/TrackService";
+} from "@/hooks/data/useTagData";
+import CreatePlaylistModal from "@/components/modals/CreatePlaylistModal";
+import { useLocalStorage } from "@/hooks/shared/useLocalStorage";
+import { TrackInfoCacheManager } from "@/utils/TrackInfoCache";
+import { trackService } from "@/services/TrackService";
 import {
   PAGINATION_BATCH_SIZE,
   SORT_OPTIONS,
   SORT_ORDERS,
   SortOption,
   SortOrder,
-} from "../constants/trackList";
+} from "@/constants/trackList";
 import {
   SpotifyArtist,
   SpotifyBatchTracksResponse,
   SpotifyTrackResponse,
-} from "../types/SpotifyTypes";
-import SmartPlaylistModal from "./SmartPlaylistModal";
-import { formatTimestamp } from "../utils/formatters";
+} from "@/types/SpotifyTypes";
+import ReactStars from "react-rating-stars-component";
+import SmartPlaylistModal from "@/components/modals/SmartPlaylistModal";
+import { formatTimestamp } from "@/utils/formatters";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBoltLightning,

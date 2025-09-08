@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./LocalTracksModal.module.css";
-import { parseLocalFileUri } from "../utils/LocalFileParser";
-import Portal from "../utils/Portal";
+import { parseLocalFileUri } from "@/utils/LocalFileParser";
+import Portal from "@/components/ui/Portal";
 
 interface LocalTrack {
   uri: string;

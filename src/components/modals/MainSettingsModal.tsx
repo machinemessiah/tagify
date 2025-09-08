@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./RefreshModal.module.css";
-import Portal from "../utils/Portal";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import Portal from "@/components/ui/Portal";
+import { useLocalStorage } from "@/hooks/shared/useLocalStorage";
 
 interface MainSettingsModalProps {
   onClose: () => void;

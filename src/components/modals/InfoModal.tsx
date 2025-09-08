@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Portal from "../utils/Portal";
+import Portal from "@/components/ui/Portal";
 import styles from "./InfoModal.module.css";
-import packageJson from "../../package.json";
+import packageJson from "@/package";
 
 import {
   faBook,

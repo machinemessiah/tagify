@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import styles from "./ExportPanel.module.css";
-import Portal from "../utils/Portal";
+import React, { useState } from "react";
+import styles from "./ExportModal.module.css";
+import Portal from "@/components/ui/Portal";
 
 interface ExportTrack {
   rating: number;
@@ -60,12 +60,12 @@ interface ExportData {
   };
 }
 
-interface ExportPanelProps {
+interface ExportModalProps {
   data: ExportData;
   onClose: () => void;
 }
 
-const ExportPanel: React.FC<ExportPanelProps> = ({ data, onClose }) => {
+const ExportModal: React.FC<ExportModalProps> = ({ data, onClose }) => {
   // Calculate tag distribution
   const tagDistribution: { [tagName: string]: number } = {};
 
@@ -438,4 +438,4 @@ const ExportPanel: React.FC<ExportPanelProps> = ({ data, onClose }) => {
   );
 };
 
-export default ExportPanel;
+export default ExportModal;

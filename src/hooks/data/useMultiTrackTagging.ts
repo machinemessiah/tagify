@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { SpotifyTrack } from "../types/SpotifyTypes";
-import { BatchTagUpdate, TrackTag, useTagData } from "./useTagData";
+import { SpotifyTrack } from "@/types/SpotifyTypes";
+import { BatchTagUpdate, TrackTag, useTagData } from "@/hooks/data/useTagData";
 
 export interface DraftTagState {
   [trackUri: string]: {

@@ -4,8 +4,8 @@ import {
   PlaylistSettings,
   resetToDefaultSettings,
   savePlaylistSettings,
-} from "../utils/PlaylistSettings";
-import Portal from "../utils/Portal";
+} from "@/utils/PlaylistSettings";
+import Portal from "@/components/ui/Portal";
 
 interface PlaylistSettingsModalProps {
   onClose: () => void;

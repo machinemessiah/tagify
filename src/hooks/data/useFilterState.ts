@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TagCategory } from "./useTagData";
+import { TagCategory } from "@/hooks/data/useTagData";
 
 export function useFilterState() {
   const [activeTagFilters, setActiveTagFilters] = useState<string[]>([]);

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Portal from "../utils/Portal";
-import styles from "./DiscoverySurvey.module.css";
-import packageJson from "../../package.json";
+import Portal from "@/components/ui/Portal";
+import styles from "./DiscoverySurveyModal.module.css";
+import packageJson from "@/package";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -18,12 +18,12 @@ import {
   faCartShopping,
 } from "@fortawesome/free-solid-svg-icons";
 
-interface DiscoverySurveyProps {
+interface DiscoverySurveyModalProps {
   onCompleteSurvey: (source: string, otherDetails?: string) => void;
   onSkipSurvey: () => void;
 }
 
-const DiscoverySurvey: React.FC<DiscoverySurveyProps> = ({
+const DiscoverySurveyModal: React.FC<DiscoverySurveyModalProps> = ({
   onCompleteSurvey,
   onSkipSurvey,
 }) => {
@@ -258,4 +258,4 @@ const DiscoverySurvey: React.FC<DiscoverySurveyProps> = ({
   );
 };
 
-export default DiscoverySurvey;
+export default DiscoverySurveyModal;

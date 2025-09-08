@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import styles from "./TagSelector.module.css";
-import { TagCategory, TrackTag } from "../hooks/useTagData";
-import { useLocalStorage } from "../hooks/useLocalStorage";
+import { TagCategory, TrackTag } from "@/hooks/data/useTagData";
+import { useLocalStorage } from "@/hooks/shared/useLocalStorage";
 import { Lightbulb, Lock, Tag } from "lucide-react";
 
 interface TagSelectorProps {

@@ -182,7 +182,7 @@ export class VersionCheckerService {
    */
   private parsePreReleaseInfo(preRelease: string): { type: string; number: number | null } {
     // Match patterns like "alpha.1", "alpha-1", "alpha1", or just "alpha"
-    const match = preRelease.match(/(alpha|beta|rc)[\.\-]?(\d+)?/);
+    const match = preRelease.match(/(alpha|beta|rc)[.-]?(\d+)?/);
 
     if (match) {
       const type = match[1];

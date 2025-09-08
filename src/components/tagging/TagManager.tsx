@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./TagManager.module.css";
-import { TagCategory, Tag, TagSubcategory } from "../hooks/useTagData";
-import Portal from "../utils/Portal";
+import { TagCategory, Tag, TagSubcategory } from "@/hooks/data/useTagData";
+import Portal from "@/components/ui/Portal";
 
 interface DragState {
   draggedTag: {

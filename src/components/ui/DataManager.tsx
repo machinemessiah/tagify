@@ -1,12 +1,12 @@
 import React, { useState, useRef } from "react";
 import styles from "./DataManager.module.css";
-import "../styles/globals.css";
-import { TagDataStructure } from "../hooks/useTagData";
+import "../../styles/globals.css";
+import { TagDataStructure } from "@/hooks/data/useTagData";
 // import { fullRefreshPlaylistCache, incrementalRefreshPlaylistCache } from "../utils/PlaylistCache";
 // import PlaylistSettingsModal from "./PlaylistSettings";
 // import RefreshModal from "./RefreshModal";
-import MainSettingsModal from "./MainSettingsModal";
-import InfoModal from "./InfoModal";
+import MainSettingsModal from "@/components/modals/MainSettingsModal";
+import InfoModal from "@/components/modals/InfoModal";
 import { Settings } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

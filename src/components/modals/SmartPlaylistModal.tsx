@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./SmartPlaylistModal.module.css";
-import Portal from "../utils/Portal";
-import { SmartPlaylistCriteria, TagCategory } from "../hooks/useTagData";
-import { formatCondensedDate, formatTimestamp } from "../utils/formatters";
-import { spotifyApiService } from "../services/SpotifyApiService";
+import Portal from "@/components/ui/Portal";
+import { SmartPlaylistCriteria, TagCategory } from "@/hooks/data/useTagData";
+import { formatCondensedDate, formatTimestamp } from "@/utils/formatters";
+import { spotifyApiService } from "@/services/SpotifyApiService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowUpRightFromSquare,

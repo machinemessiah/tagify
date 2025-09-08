@@ -1,4 +1,4 @@
-import { TagDataStructure } from "../hooks/useTagData";
+import { TagDataStructure } from "@/hooks/data/useTagData";
 
 // Default tag structure with 4 main categories
 export const defaultTagData: TagDataStructure = {

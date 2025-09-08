@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import styles from "./TrackDetails.module.css";
-import { TagCategory, TrackTag } from "../hooks/useTagData";
+import { TagCategory, TrackTag } from "@/hooks/data/useTagData";
+import { formatTimestamp } from "@/utils/formatters";
 import ReactStars from "react-rating-stars-component";
 import {
   SpotifyTrack,
   SpotifyTrackResponse,
   SpotifyImage,
   SpotifyArtist,
-} from "../types/SpotifyTypes";
-import { formatTimestamp } from "../utils/formatters";
+} from "@/types/SpotifyTypes";
 import { Lock, LockOpen } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faStarHalf } from "@fortawesome/free-solid-svg-icons";

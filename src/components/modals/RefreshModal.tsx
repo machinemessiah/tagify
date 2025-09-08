@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./RefreshModal.module.css";
-import Portal from "../utils/Portal";
+import Portal from "@/components/ui/Portal";
 
 interface RefreshModalProps {
   onClose: () => void;

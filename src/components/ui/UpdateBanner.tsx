@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./UpdateBanner.module.css";
-import { UpdateInfo } from "../services/VersionCheckerService";
+import { UpdateInfo } from "@/services/VersionCheckerService";
 
 interface UpdateBannerProps {
   updateInfo: UpdateInfo;

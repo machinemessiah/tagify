@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { SpotifyArtist, SpotifyTrack, SpotifyTrackResponse } from "../types/SpotifyTypes";
-import { parseLocalFileUri } from "../utils/LocalFileParser";
+import { SpotifyArtist, SpotifyTrack, SpotifyTrackResponse } from "@/types/SpotifyTypes";
+import { parseLocalFileUri } from "@/utils/LocalFileParser";
 
 const LOCK_STATE_KEY = "tagify:lockState";
 const LOCKED_TRACK_KEY = "tagify:lockedTrack";
