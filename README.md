@@ -40,6 +40,7 @@ Select multiple tracks and apply tags in bulk.
 
 ![Bulk Track Tagging](src/assets/MULTI_TRACK_TAGGING.gif)
 
+
 ---
 
 ## Quick Start
@@ -108,8 +109,16 @@ curl -fsSL "https://raw.githubusercontent.com/alexk218/tagify/main/install.sh" |
 - Look for "Tagify" in your Spotify **top navigation bar** (next to the Spicetify Marketplace button)
 - Click it to open Tagify!
 
-## Community & Support
+## ⌛ Coming soon
+Tagify is being upgraded on a regular basis.
+Soon you'll be able to...
+- Apply ratings and tags to your playlists.
+- Import your data from RateYourMusic.
+- Downloads your tracks within Spotify. A download button next to all of your tracks.
 
+## Community & Support
+Join the community and influence Tagify's roadmap.
+- **Upcoming Features**:[Tagify Roadmap](https://github.com/alexk218/tagify/discussions/4)
 - **Feature Requests**: [Share your ideas](https://github.com/alexk218/tagify/discussions/categories/ideas-feature-requests)
 - **Get Help**: [Ask questions](https://github.com/alexk218/tagify/discussions/categories/q-a)
 - **Report Bugs**: [Bug reports](https://github.com/alexk218/tagify/discussions/categories/bug-report)
