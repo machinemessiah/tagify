@@ -12,7 +12,7 @@ Check out a video walkthrough of Tagify in action: [YouTube demo](https://www.yo
 
 ## Motivation
 
-After years of failed attempts to organize my 10,000+ track collection, I built what every music lover actually needs: a way to tag, rate, and find music the way your brain thinks about it.
+After years of failed attempts to organize my 10,000+ track collection, I built what every lover of music needs: a way to tag, rate, and find music the way your brain thinks about it.
 
 ---
 
