@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./DataManager.module.css";
 import "../../styles/globals.css";
 import { TagDataStructure } from "@/hooks/data/useTagData";
@@ -17,6 +17,7 @@ import {
   faLightbulb,
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
+import { useLocalStorage } from "@/hooks/shared/useLocalStorage";
 
 interface DataManagerProps {
   onExportTagData: () => void;
@@ -24,6 +25,8 @@ interface DataManagerProps {
   onExportRekordbox: () => void;
   lastSaved: Date | null;
 }
+
+const SHOW_SUPPORT_BUTTONS_KEY = "tagify:showSupportButtons";
 
 const DataManager: React.FC<DataManagerProps> = ({
   onExportTagData,
@@ -35,6 +38,10 @@ const DataManager: React.FC<DataManagerProps> = ({
 
   const [showMainSettings, setShowMainSettings] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showSupportButtons, setShowSupportButtons] = useLocalStorage(
+    SHOW_SUPPORT_BUTTONS_KEY,
+    true
+  );
 
   const handleImportClick = () => {
     if (fileInputRef.current) {
@@ -116,29 +123,33 @@ const DataManager: React.FC<DataManagerProps> = ({
         >
           <FontAwesomeIcon icon={faInfo} /> Info
         </button>
-        <button
-          className={`${styles.pillButton} ${styles.surveyButton} `}
-          onClick={() => {
-            const formUrl = `https://forms.gle/H4xMyNC2zVAHowPF6`;
-            window.open(formUrl, "_blank", "noopener,noreferrer");
-          }}
-          title="Help improve Tagify with your feedback"
-        >
-          <FontAwesomeIcon icon={faLightbulb} /> Feedback
-        </button>
-        <button
-          className={`${styles.pillButton} ${styles.coffeeButton}`}
-          onClick={() => {
-            window.open(
-              "https://buymeacoffee.com/alexk218",
-              "_blank",
-              "noopener,noreferrer"
-            );
-          }}
-          title="Support Tagify development"
-        >
-          <FontAwesomeIcon icon={faCoffee} /> Support
-        </button>
+        {showSupportButtons && (
+          <>
+            <button
+              className={`${styles.pillButton} ${styles.surveyButton} `}
+              onClick={() => {
+                const formUrl = `https://forms.gle/H4xMyNC2zVAHowPF6`;
+                window.open(formUrl, "_blank", "noopener,noreferrer");
+              }}
+              title="Help improve Tagify with your feedback"
+            >
+              <FontAwesomeIcon icon={faLightbulb} /> Feedback
+            </button>
+            <button
+              className={`${styles.pillButton} ${styles.coffeeButton}`}
+              onClick={() => {
+                window.open(
+                  "https://buymeacoffee.com/alexk218",
+                  "_blank",
+                  "noopener,noreferrer"
+                );
+              }}
+              title="Support Tagify development"
+            >
+              <FontAwesomeIcon icon={faCoffee} /> Support
+            </button>
+          </>
+        )}
       </div>
 
       <input
@@ -162,7 +173,11 @@ const DataManager: React.FC<DataManagerProps> = ({
         <Settings size={20} />
       </button>
       {showMainSettings && (
-        <MainSettingsModal onClose={() => setShowMainSettings(false)} />
+        <MainSettingsModal
+          onClose={() => setShowMainSettings(false)}
+          showSupportButtons={showSupportButtons}
+          onToggleSupportButtons={setShowSupportButtons}
+        />
       )}
       {showInfoModal && <InfoModal onClose={() => setShowInfoModal(false)} />}
     </div>
