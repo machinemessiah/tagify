@@ -317,8 +317,6 @@
 .trackItemMetaTop {
   justify-content: space-between;
   align-items: center;
-
-  /* position: relative; */
   width: 100%;
   padding-right: 0;
 }
@@ -524,8 +522,6 @@
   opacity: 0.4;
   cursor: not-allowed;
   background: rgb(255 193 7 / 8%);
-
-  /* border-color: rgb(255 193 7 / 15%); */
   transform: none;
   box-shadow: none;
 }
@@ -536,7 +532,6 @@
     rgb(255 193 7 / 25%),
     rgb(255 152 0 / 25%)
   );
-  /* border-color: rgb(255 193 7 / 50%); */
   box-shadow: 0 4px 12px rgb(255 193 7 / 30%);
 }
 
@@ -650,7 +645,7 @@
 }
 
 .incompleteBullet {
-  color: #ffa500; /* Orange bullet for incomplete tags */
+  color: #ffa500;
   margin-right: 4px;
   font-size: 12px;
   display: inline-block;

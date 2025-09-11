@@ -60,7 +60,7 @@
 }
 
 .closeButton {
-  background: transparent;
+  background: 0 0;
   border: 1px solid transparent;
   color: var(--spice-text);
   font-size: 28px;
@@ -105,7 +105,7 @@
 }
 
 .navButton {
-  background: transparent;
+  background: 0 0;
   border: none;
   color: var(--spice-subtext);
   padding: 12px 16px;
@@ -210,11 +210,6 @@
   line-height: 1.4;
 }
 
-.featureIcon {
-  font-size: 32px;
-  margin-bottom: 8px;
-}
-
 .stepsList {
   display: flex;
   flex-direction: column;
@@ -230,7 +225,7 @@
 
 .stepNumber {
   background: linear-gradient(135deg, #656565, #302f2c);
-  color: white;
+  color: #fff;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -355,7 +350,7 @@
 
 .primaryButton {
   background: rgb(0 0 0 / 20%);
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 8px;
   padding: 12px 24px;
@@ -381,17 +376,6 @@
   border-radius: 4px;
 }
 
-.githubLink:hover {
-  /* color: var(--spice-text); */
-}
-
-/* Info button styling for DataManager */
-.pillButton.infoButton:hover {
-  background: rgb(255 193 7 / 30%);
-  transform: translateY(-1px);
-}
-
-/* Responsive Design */
 @media (width <= 768px) {
   .modal {
     width: 98%;
@@ -452,10 +436,6 @@
   }
 }
 
-/* Advanced Features Section Styles */
-
-/* Filtering explanation styles */
-
 .filterMode {
   background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
@@ -466,20 +446,6 @@
   border: 1px solid rgb(255 255 255 / 20%);
 }
 
-.filterBadge {
-  background: #666;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  min-width: 60px;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Compact features layout */
 .featuresCompact {
   display: flex;
   flex-direction: column;
@@ -502,13 +468,8 @@
 .featureHeader {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.featureIcon {
-  font-size: 18px;
-  flex-shrink: 0;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .featureHeader h4 {
@@ -525,10 +486,9 @@
   line-height: 1.5;
 }
 
-/* Tag demonstration styles */
 .includeTag {
   background: #1e90ff;
-  color: white;
+  color: #fff;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 12px;
@@ -537,7 +497,7 @@
 
 .excludeTag {
   background: #ff4c4c;
-  color: white;
+  color: #fff;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 12px;
@@ -545,7 +505,6 @@
   text-decoration: line-through;
 }
 
-/* Indicator demonstration */
 .indicatorDemo {
   margin-top: 8px;
 }
@@ -569,15 +528,15 @@
 }
 
 .orangeBullet {
-  color: #ffa500;
+  color: orange;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .greenBullet {
   color: #28a745;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .indicatorTip {
@@ -587,9 +546,6 @@
   margin-top: 8px;
 }
 
-/* Feature tip callout */
-
-/* Responsive adjustments */
 @media (width <= 768px) {
   .featuresCompact {
     gap: 12px;
@@ -612,25 +568,11 @@
   }
 }
 
-/* Add these styles to your existing InfoModal.module.css */
-
-/* What's New Section Styles */
 .whatsNewHeader {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 24px;
-}
-
-.versionBadge {
-  background: linear-gradient(135deg, #1db954, #1ed760);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .featureGroup {
@@ -641,13 +583,6 @@
   border: 1px solid rgb(255 255 255 / 5%);
 }
 
-.featureHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
 .featureIcon {
   font-size: 24px;
   display: flex;
@@ -655,6 +590,8 @@
   justify-content: center;
   width: 32px;
   height: 32px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .featureTitle {
@@ -667,7 +604,7 @@
 
 .newBadge {
   background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-  color: white;
+  color: #fff;
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 11px;
@@ -682,7 +619,6 @@
   margin-bottom: 16px;
 }
 
-/* Bug Fixes & Improvements */
 .bugFixList,
 .improvementList {
   display: flex;
@@ -715,7 +651,6 @@
   color: #10b981;
 }
 
-/* Roadmap Section Styles */
 .roadmapList {
   display: flex;
   flex-direction: column;
@@ -756,7 +691,7 @@
 
 .comingSoonBadge {
   background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-  color: white;
+  color: #fff;
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 11px;
@@ -767,7 +702,7 @@
 
 .plannedBadge {
   background: linear-gradient(135deg, #64748b, #94a3b8);
-  color: white;
+  color: #fff;
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 11px;
@@ -782,7 +717,6 @@
   margin: 0;
 }
 
-/* Community Section */
 .communitySection {
   padding: 24px;
   background: linear-gradient(
@@ -851,7 +785,7 @@
   background: rgb(255 165 0 / 10%);
   border: 1px solid rgb(255 165 0 / 30%);
   border-radius: 8px;
-  color: #ffa500;
+  color: orange;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -875,7 +809,7 @@
   gap: 8px;
   padding: 12px 24px;
   background: linear-gradient(135deg, var(--spice-accent), #1ed760);
-  color: white;
+  color: #fff;
   text-decoration: none;
   border-radius: 24px;
   font-weight: 600;
@@ -897,11 +831,10 @@
   opacity: 0.8;
 }
 
-/* Responsive adjustments */
 @media (width <= 768px) {
+  .communitySection,
   .featureGroup,
-  .roadmapItem,
-  .communitySection {
+  .roadmapItem {
     padding: 16px;
   }
 
@@ -918,7 +851,6 @@
   }
 }
 
-/* Special styling for What's New navigation button */
 .whatsNewButton {
   position: relative;
   background: linear-gradient(
@@ -929,6 +861,7 @@
   border: 1px solid rgb(255 107 107 / 30%) !important;
   box-shadow: 0 0 20px rgb(255 107 107 / 15%);
   animation: whatsNewGlow 2s ease-in-out infinite alternate;
+  overflow: visible !important;
 }
 
 .whatsNewButton:hover {
@@ -957,7 +890,7 @@
   top: -6px;
   right: -8px;
   background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-  color: white;
+  color: #fff;
   font-size: 9px;
   font-weight: 700;
   padding: 2px 6px;
@@ -991,12 +924,6 @@
   }
 }
 
-/* Ensure the button has proper positioning for the indicator */
-.whatsNewButton {
-  overflow: visible !important;
-}
-
-/* Visual Tutorial Styles for Smart Playlists */
 .visualTutorial {
   margin: 24px 0;
   padding: 24px;
@@ -1025,7 +952,7 @@
   min-width: 60px;
   height: 28px;
   background: linear-gradient(135deg, var(--spice-accent), #1ed760);
-  color: white;
+  color: #fff;
   border-radius: 14px;
   font-size: 12px;
   font-weight: 700;
@@ -1075,7 +1002,7 @@
   left: 0;
   right: 0;
   background: linear-gradient(to top, rgb(0 0 0 / 80%), transparent);
-  color: white;
+  color: #fff;
   padding: 12px 16px;
   font-size: 13px;
   font-weight: 500;

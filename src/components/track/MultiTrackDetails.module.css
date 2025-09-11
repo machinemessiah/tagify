@@ -306,13 +306,13 @@
   transition: background-color 0.2s ease;
 }
 
-.saveButton:hover:not(:disabled) {
-  background: rgb(30 144 255 / 50%);
-}
-
 .saveButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: rgb(30 144 255 / 50%);
 }
 
 .discardButton {
@@ -472,4 +472,3 @@
   visibility: hidden;
   pointer-events: none;
 }
-

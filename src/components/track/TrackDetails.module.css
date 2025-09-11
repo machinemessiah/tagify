@@ -645,6 +645,12 @@
   pointer-events: none; /* Can't click when hidden */
 }
 
+.bpmRefreshButton:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed;
+  transform: scale(1) !important;
+}
+
 /* Show on container hover */
 .bpmDisplayContainer:hover .bpmRefreshButton {
   opacity: 1;
@@ -657,12 +663,6 @@
   border-color: rgb(30 144 255 / 40%);
   color: #1e90ff;
   transform: scale(1.05);
-}
-
-.bpmRefreshButton:disabled {
-  opacity: 0.6 !important;
-  cursor: not-allowed;
-  transform: scale(1) !important;
 }
 
 .editableBpm {

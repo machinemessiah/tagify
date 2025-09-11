@@ -63,6 +63,11 @@
   color: var(--spice-text);
 }
 
+.warning {
+  color: var(--spice-notification-error);
+  font-style: italic;
+}
+
 .warningBox {
   background: rgb(255 193 7 / 10%);
   border: 1px solid rgb(255 193 7 / 30%);
@@ -93,11 +98,6 @@
   font-weight: 600;
 }
 
-.warning {
-  color: var(--spice-notification-error);
-  font-style: italic;
-}
-
 .playlistForm {
   display: flex;
   flex-direction: column;
@@ -116,6 +116,11 @@
   color: var(--spice-text);
 }
 
+.textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
 .input,
 .textarea {
   padding: 10px 12px;
@@ -131,11 +136,6 @@
 .textarea:focus {
   outline: none;
   border-color: rgb(255 255 255 / 30%);
-}
-
-.textarea {
-  min-height: 80px;
-  resize: vertical;
 }
 
 .tagsSection {

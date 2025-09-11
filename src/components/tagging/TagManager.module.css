@@ -193,14 +193,14 @@
   transition: background-color 0.2s ease;
 }
 
-.saveButton:hover:not(:disabled) {
-  background: #1a7ee0;
-}
-
 .saveButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background: rgb(0 0 0 / 20%);
+}
+
+.saveButton:hover:not(:disabled) {
+  background: #1a7ee0;
 }
 
 .cancelButton {
