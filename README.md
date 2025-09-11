@@ -124,7 +124,8 @@ Join the community and influence Tagify's roadmap.
 - **Announcements**: [Latest updates](https://github.com/alexk218/tagify/discussions/categories/announcements)
 
 ## Support me ☕
-If you enjoy Tagify and want to support its development, consider [buying me a coffee](https://buymeacoffee.com/alexk218)
-:). 
+Many coffees were consumed in the making of Tagify. 
+
+If you enjoy Tagify and want to support its development, consider [buying my next one](https://buymeacoffee.com/alexk218) :)
 
 Thank you.
