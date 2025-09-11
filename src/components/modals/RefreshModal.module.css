@@ -1,10 +1,7 @@
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background-color: rgb(0 0 0 / 70%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -49,14 +46,6 @@
   gap: 20px;
 }
 
-.modalBodyExtensions {
-  overflow-y: auto;
-  max-height: calc(90vh - 70px);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
 .description {
   color: var(--spice-text);
   font-size: 14px;
@@ -72,7 +61,7 @@
 }
 
 .refreshOption {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   border-radius: 8px;
   padding: 20px;
   display: flex;
@@ -83,8 +72,8 @@
 }
 
 .refreshOption:hover {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.3);
+  border-color: rgb(255 255 255 / 10%);
+  background: rgb(0 0 0 / 30%);
 }
 
 .optionHeader {
@@ -108,7 +97,7 @@
 .optionTime {
   font-size: 12px;
   color: var(--spice-subtext);
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   padding: 4px 8px;
   border-radius: 12px;
   white-space: nowrap;
@@ -120,7 +109,7 @@
 }
 
 .optionDescription p {
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
 }
 
 .optionDescription ul {
@@ -135,7 +124,7 @@
 }
 
 .refreshButton {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   border: none;
   border-radius: 6px;
@@ -148,7 +137,7 @@
 }
 
 .refreshButton:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
   transform: translateY(-1px);
 }
 
@@ -159,31 +148,31 @@
 }
 
 .quickButton {
-  background: rgba(30, 144, 255, 0.2);
-  border: 1px solid rgba(30, 144, 255, 0.3);
+  background: rgb(30 144 255 / 20%);
+  border: 1px solid rgb(30 144 255 / 30%);
 }
 
 .quickButton:hover:not(:disabled) {
-  background: rgba(30, 144, 255, 0.3);
-  border-color: rgba(30, 144, 255, 0.5);
+  background: rgb(30 144 255 / 30%);
+  border-color: rgb(30 144 255 / 50%);
 }
 
 .fullButton {
-  background: rgba(255, 165, 0, 0.2);
-  border: 1px solid rgba(255, 165, 0, 0.3);
+  background: rgb(255 165 0 / 20%);
+  border: 1px solid rgb(255 165 0 / 30%);
 }
 
 .fullButton:hover:not(:disabled) {
-  background: rgba(255, 165, 0, 0.3);
-  border-color: rgba(255, 165, 0, 0.5);
+  background: rgb(255 165 0 / 30%);
+  border-color: rgb(255 165 0 / 50%);
 }
 
 .infoBox {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  background: rgba(30, 144, 255, 0.1);
-  border: 1px solid rgba(30, 144, 255, 0.2);
+  background: rgb(30 144 255 / 10%);
+  border: 1px solid rgb(30 144 255 / 20%);
   border-radius: 8px;
   padding: 16px;
   margin-top: 8px;
@@ -201,8 +190,7 @@
   line-height: 1.4;
 }
 
-/* Responsive design for smaller screens */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .modal {
     width: 95%;
     max-height: 95vh;
@@ -234,12 +222,12 @@
   }
 }
 
-/* Animation for modal entrance */
 @keyframes modalSlideIn {
   from {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -248,98 +236,4 @@
 
 .modal {
   animation: modalSlideIn 0.2s ease-out;
-}
-
-.sectionTitle {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: var(--spice-text);
-}
-
-.toggleGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-}
-
-.toggleItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px; /* Internal padding for each item */
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: background-color 0.2s ease;
-}
-
-.toggleItem:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.toggleInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.toggleLabel {
-  font-weight: 500;
-  color: var(--spice-text);
-  font-size: 14px;
-  margin: 0;
-}
-
-.toggleDescription {
-  font-size: 12px;
-  color: var(--spice-subtext);
-  opacity: 0.8;
-}
-
-.toggleSwitch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.toggleSwitch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--spice-button-disabled);
-  border-radius: 24px;
-  transition: background-color 0.3s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  border-radius: 50%;
-  transition: transform 0.3s;
-}
-
-.toggleSwitch input:checked + .slider {
-  background-color: #1e90ff;
-}
-
-.toggleSwitch input:checked + .slider:before {
-  transform: translateX(20px);
 }
