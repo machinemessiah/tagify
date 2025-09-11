@@ -3,7 +3,9 @@
 Tagify is a powerful [Spicetify](https://github.com/spicetify/cli) custom app that brings advanced music tagging and organization capabilities to Spotify.
 
 [![GitHub release](https://img.shields.io/github/release/alexk218/tagify.svg)](https://github.com/alexk218/tagify/releases)
+[![GitHub Discussions](https://img.shields.io/github/discussions/alexk218/tagify?color=blue&logo=github&label=discussions)](https://github.com/alexk218/tagify/discussions)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/alexk218)
+
 
 ## Demo
 
