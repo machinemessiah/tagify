@@ -126,6 +126,6 @@ Join the community and influence Tagify's roadmap.
 ## Support me ☕
 Many coffees were consumed in the making of Tagify. 
 
-If you enjoy Tagify and want to support its development, consider [buying my next one](https://buymeacoffee.com/alexk218) :)
+If you enjoy Tagify and want to support its development, consider [contributing to my next one](https://buymeacoffee.com/alexk218) :)
 
 Thank you.
