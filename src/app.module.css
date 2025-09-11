@@ -1,7 +1,6 @@
 .container {
   display: flex;
   flex-direction: column;
-  height: 100%;
   padding: 4px;
   color: var(--spice-text);
   background-color: var(--spice-main);
