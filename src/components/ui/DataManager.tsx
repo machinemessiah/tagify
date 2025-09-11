@@ -86,49 +86,45 @@ const DataManager: React.FC<DataManagerProps> = ({
   return (
     <div className={styles.controlBar}>
       <div className={styles.actionPills}>
-        <div className={styles.primaryPill}>
-          <button
-            className={`${styles.pillButton} ${styles.exportButton}`}
-            onClick={onExportTagData}
-            title="Backup your tag data"
-          >
-            <FontAwesomeIcon icon={faDownload} /> Backup
-          </button>
-          <button
-            className={`${styles.pillButton} ${styles.importButton}`}
-            onClick={handleImportClick}
-            title="Import your tag data"
-          >
-            <FontAwesomeIcon icon={faUpload} /> Import
-          </button>
-        </div>
+        <button
+          className={`${styles.pillButton} ${styles.exportButton}`}
+          onClick={onExportTagData}
+          title="Backup your tag data"
+        >
+          <FontAwesomeIcon icon={faDownload} /> Backup
+        </button>
+        <button
+          className={`${styles.pillButton} ${styles.importButton}`}
+          onClick={handleImportClick}
+          title="Import your tag data"
+        >
+          <FontAwesomeIcon icon={faUpload} /> Import
+        </button>
 
-        <div className={styles.secondaryPill}>
-          <button
-            className={`${styles.pillButton} ${styles.statsButton}`}
-            onClick={onExportRekordbox}
-            title="View your tag stats"
-          >
-            <FontAwesomeIcon icon={faChartSimple} /> Stats
-          </button>
-          <button
-            className={`${styles.pillButton} ${styles.infoButton}`}
-            onClick={() => setShowInfoModal(true)}
-            title="Help & Tutorial"
-          >
-            <FontAwesomeIcon icon={faInfo} /> Info
-          </button>
-          <button
-            className={`${styles.pillButton} ${styles.surveyButton} `}
-            onClick={() => {
-              const formUrl = `https://forms.gle/H4xMyNC2zVAHowPF6`;
-              window.open(formUrl, "_blank", "noopener,noreferrer");
-            }}
-            title="Help improve Tagify with your feedback"
-          >
-            <FontAwesomeIcon icon={faLightbulb} /> Feedback
-          </button>
-        </div>
+        <button
+          className={`${styles.pillButton} ${styles.statsButton}`}
+          onClick={onExportRekordbox}
+          title="View your tag stats"
+        >
+          <FontAwesomeIcon icon={faChartSimple} /> Stats
+        </button>
+        <button
+          className={`${styles.pillButton} ${styles.infoButton}`}
+          onClick={() => setShowInfoModal(true)}
+          title="Help & Tutorial"
+        >
+          <FontAwesomeIcon icon={faInfo} /> Info
+        </button>
+        <button
+          className={`${styles.pillButton} ${styles.surveyButton} `}
+          onClick={() => {
+            const formUrl = `https://forms.gle/H4xMyNC2zVAHowPF6`;
+            window.open(formUrl, "_blank", "noopener,noreferrer");
+          }}
+          title="Help improve Tagify with your feedback"
+        >
+          <FontAwesomeIcon icon={faLightbulb} /> Feedback
+        </button>
       </div>
 
       <input

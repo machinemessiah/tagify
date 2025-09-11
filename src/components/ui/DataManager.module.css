@@ -93,17 +93,12 @@
 
 .actionPills {
   display: flex;
-  gap: 12px;
+  gap: 6px;
   align-items: center;
-}
 
-.primaryPill,
-.secondaryPill {
-  display: flex;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   padding: 2px;
-  gap: 2px;
 }
 
 .pillButton {
