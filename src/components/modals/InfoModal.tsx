@@ -872,7 +872,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   href="https://github.com/alexk218/tagify"
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="Give Tagify a star :)"
+                  title="Help others discover Tagify - star the repo! (please)"
                   className={styles.githubLink}
                 >
                   <FontAwesomeIcon
@@ -892,7 +892,7 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                   href="https://buymeacoffee.com/alexk218"
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="Give Alex a coffee :)"
+                  title="Give Alex a coffee :) (he probably needs it)"
                   className={styles.githubLink}
                 >
                   <FontAwesomeIcon

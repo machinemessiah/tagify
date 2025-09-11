@@ -131,7 +131,7 @@ const DataManager: React.FC<DataManagerProps> = ({
                 const formUrl = `https://forms.gle/H4xMyNC2zVAHowPF6`;
                 window.open(formUrl, "_blank", "noopener,noreferrer");
               }}
-              title="Help improve Tagify with your feedback"
+              title="Your feedback helps me build better features"
             >
               <FontAwesomeIcon icon={faLightbulb} /> Feedback
             </button>
@@ -144,7 +144,7 @@ const DataManager: React.FC<DataManagerProps> = ({
                   "noopener,noreferrer"
                 );
               }}
-              title="Support Tagify development"
+              title="Love Tagify? Buy me a coffee! :)"
             >
               <FontAwesomeIcon icon={faCoffee} /> Support
             </button>
