@@ -20,6 +20,7 @@
   flex-direction: column;
   margin: auto;
   position: relative;
+  animation: modalSlideIn 0.2s ease-out;
 }
 
 .modalHeader {
@@ -232,8 +233,4 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-}
-
-.modal {
-  animation: modalSlideIn 0.2s ease-out;
 }

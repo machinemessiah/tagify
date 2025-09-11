@@ -1,10 +1,7 @@
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background-color: rgb(0 0 0 / 70%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,6 +28,7 @@
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -78,7 +76,7 @@
 }
 
 .message {
-  margin: 0 0 16px 0;
+  margin: 0 0 16px;
   color: var(--spice-text);
   font-size: 15px;
   line-height: 1.5;
@@ -87,12 +85,12 @@
 .instructions {
   margin-top: 16px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
   border-radius: 4px;
 }
 
 .instructions h3 {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   font-size: 16px;
   font-weight: 600;
   color: var(--spice-text);
@@ -125,7 +123,7 @@
 }
 
 .copyButton {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -137,7 +135,7 @@
 }
 
 .copyButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .tracksList {
@@ -147,7 +145,7 @@
   flex-direction: column;
   gap: 8px;
   padding: 8px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   border-radius: 4px;
 }
 
@@ -155,7 +153,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   border-radius: 4px;
 }
 
@@ -177,7 +175,7 @@
 }
 
 .actionButton {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: white;
   border: none;
   border-radius: 4px;
@@ -190,11 +188,11 @@
 }
 
 .actionButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .closeAction {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -206,5 +204,5 @@
 }
 
 .closeAction:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }

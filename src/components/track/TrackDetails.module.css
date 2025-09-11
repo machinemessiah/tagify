@@ -43,7 +43,7 @@
 }
 
 .clickableArtist:hover {
-  color: rgba(255, 255, 255, 0.977);
+  color: rgb(255 255 255 / 97.7%);
   text-decoration: underline;
 }
 
@@ -53,7 +53,7 @@
   height: 100px;
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 20%);
   background-color: var(--spice-main);
   min-height: 140px;
   display: flex;
@@ -108,6 +108,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -120,7 +121,7 @@
 
 .trackTitle {
   font-size: 20px;
-  margin: 0 0 6px 0;
+  margin: 0 0 6px;
   font-weight: 700;
   color: var(--spice-text);
   white-space: nowrap;
@@ -131,13 +132,13 @@
 }
 
 .trackTitle:hover {
-  color: rgba(255, 255, 255, 0.977);
+  color: rgb(255 255 255 / 97.7%);
   text-decoration: underline;
 }
 
 .trackArtist {
   font-size: 14px;
-  margin: 0 0 4px 0;
+  margin: 0 0 4px;
   color: var(--spice-subtext);
   white-space: nowrap;
   overflow: hidden;
@@ -146,7 +147,7 @@
 
 .trackAlbum {
   font-size: 12px;
-  margin: 0 0 8px 0;
+  margin: 0 0 8px;
   color: var(--spice-subtext);
   font-style: italic;
   white-space: nowrap;
@@ -194,7 +195,7 @@
 }
 
 .contextLink:hover {
-  color: rgba(255, 255, 255, 0.977);
+  color: rgb(255 255 255 / 97.7%);
   text-decoration: underline;
 }
 
@@ -220,7 +221,7 @@
 }
 
 .genreTag {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   border-radius: 12px;
   padding: 2px 8px;
@@ -280,7 +281,6 @@
   width: 100%;
   max-width: 250px;
   height: 4px;
-  -webkit-appearance: none;
   appearance: none;
   background: var(--spice-button-disabled);
   border-radius: 2px;
@@ -288,7 +288,6 @@
 }
 
 .energySlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
   appearance: none;
   width: 16px;
   height: 16px;
@@ -311,7 +310,7 @@
 }
 
 .clearButton {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -322,7 +321,7 @@
 }
 
 .clearButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .noTags {
@@ -381,7 +380,7 @@
 .tagItem {
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   border-radius: 12px;
   padding: 2px 6px 2px 8px;
   font-size: 11px;
@@ -390,7 +389,7 @@
 }
 
 .tagItem:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .tagName {
@@ -456,7 +455,7 @@
 
 .playlistItem {
   display: inline-flex;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   padding: 4px 8px;
   border-radius: 12px;
   cursor: pointer;
@@ -467,7 +466,7 @@
 }
 
 .playlistItem:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .playlistName {
@@ -485,7 +484,7 @@
 }
 
 .playButton {
-  background: rgba(0, 0, 0, 0.24);
+  background: rgb(0 0 0 / 24%);
   color: white;
   border: none;
   border-radius: 4px;
@@ -494,17 +493,18 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
+
   /* margin-top: 8px; */
   width: 100%;
   text-align: center;
 }
 
 .playButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .switchTrackButton {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -522,7 +522,7 @@
 }
 
 .switchTrackButton:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgb(255 255 255 / 15%);
 }
 
 .buttonIcon {
@@ -542,7 +542,7 @@
 }
 
 .lockButton {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -562,17 +562,17 @@
 }
 
 .lockButton.unlocked {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgb(0 0 0 / 30%);
 }
 
 .lockButton:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgb(255 255 255 / 10%);
 }
 
 /* Timestamp metadata container */
 .timestampMetadata {
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
 }
 
 .timestampRow {
@@ -627,8 +627,8 @@
 }
 
 .bpmRefreshButton {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgb(0 0 0 / 30%);
+  border: 1px solid rgb(255 255 255 / 15%);
   color: var(--spice-subtext);
   cursor: pointer;
   font-size: 11px;
@@ -653,8 +653,8 @@
 }
 
 .bpmRefreshButton:hover:not(:disabled) {
-  background-color: rgba(30, 144, 255, 0.2);
-  border-color: rgba(30, 144, 255, 0.4);
+  background-color: rgb(30 144 255 / 20%);
+  border-color: rgb(30 144 255 / 40%);
   color: #1e90ff;
   transform: scale(1.05);
 }
@@ -677,8 +677,8 @@
 }
 
 .editableBpm:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgb(255 255 255 / 8%);
+  border-color: rgb(255 255 255 / 15%);
   transform: translateY(-1px);
 }
 
@@ -686,18 +686,18 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   padding: 4px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgb(255 255 255 / 20%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
   animation: slideIn 0.2s ease-out;
 }
 
 .bpmEditInput {
   width: 70px;
   padding: 6px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 4px;
   background: var(--spice-main);
   color: var(--spice-text);
@@ -710,18 +710,18 @@
 .bpmEditInput:focus {
   outline: none;
   border-color: #1e90ff;
-  box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.2);
-  background: rgba(30, 144, 255, 0.05);
+  box-shadow: 0 0 0 2px rgb(30 144 255 / 20%);
+  background: rgb(30 144 255 / 5%);
 }
 
 .bpmEditInput:hover {
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgb(255 255 255 / 30%);
 }
 
 .bpmSaveButton,
 .bpmCancelButton {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgb(0 0 0 / 30%);
+  border: 1px solid rgb(255 255 255 / 20%);
   color: var(--spice-text);
   cursor: pointer;
   font-size: 12px;
@@ -737,19 +737,19 @@
 }
 
 .bpmSaveButton:hover {
-  background-color: rgba(34, 197, 94, 0.2);
+  background-color: rgb(34 197 94 / 20%);
   border-color: #22c55e;
   color: #22c55e;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 2px 4px rgb(34 197 94 / 20%);
 }
 
 .bpmCancelButton:hover {
-  background-color: rgba(239, 68, 68, 0.2);
+  background-color: rgb(239 68 68 / 20%);
   border-color: #ef4444;
   color: #ef4444;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 2px 4px rgb(239 68 68 / 20%);
 }
 
 @keyframes slideIn {
@@ -757,6 +757,7 @@
     opacity: 0;
     transform: scale(0.95) translateY(-2px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -772,6 +773,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

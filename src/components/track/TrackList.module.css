@@ -45,19 +45,19 @@
   width: 100%;
   padding: 8px 12px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgb(255 255 255 / 10%);
+  background: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   font-size: 14px;
 }
 
 .searchInput:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgb(255 255 255 / 30%);
 }
 
 .filterToggle {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -71,16 +71,16 @@
 }
 
 .filterToggle:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 /* Active filter toggle style */
 .filterToggleActive {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .filterToggleActive:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
 }
 
 .filterBadge {
@@ -113,7 +113,7 @@
 
 /* Filter options panel */
 .filterOptions {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   border-radius: 4px;
   padding: 12px;
   display: flex;
@@ -149,7 +149,7 @@
 
 /* Rating filters */
 .ratingFilter {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -159,7 +159,7 @@
 }
 
 .ratingFilter:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .ratingFilter.active {
@@ -187,7 +187,7 @@
 }
 
 .tagFilter {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   border: none;
   border-radius: 16px;
@@ -198,7 +198,7 @@
 }
 
 .tagFilter:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .tagFilter.active {
@@ -244,15 +244,15 @@
   width: 200px;
   padding: 8px 12px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgb(255 255 255 / 10%);
+  background: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   font-size: 13px;
 }
 
 .tagSearchInput:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgb(255 255 255 / 30%);
 }
 
 /* Track list */
@@ -275,13 +275,13 @@
   flex-direction: column;
   padding: 12px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   transition: background 0.2s ease;
   position: relative;
 }
 
 .trackItem:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .trackItemInfo {
@@ -314,6 +314,7 @@
 .trackItemMetaTop {
   justify-content: space-between;
   align-items: center;
+
   /* position: relative; */
   width: 100%;
   padding-right: 0;
@@ -335,7 +336,7 @@
 /* Filter stars */
 
 .trackItemEnergy {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   padding: 2px 6px;
   border-radius: 4px;
@@ -358,7 +359,7 @@
 
 .trackItemTag {
   display: inline-flex;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   border-radius: 12px;
   padding: 2px 8px;
   max-width: 100%;
@@ -366,7 +367,7 @@
 }
 
 .trackItemTag:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .noTags {
@@ -394,7 +395,7 @@
 }
 
 .actionButton {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -405,7 +406,7 @@
 }
 
 .actionButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .activeTagFilter {
@@ -427,7 +428,7 @@
 }
 
 .filterModeButton {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -439,7 +440,7 @@
 }
 
 .filterModeButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .activeFilterMode {
@@ -448,24 +449,24 @@
 }
 
 .createPlaylistButton {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgb(255 255 255 / 20%);
   backdrop-filter: blur(10px);
   width: 10em;
 }
 
 .createPlaylistButton:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: rgb(255 255 255 / 10%);
+  border-color: rgb(255 255 255 / 30%);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
 }
 
 .createPlaylistButton:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 5%);
+  border-color: rgb(255 255 255 / 10%);
   transform: none;
   box-shadow: none;
 }
@@ -473,11 +474,11 @@
 .smartPlaylistButton {
   background: linear-gradient(
     135deg,
-    rgba(255, 193, 7, 0.15),
-    rgba(255, 152, 0, 0.15)
+    rgb(255 193 7 / 15%),
+    rgb(255 152 0 / 15%)
   );
   color: white;
-  border: 1px solid rgba(255, 193, 7, 0.3);
+  border: 1px solid rgb(255 193 7 / 30%);
   position: relative;
   overflow: hidden;
 }
@@ -492,7 +493,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 193, 7, 0.2),
+    rgb(255 193 7 / 20%),
     transparent
   );
   transition: left 0.5s ease;
@@ -501,11 +502,11 @@
 .smartPlaylistButton:hover:not(:disabled) {
   background: linear-gradient(
     135deg,
-    rgba(255, 193, 7, 0.25),
-    rgba(255, 152, 0, 0.25)
+    rgb(255 193 7 / 25%),
+    rgb(255 152 0 / 25%)
   );
-  border-color: rgba(255, 193, 7, 0.5);
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+  border-color: rgb(255 193 7 / 50%);
+  box-shadow: 0 4px 12px rgb(255 193 7 / 30%);
 }
 
 .smartPlaylistButton:hover::before {
@@ -515,13 +516,13 @@
 .smartPlaylistButton svg {
   color: #ffd700;
   font-size: 12px;
-  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+  filter: drop-shadow(0 0 4px rgb(255 215 0 / 50%));
   animation: sparkle 2s ease-in-out infinite;
 }
 
 .smartPlaylistButton:hover svg {
   color: #fff;
-  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
+  filter: drop-shadow(0 0 6px rgb(255 215 0 / 80%));
 }
 
 /* ANIMATION ON LIGHTNING ICON */
@@ -529,19 +530,20 @@
   0%,
   100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+    filter: drop-shadow(0 0 4px rgb(255 215 0 / 50%));
   }
+
   50% {
     transform: scale(1.1);
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+    filter: drop-shadow(0 0 8px rgb(255 215 0 / 80%));
   }
 }
 
 .smartPlaylistButton:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-  background: rgba(255, 193, 7, 0.08);
-  border-color: rgba(255, 193, 7, 0.15);
+  background: rgb(255 193 7 / 8%);
+  border-color: rgb(255 193 7 / 15%);
   transform: none;
   box-shadow: none;
 }
@@ -557,7 +559,7 @@
 }
 
 .clickable:hover {
-  color: rgba(255, 255, 255, 0.977);
+  color: rgb(255 255 255 / 97.7%);
   text-decoration: underline;
 }
 
@@ -567,20 +569,20 @@
 }
 
 .clickableArtist:hover {
-  color: rgba(255, 255, 255, 0.977);
+  color: rgb(255 255 255 / 97.7%);
   text-decoration: underline;
 }
 
 /* Active Track Highlighting Styles */
 .activeTrackItem {
-  background: rgba(30, 144, 255, 0.15) !important;
-  border: 1px solid rgba(30, 144, 255, 0.4) !important;
+  background: rgb(30 144 255 / 15%) !important;
+  border: 1px solid rgb(30 144 255 / 40%) !important;
   position: relative;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
 }
 
 .activeTrackItem:hover {
-  background: rgba(30, 144, 255, 0.2) !important;
+  background: rgb(30 144 255 / 20%) !important;
 }
 
 .activeTrackTitle {
@@ -610,7 +612,7 @@
 }
 
 .loadMoreButton {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -622,7 +624,7 @@
 }
 
 .loadMoreButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .excludedTagFilter {
@@ -649,7 +651,7 @@
   flex-wrap: wrap;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   border-radius: 4px;
   max-width: 100%;
   overflow: hidden;
@@ -713,7 +715,7 @@
 }
 
 .trackItemBpm {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   padding: 2px 6px;
   border-radius: 4px;
@@ -750,12 +752,12 @@
 .playAllButton {
   background: linear-gradient(135deg, #1e40af, #1d4ed8);
   color: white;
-  box-shadow: 0 2px 6px rgba(30, 64, 175, 0.25);
+  box-shadow: 0 2px 6px rgb(30 64 175 / 25%);
 }
 
 .playAllButton:hover:not(:disabled) {
   background: linear-gradient(135deg, #1d4ed8, #2563eb);
-  box-shadow: 0 3px 10px rgba(30, 64, 175, 0.35);
+  box-shadow: 0 3px 10px rgb(30 64 175 / 35%);
 }
 
 .playAllButton:disabled {
@@ -776,9 +778,9 @@
 /* Sort controls */
 
 .sortOrderButton {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   color: var(--spice-text);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 4px;
   width: 28px;
   height: 28px;
@@ -792,7 +794,7 @@
 }
 
 .sortOrderButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 /* Timestamp styles */
@@ -870,7 +872,7 @@
   margin-right: 5px;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .header {
     flex-direction: column;
     align-items: stretch;

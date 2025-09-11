@@ -1,10 +1,7 @@
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
+  inset: 0;
+  background-color: rgb(0 0 0 / 80%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -24,7 +21,7 @@
   margin: auto;
   position: relative;
   animation: modalSlideIn 0.3s ease-out;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 40px rgb(0 0 0 / 40%);
 }
 
 @keyframes modalSlideIn {
@@ -32,6 +29,7 @@
     opacity: 0;
     transform: translateY(-30px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -40,12 +38,12 @@
 
 /* Header Styles */
 .modalHeader {
-  padding: 24px 24px 16px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
   background: linear-gradient(
     135deg,
-    rgba(29, 185, 84, 0.1),
-    rgba(30, 144, 255, 0.1)
+    rgb(29 185 84 / 10%),
+    rgb(30 144 255 / 10%)
   );
 }
 
@@ -64,7 +62,7 @@
 }
 
 .subtitle {
-  margin: 4px 0 0 0;
+  margin: 4px 0 0;
   font-size: 14px;
   color: var(--spice-subtext);
   font-weight: 400;
@@ -110,7 +108,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(255 255 255 / 5%);
   border: 2px solid transparent;
   border-radius: 12px;
   cursor: pointer;
@@ -121,12 +119,12 @@
 }
 
 .optionButton:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(30, 144, 255, 0.3);
+  background: rgb(255 255 255 / 8%);
+  border-color: rgb(30 144 255 / 30%);
 }
 
 .optionSelected {
-  background: rgba(30, 144, 255, 0.15) !important;
+  background: rgb(30 144 255 / 15%) !important;
   border-color: #1e90ff !important;
 }
 
@@ -138,7 +136,7 @@
 .radioIndicator {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgb(255 255 255 / 30%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -162,6 +160,7 @@
   from {
     transform: scale(0);
   }
+
   to {
     transform: scale(1);
   }
@@ -176,7 +175,7 @@
 .inlineInputSection {
   margin-top: 8px;
   padding: 12px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgb(255 255 255 / 5%);
   border-radius: 8px;
   border-left: 3px solid var(--spice-accent, #1db954);
 }
@@ -185,17 +184,17 @@
   display: block;
   margin-bottom: 6px;
   font-size: 0.9em;
-  color: var(--spice-text, #ffffff);
+  color: var(--spice-text, #fff);
   font-weight: 500;
 }
 
 .inlineInput {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 6px;
-  background-color: rgba(0, 0, 0, 0.3);
-  color: var(--spice-text, #ffffff);
+  background-color: rgb(0 0 0 / 30%);
+  color: var(--spice-text, #fff);
   font-size: 0.9em;
   transition: border-color 0.2s ease;
 }
@@ -207,8 +206,8 @@
 
 /* Footer Styles */
 .modalFooter {
-  padding: 16px 24px 24px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 24px 24px;
+  border-top: 1px solid rgb(255 255 255 / 10%);
 }
 
 .footerActions {
@@ -220,7 +219,7 @@
 .skipButton {
   padding: 10px 20px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 8px;
   color: var(--spice-subtext);
   font-size: 14px;
@@ -230,8 +229,8 @@
 }
 
 .skipButton:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgb(255 255 255 / 5%);
+  border-color: rgb(255 255 255 / 30%);
   color: var(--spice-text);
 }
 
@@ -260,11 +259,11 @@
 .submitButton:hover:not(:disabled) {
   background: linear-gradient(135deg, #1ed760, #1db954);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+  box-shadow: 0 4px 12px rgb(29 185 84 / 30%);
 }
 
 .submitButton:disabled {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
   color: var(--spice-subtext);
   cursor: not-allowed;
   transform: none;
@@ -275,7 +274,7 @@
 .loadingSpinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgb(255 255 255 / 30%);
   border-top: 2px solid white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -285,20 +284,21 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .modal {
     width: 95%;
     margin: 20px auto;
   }
 
   .modalHeader {
-    padding: 20px 20px 16px 20px;
+    padding: 20px 20px 16px;
   }
 
   .modalBody {
@@ -306,7 +306,7 @@
   }
 
   .modalFooter {
-    padding: 16px 20px 20px 20px;
+    padding: 16px 20px 20px;
   }
 
   .titleSection {

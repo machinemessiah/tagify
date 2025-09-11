@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./RefreshModal.module.css";
+import styles from "./MainSettingsModal.module.css"
 import Portal from "@/components/ui/Portal";
 import { useLocalStorage } from "@/hooks/shared/useLocalStorage";
 

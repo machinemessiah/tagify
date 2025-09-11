@@ -41,7 +41,7 @@
 }
 
 .cancelButton {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -53,7 +53,7 @@
 }
 
 .cancelButton:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgb(255 255 255 / 10%);
 }
 
 .sectionTitle {
@@ -66,7 +66,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgb(0 0 0 / 10%);
   border-radius: 8px;
   padding: 12px;
 }
@@ -79,7 +79,7 @@
 }
 
 .tagItem {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   border-radius: 12px;
   padding: 4px 10px;
@@ -91,7 +91,7 @@
 }
 
 .tagItem:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .removeTagIcon {
@@ -120,7 +120,7 @@
 }
 
 .trackItem {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   border-radius: 4px;
   padding: 10px 12px;
   display: grid;
@@ -131,7 +131,7 @@
 }
 
 .trackItem:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(255 255 255 / 5%);
 }
 
 .lockColumn {
@@ -203,7 +203,7 @@
 
 .trackItemEnergy {
   grid-column: 1;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0 0 0 / 30%);
   color: var(--spice-text);
   padding: 4px 5px;
   border-radius: 4px;
@@ -224,7 +224,7 @@
 /* Play button styles */
 .playButton {
   grid-column: 5;
-  background: rgba(0, 0, 0, 0.24);
+  background: rgb(0 0 0 / 24%);
   color: white;
   border: none;
   border-radius: 4px;
@@ -243,14 +243,14 @@
 }
 
 .lockedTrack {
-  background: rgba(30, 144, 255, 0.1);
-  border: 1px solid rgba(30, 144, 255, 0.3);
+  background: rgb(30 144 255 / 10%);
+  border: 1px solid rgb(30 144 255 / 30%);
   border-left: 4px solid #1e90ff; /* Add thick left border */
   position: relative;
 }
 
 .lockedTrack:hover {
-  background: rgba(30, 144, 255, 0.15);
+  background: rgb(30 144 255 / 15%);
 }
 
 .contextBar {
@@ -282,6 +282,7 @@
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -294,7 +295,7 @@
 }
 
 .saveButton {
-  background: rgba(30, 144, 255, 0.3);
+  background: rgb(30 144 255 / 30%);
   color: white;
   border: none;
   border-radius: 4px;
@@ -306,7 +307,7 @@
 }
 
 .saveButton:hover:not(:disabled) {
-  background: rgba(30, 144, 255, 0.5);
+  background: rgb(30 144 255 / 50%);
 }
 
 .saveButton:disabled {
@@ -315,7 +316,7 @@
 }
 
 .discardButton {
-  background-color: rgba(255, 0, 0, 0.2);
+  background-color: rgb(255 0 0 / 20%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
@@ -327,7 +328,7 @@
 }
 
 .discardButton:hover {
-  background-color: rgba(255, 0, 0, 0.3);
+  background-color: rgb(255 0 0 / 30%);
 }
 
 .discardButton:disabled {
@@ -416,17 +417,16 @@
   justify-self: center;
   width: 200px;
   height: 4px;
-  -webkit-appearance: none;
   appearance: none;
   background: var(--spice-button-disabled);
   border-radius: 2px;
   outline: none;
+
   /* Add margin to push it down slightly to match stars */
   margin-top: 2px;
 }
 
 .energySlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
   appearance: none;
   width: 16px;
   height: 16px;
@@ -449,22 +449,22 @@
 
 .clearButton {
   grid-column: 3;
-  justify-self: start;
+  place-self: center start;
   width: 50px;
   height: 28px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   border: none;
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
+
   /* Ensure button is vertically centered in its grid cell */
-  align-self: center;
 }
 
 .clearButton:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(255 255 255 / 10%);
 }
 
 .clearButton.hidden {

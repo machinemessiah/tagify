@@ -1,10 +1,7 @@
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background-color: rgb(0 0 0 / 70%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -28,6 +25,7 @@
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -50,7 +48,7 @@
 }
 
 .modalBody {
-  padding: 8px 24px 24px 24px;
+  padding: 8px 24px 24px;
   overflow-y: auto;
   max-height: calc(90vh - 70px);
   display: flex;
@@ -213,7 +211,7 @@
 }
 
 .error {
-  background-color: rgba(255, 0, 0, 0.1);
+  background-color: rgb(255 0 0 / 10%);
   color: #e74c3c;
 }
 
@@ -330,7 +328,7 @@
 }
 
 .paginationButton {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgb(0 0 0 / 20%);
   color: var(--spice-text);
   flex: 1;
   max-width: 100px;
@@ -344,7 +342,7 @@
 }
 
 .paginationButton:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgb(255 255 255 / 10%);
 }
 
 .paginationButton:disabled {
