@@ -11,6 +11,7 @@ import { Settings } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartSimple,
+  faCoffee,
   faDownload,
   faInfo,
   faLightbulb,
@@ -124,6 +125,19 @@ const DataManager: React.FC<DataManagerProps> = ({
           title="Help improve Tagify with your feedback"
         >
           <FontAwesomeIcon icon={faLightbulb} /> Feedback
+        </button>
+        <button
+          className={`${styles.pillButton} ${styles.coffeeButton}`}
+          onClick={() => {
+            window.open(
+              "https://buymeacoffee.com/alexk218",
+              "_blank",
+              "noopener,noreferrer"
+            );
+          }}
+          title="Support Tagify development"
+        >
+          <FontAwesomeIcon icon={faCoffee} /> Support
         </button>
       </div>
 
