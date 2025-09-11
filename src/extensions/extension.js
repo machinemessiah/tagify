@@ -12,6 +12,82 @@
   const SETTINGS_CHANGED_EVENT = "tagify:settingsChanged";
   const DATA_UPDATED_EVENT = "tagify:dataUpdated";
 
+  // ! SET TO TRUE TO DEBUG
+  const DEBUG_MODE = false;
+
+  const Logger = {
+    log(...args) {
+      if (DEBUG_MODE) {
+        console.log("🏷️ Tagify:", ...args);
+      }
+    },
+
+    warn(...args) {
+      if (DEBUG_MODE) {
+        console.warn("⚠️ Tagify:", ...args);
+      }
+    },
+
+    error(...args) {
+      // Always log errors, even in production
+      console.error("❌ Tagify:", ...args);
+    },
+
+    debug(...args) {
+      if (DEBUG_MODE) {
+        console.log("🔍 Debug:", ...args);
+      }
+    },
+
+    performance(label, duration) {
+      if (DEBUG_MODE) {
+        console.log(`⏱️ ${label}: ${duration.toFixed(2)}ms`);
+      }
+    },
+  };
+
+  const PerformanceMonitor = {
+    timers: new Map(),
+
+    start(label) {
+      if (DEBUG_MODE) {
+        this.timers.set(label, performance.now());
+      }
+    },
+
+    end(label) {
+      if (!DEBUG_MODE) return;
+
+      const start = this.timers.get(label);
+      if (start) {
+        const duration = performance.now() - start;
+        Logger.performance(label, duration);
+        this.timers.delete(label);
+        return duration;
+      }
+    },
+
+    measure(label, fn) {
+      if (!DEBUG_MODE) {
+        return fn(); // Just execute without measuring
+      }
+
+      this.start(label);
+      const result = fn();
+      this.end(label);
+      return result;
+    },
+
+    measureAsync(label, asyncFn) {
+      if (!DEBUG_MODE) {
+        return asyncFn(); // Just execute without measuring
+      }
+
+      this.start(label);
+      return asyncFn().finally(() => this.end(label));
+    },
+  };
+
   // Shared state
   const state = {
     taggedTracks: {},
@@ -41,18 +117,23 @@
      */
     loadExtensionSettings() {
       try {
-        const savedExtensionSettings = localStorage.getItem(EXTENSION_SETTINGS_KEY);
+        const savedExtensionSettings = localStorage.getItem(
+          EXTENSION_SETTINGS_KEY
+        );
         if (savedExtensionSettings) {
           const data = JSON.parse(savedExtensionSettings);
-          state.activeExtensions.tracklistEnhancer = data.enableTracklistEnhancer ?? true;
-          state.activeExtensions.playbarEnhancer = data.enablePlaybarEnhancer ?? true;
+          state.activeExtensions.tracklistEnhancer =
+            data.enableTracklistEnhancer ?? true;
+          state.activeExtensions.playbarEnhancer =
+            data.enablePlaybarEnhancer ?? true;
           return true;
         } else {
           // create initial localStorage item
           this.saveExtensionSettings(DEFAULT_EXTENSION_SETTINGS);
           state.activeExtensions.tracklistEnhancer =
             DEFAULT_EXTENSION_SETTINGS.enableTracklistEnhancer;
-          state.activeExtensions.playbarEnhancer = DEFAULT_EXTENSION_SETTINGS.enablePlaybarEnhancer;
+          state.activeExtensions.playbarEnhancer =
+            DEFAULT_EXTENSION_SETTINGS.enablePlaybarEnhancer;
           return false; // Indicates we created defaults
         }
       } catch (error) {
@@ -73,10 +154,15 @@
     handleSettingsChange(newSettings) {
       const oldSettings = { ...state.activeExtensions };
 
-      state.activeExtensions.tracklistEnhancer = newSettings.enableTracklistEnhancer;
-      state.activeExtensions.playbarEnhancer = newSettings.enablePlaybarEnhancer;
+      state.activeExtensions.tracklistEnhancer =
+        newSettings.enableTracklistEnhancer;
+      state.activeExtensions.playbarEnhancer =
+        newSettings.enablePlaybarEnhancer;
 
-      if (oldSettings.tracklistEnhancer !== state.activeExtensions.tracklistEnhancer) {
+      if (
+        oldSettings.tracklistEnhancer !==
+        state.activeExtensions.tracklistEnhancer
+      ) {
         if (state.activeExtensions.tracklistEnhancer) {
           tracklistEnhancer.initialize();
         } else {
@@ -84,7 +170,9 @@
         }
       }
 
-      if (oldSettings.playbarEnhancer !== state.activeExtensions.playbarEnhancer) {
+      if (
+        oldSettings.playbarEnhancer !== state.activeExtensions.playbarEnhancer
+      ) {
         if (state.activeExtensions.playbarEnhancer) {
           playbarEnhancer.initialize();
         } else {
@@ -177,7 +265,11 @@
       // Return default settings if not found or error
       return {
         excludeNonOwnedPlaylists: true,
-        excludedPlaylistKeywords: ["Daylist", "Discover Weekly", "Release Radar"],
+        excludedPlaylistKeywords: [
+          "Daylist",
+          "Discover Weekly",
+          "Release Radar",
+        ],
         excludedPlaylistIds: [],
         excludeByDescription: ["ignore"],
       };
@@ -270,12 +362,14 @@
 
       if (relevantPlaylists.length === 0) {
         if (trackUri.startsWith("spotify:local:")) {
-          console.log(`Tagify: No relevant playlists for local file`);
+          Logger.debug(`Tagify: No relevant playlists for local file`);
         }
         return "No regular playlists";
       }
 
-      const playlistNames = relevantPlaylists.map((playlist) => playlist.name).sort();
+      const playlistNames = relevantPlaylists
+        .map((playlist) => playlist.name)
+        .sort();
 
       return playlistNames.join(", ");
     },
@@ -341,7 +435,7 @@
     getTracklistTrackUri(tracklistElement) {
       let values = Object.values(tracklistElement);
       if (!values) {
-        console.log("Error: Could not get tracklist element");
+        Logger.error("Error: Could not get tracklist element");
         return null;
       }
 
@@ -349,9 +443,10 @@
         // First try standard approach
         const uri =
           values[0]?.pendingProps?.children[0]?.props?.children?.props?.uri ||
-          values[0]?.pendingProps?.children[0]?.props?.children?.props?.children?.props?.uri ||
-          values[0]?.pendingProps?.children[0]?.props?.children?.props?.children?.props?.children
+          values[0]?.pendingProps?.children[0]?.props?.children?.props?.children
             ?.props?.uri ||
+          values[0]?.pendingProps?.children[0]?.props?.children?.props?.children
+            ?.props?.children?.props?.uri ||
           values[0]?.pendingProps?.children[0]?.props?.children[0]?.props?.uri;
 
         // If we have a URI at this point, return it
@@ -362,10 +457,10 @@
         if (localUri) return localUri;
 
         // If we couldn't find a URI, log a warning and return null
-        console.log("Warning: Could not extract URI from element");
+        Logger.warn("Warning: Could not extract URI from element");
         return null;
       } catch (e) {
-        console.log("Error getting URI from element:", e);
+        Logger.error("Error getting URI from element:", e);
         return null;
       }
     },
@@ -376,7 +471,10 @@
         if (!element || !element.pendingProps) return null;
 
         // First direct check for uri property
-        if (element.pendingProps.uri && element.pendingProps.uri.startsWith("spotify:local:")) {
+        if (
+          element.pendingProps.uri &&
+          element.pendingProps.uri.startsWith("spotify:local:")
+        ) {
           return element.pendingProps.uri;
         }
 
@@ -390,11 +488,17 @@
         }
 
         // Deep search in children
-        if (element.pendingProps.children && Array.isArray(element.pendingProps.children)) {
+        if (
+          element.pendingProps.children &&
+          Array.isArray(element.pendingProps.children)
+        ) {
           for (const child of element.pendingProps.children) {
             if (child && child.props) {
               // Check if this child has the URI
-              if (child.props.uri && child.props.uri.startsWith("spotify:local:")) {
+              if (
+                child.props.uri &&
+                child.props.uri.startsWith("spotify:local:")
+              ) {
                 return child.props.uri;
               }
 
@@ -412,7 +516,7 @@
 
         return null;
       } catch (error) {
-        console.error("Error extracting local file URI:", error);
+        Logger.error("Error extracting local file URI:", error);
         return null;
       }
     },
@@ -435,7 +539,9 @@
           if (parts[2] === "" && parts[3] === "") {
             artist = decodeURIComponent(parts[4].replace(/\+/g, " "));
             let potentialTitle =
-              parts.length > 5 ? decodeURIComponent(parts[5].replace(/\+/g, " ")) : "";
+              parts.length > 5
+                ? decodeURIComponent(parts[5].replace(/\+/g, " "))
+                : "";
 
             // Check if the title part is just a number (likely duration)
             if (potentialTitle && !isNaN(Number(potentialTitle))) {
@@ -490,7 +596,9 @@
       if (state.initialized.menu) return;
 
       if (!Spicetify.ContextMenu) {
-        console.warn("Tagify: Spicetify.ContextMenu not available, menu feature disabled");
+        console.warn(
+          "Tagify: Spicetify.ContextMenu not available, menu feature disabled"
+        );
         return;
       }
 
@@ -528,7 +636,8 @@
      */
     shouldShowSingleMenu(uris) {
       const trackUris = uris.filter(
-        (uri) => uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
+        (uri) =>
+          uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
       );
       return trackUris.length === 1;
     },
@@ -540,7 +649,8 @@
      */
     shouldShowBulkMenu(uris) {
       const trackUris = uris.filter(
-        (uri) => uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
+        (uri) =>
+          uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
       );
       return trackUris.length > 1;
     },
@@ -554,7 +664,8 @@
 
       // Filter to only track URIs
       const trackUris = uris.filter(
-        (uri) => uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
+        (uri) =>
+          uri.startsWith("spotify:track:") || uri.startsWith("spotify:local:")
       );
 
       if (trackUris.length === 1) {
@@ -583,6 +694,12 @@
   const tracklistEnhancer = {
     tracklistObservers: new Set(),
     updateInterval: null,
+    processedElements: new WeakSet(),
+    lastProcessedCount: 0,
+    smartUpdateInterval: null,
+    isIdle: false,
+    lastActivityTime: Date.now(),
+
     /**
      * Initialize the tracklist indicator feature
      */
@@ -595,22 +712,93 @@
         this.setupObserver();
 
         // Initial processing
-        setTimeout(this.updateTracklists, 500);
+        setTimeout(this.updateTracklists.bind(this), 500);
 
-        // Store the interval reference for cleanup
-        this.updateInterval = setInterval(this.updateTracklists, 3000);
+        // Start smart interval management instead of fixed interval
+        this.startSmartUpdates();
 
         // Setup debug utility
         window.tagifyDebug = {
-          reprocess: this.updateTracklists,
+          reprocess: this.updateTracklists.bind(this),
           getData: () => state.taggedTracks,
-          checkTrack: (uri) => console.log(`Track ${uri} is tagged: ${utils.isTrackTagged(uri)}`),
+          checkTrack: (uri) =>
+            Logger.debug(`Track ${uri} is tagged: ${utils.isTrackTagged(uri)}`),
         };
 
         state.initialized.tracklistEnhancer = true;
       } catch (error) {
-        console.error("Tagify: Error initializing tracklist indicator feature:", error);
+        console.error(
+          "Tagify: Error initializing tracklist indicator feature:",
+          error
+        );
       }
+    },
+
+    /**
+     * Smart interval management with idle detection
+     */
+    startSmartUpdates() {
+      // Clear any existing interval
+      if (this.smartUpdateInterval) {
+        clearTimeout(this.smartUpdateInterval);
+      }
+
+      // Start with shorter intervals, extend when idle
+      this.scheduleNextUpdate();
+
+      // Track user activity to detect idle state
+      this.trackUserActivity();
+    },
+
+    scheduleNextUpdate() {
+      const timeSinceActivity = Date.now() - this.lastActivityTime;
+      let interval;
+
+      if (timeSinceActivity < 5000) {
+        // Active in last 5 seconds
+        interval = 1000; // Check every second
+        this.isIdle = false;
+      } else if (timeSinceActivity < 30000) {
+        // Active in last 30 seconds
+        interval = 3000; // Check every 3 seconds
+        this.isIdle = false;
+      } else {
+        interval = 10000; // Check every 10 seconds when idle
+        this.isIdle = true;
+      }
+
+      this.smartUpdateInterval = setTimeout(() => {
+        if (this.isIdle) {
+          Logger.log("Idle update check");
+        }
+        this.updateTracklists();
+        this.scheduleNextUpdate(); // Schedule next update
+      }, interval);
+    },
+
+    trackUserActivity() {
+      const activityEvents = ["click", "scroll", "keydown", "mousemove"];
+
+      const resetActivity = () => {
+        this.lastActivityTime = Date.now();
+        if (this.isIdle) {
+          Logger.log("👆 User activity detected, exiting idle mode");
+          this.isIdle = false;
+        }
+      };
+
+      // Throttle mousemove to avoid excessive calls
+      const throttledMouseMove = this.throttle(resetActivity, 1000);
+
+      activityEvents.forEach((event) => {
+        if (event === "mousemove") {
+          document.addEventListener(event, throttledMouseMove, {
+            passive: true,
+          });
+        } else {
+          document.addEventListener(event, resetActivity, { passive: true });
+        }
+      });
     },
 
     /**
@@ -629,7 +817,7 @@
       const tracklistObserver = new MutationObserver(() => {
         // CHECK IF STILL ACTIVE BEFORE PROCESSING
         if (!state.activeExtensions.tracklistEnhancer) return;
-        tracklistEnhancer.updateTracklists();
+        this.updateTracklists();
       });
 
       // Store reference for cleanup
@@ -650,14 +838,16 @@
             );
 
             if (addedTracklists.length > 0) {
-              tracklistEnhancer.updateTracklists();
+              this.updateTracklists();
 
               // Observe each tracklist for changes
-              const tracklists = document.getElementsByClassName("main-trackList-indexable");
+              const tracklists = document.getElementsByClassName(
+                "main-trackList-indexable"
+              );
               for (const tracklist of tracklists) {
                 const newObserver = new MutationObserver(() => {
                   if (!state.activeExtensions.tracklistEnhancer) return;
-                  tracklistEnhancer.updateTracklists();
+                  this.updateTracklists();
                 });
 
                 newObserver.observe(tracklist, {
@@ -680,11 +870,13 @@
       });
 
       // Get all tracklists and observe them for changes
-      const tracklists = document.getElementsByClassName("main-trackList-indexable");
+      const tracklists = document.getElementsByClassName(
+        "main-trackList-indexable"
+      );
       for (const tracklist of tracklists) {
         const newObserver = new MutationObserver(() => {
           if (!state.activeExtensions.tracklistEnhancer) return;
-          tracklistEnhancer.updateTracklists();
+          this.updateTracklists();
         });
 
         newObserver.observe(tracklist, {
@@ -697,16 +889,79 @@
     },
 
     /**
-     * Update all tracklists on the page
+     * Update all tracklists on the page with change detection
      */
     updateTracklists() {
       // CHECK IF STILL ACTIVE BEFORE PROCESSING
       if (!state.activeExtensions.tracklistEnhancer) return;
 
-      const tracklists = document.getElementsByClassName("main-trackList-indexable");
-      for (const tracklist of tracklists) {
-        tracklistEnhancer.processTracklist(tracklist);
+      const tracklists = document.getElementsByClassName(
+        "main-trackList-indexable"
+      );
+
+      if (tracklists.length === 0) {
+        Logger.debug("No tracklists found, skipping update");
+        return;
       }
+
+      let hasChanges = false;
+
+      for (const tracklist of tracklists) {
+        if (this.hasTracklistChanged(tracklist)) {
+          hasChanges = true;
+          this.processTracklist(tracklist);
+          this.markTracklistAsProcessed(tracklist);
+        }
+      }
+
+      if (!hasChanges) {
+        Logger.debug("No changes detected, skipping processing");
+      }
+    },
+
+    /**
+     * Check if a tracklist has changed since last processing
+     */
+    hasTracklistChanged(tracklist) {
+      // Check if we've already processed this exact tracklist
+      if (this.processedElements.has(tracklist)) {
+        const trackRows = tracklist.querySelectorAll(
+          ".main-trackList-trackListRow"
+        );
+        const currentCount = trackRows.length;
+
+        // Check if track count changed
+        const lastCount = tracklist.dataset.tagifyLastCount || 0;
+        if (parseInt(lastCount) !== currentCount) {
+          Logger.log(`Track count changed: ${lastCount} -> ${currentCount}`);
+          return true;
+        }
+
+        // Check if any new rows were added
+        const unprocessedRows = Array.from(trackRows).filter(
+          (row) => !row.querySelector(".tagify-info")
+        );
+
+        if (unprocessedRows.length > 0) {
+          Logger.log(`Found ${unprocessedRows.length} unprocessed rows`);
+          return true;
+        }
+
+        return false; // No changes detected
+      }
+
+      return true; // Never processed before
+    },
+
+    /**
+     * Mark a tracklist as processed
+     */
+    markTracklistAsProcessed(tracklist) {
+      this.processedElements.add(tracklist);
+      const trackRows = tracklist.querySelectorAll(
+        ".main-trackList-trackListRow"
+      );
+      tracklist.dataset.tagifyLastCount = trackRows.length.toString();
     },
 
     /**
@@ -716,17 +971,30 @@
     processTracklist(tracklist) {
       if (!tracklist) return;
 
-      // Add column to header first
-      const header = tracklist.querySelector(".main-trackList-trackListHeaderRow");
-      if (header) {
-        tracklistEnhancer.addColumnToHeader(header);
+      Logger.log("Actually processing tracklist (changes detected)");
+
+      // Add column to header first (with duplicate check)
+      const header = tracklist.querySelector(
+        ".main-trackList-trackListHeaderRow"
+      );
+      if (header && !header.querySelector(".tagify-header")) {
+        this.addColumnToHeader(header);
       }
 
-      // Process all track rows
-      const trackRows = tracklist.querySelectorAll(".main-trackList-trackListRow");
+      // Only process unprocessed track rows
+      const trackRows = tracklist.querySelectorAll(
+        ".main-trackList-trackListRow"
+      );
+      const unprocessedRows = Array.from(trackRows).filter(
+        (row) => !row.querySelector(".tagify-info")
+      );
 
-      trackRows.forEach((row) => {
-        tracklistEnhancer.addTagInfoToTrack(row);
+      Logger.log(
+        `Processing ${unprocessedRows.length} new rows out of ${trackRows.length} total`
+      );
+
+      unprocessedRows.forEach((row) => {
+        this.addTagInfoToTrack(row);
       });
     },
 
@@ -770,7 +1038,9 @@
       if (!lastColumn) return;
 
       // Count existing columns before adding ours
-      const existingColumns = header.querySelectorAll('[class*="main-trackList-rowSection"]');
+      const existingColumns = header.querySelectorAll(
+        '[class*="main-trackList-rowSection"]'
+      );
       const currentColumnCount = existingColumns.length;
 
       // Get current column index and increment it for the last column
@@ -809,13 +1079,23 @@
     },
 
     /**
-     * Add Tagify info to track row
+     * Add Tagify info to track row with observer isolation
      * @param {HTMLElement} row - The track row element
      */
     addTagInfoToTrack(row) {
       // Skip if already processed
       if (row.querySelector(".tagify-info")) return;
 
+      // Temporarily disconnect observers to prevent feedback
+      this.temporarilyDisconnectObservers(() => {
+        this.addTagInfoToTrackInternal(row);
+      });
+    },
+
+    /**
+     * Internal method for adding tag info without observer management
+     */
+    addTagInfoToTrackInternal(row) {
       // Get track URI
       const trackUri = utils.getTracklistTrackUri(row);
 
@@ -823,14 +1103,17 @@
       if (!trackUri) return;
 
       // Ensure we're dealing with a track URI (either Spotify track or local file)
-      if (!trackUri.includes("track") && !trackUri.startsWith("spotify:local:")) return;
+      if (!trackUri.includes("track") && !trackUri.startsWith("spotify:local:"))
+        return;
 
       // Find the last column to insert before
       const lastColumn = row.querySelector(".main-trackList-rowSectionEnd");
       if (!lastColumn) return;
 
       // Count existing columns before adding ours
-      const existingColumns = row.querySelectorAll('[class*="main-trackList-rowSection"]');
+      const existingColumns = row.querySelectorAll(
+        '[class*="main-trackList-rowSection"]'
+      );
       const currentColumnCount = existingColumns.length;
 
       // Get column index and increment it for the last column
@@ -886,7 +1169,8 @@
         const bulletColor = incomplete ? "#FFA500" : "#1DB954";
 
         // Truncate long summaries for narrow column
-        const truncatedSummary = summary.length > 12 ? summary.substring(0, 12) + "..." : summary;
+        const truncatedSummary =
+          summary.length > 12 ? summary.substring(0, 12) + "..." : summary;
 
         tagText.innerHTML = `<span style="color:${bulletColor}; margin-right:4px;">●</span>${truncatedSummary}`;
         tagText.style.fontSize = "12px";
@@ -903,7 +1187,7 @@
           state.taggedTracks[trackUri].tags &&
           state.taggedTracks[trackUri].tags.length > 0
         ) {
-          const tagList = tracklistEnhancer.createTagListTooltip(trackUri);
+          const tagList = this.createTagListTooltip(trackUri);
           tagText.title = tagList;
         }
 
@@ -1001,7 +1285,9 @@
             const category = categories.find((c) => c.id === tag.categoryId);
             if (category) {
               const categoryName = category.name;
-              const subcategory = category.subcategories.find((s) => s.id === tag.subcategoryId);
+              const subcategory = category.subcategories.find(
+                (s) => s.id === tag.subcategoryId
+              );
               if (subcategory) {
                 const subcategoryName = subcategory.name;
                 const tagObj = subcategory.tags.find((t) => t.id === tag.tagId);
@@ -1021,13 +1307,15 @@
           });
 
           const tagLines = [];
-          Object.entries(tagsByCategory).forEach(([_category, subcategories]) => {
-            Object.entries(subcategories).forEach(([_subcategory, tags]) => {
-              if (tags.length > 0) {
-                tagLines.push(tags.join(", "));
-              }
-            });
-          });
+          Object.entries(tagsByCategory).forEach(
+            ([_category, subcategories]) => {
+              Object.entries(subcategories).forEach(([_subcategory, tags]) => {
+                if (tags.length > 0) {
+                  tagLines.push(tags.join(", "));
+                }
+              });
+            }
+          );
 
           if (tagLines.length > 0) {
             return tagLines.join("\n");
@@ -1036,7 +1324,9 @@
       }
 
       // Handle older format tags as fallback
-      const simpleTags = track.tags.filter((tag) => tag.tag).map((tag) => tag.tag);
+      const simpleTags = track.tags
+        .filter((tag) => tag.tag)
+        .map((tag) => tag.tag);
       if (simpleTags.length > 0) {
         return simpleTags.join(", ");
       }
@@ -1044,11 +1334,57 @@
       return "";
     },
 
+    /**
+     * Temporarily disconnect observers during DOM modifications
+     */
+    temporarilyDisconnectObservers(callback) {
+      // Disconnect all observers
+      const observers = Array.from(this.tracklistObservers);
+      observers.forEach((observer) => observer.disconnect());
+
+      // Execute the callback
+      callback();
+
+      // Reconnect observers after a brief delay
+      setTimeout(() => {
+        this.reconnectObservers();
+      }, 100);
+    },
+
+    /**
+     * Reconnect all observers
+     */
+    reconnectObservers() {
+      // Clear existing observers
+      this.tracklistObservers.forEach((observer) => observer.disconnect());
+      this.tracklistObservers.clear();
+
+      // Re-setup observers
+      this.setupObserver();
+    },
+
+    /**
+     * Utility: Throttle function calls
+     */
+    throttle(func, limit) {
+      let inThrottle;
+      return (...args) => {
+        if (!inThrottle) {
+          func.apply(this, args);
+          inThrottle = true;
+          setTimeout(() => (inThrottle = false), limit);
+        }
+      };
+    },
+
+    /**
+     * Disable the tracklist enhancer
+     */
     disable() {
-      // Clear the interval
-      if (this.updateInterval) {
-        clearInterval(this.updateInterval);
-        this.updateInterval = null;
+      // Clear the smart update interval
+      if (this.smartUpdateInterval) {
+        clearTimeout(this.smartUpdateInterval);
+        this.smartUpdateInterval = null;
       }
 
       // Disconnect main observer
@@ -1062,14 +1398,21 @@
       this.tracklistObservers.clear();
 
       // Remove ALL existing tag columns immediately
-      document.querySelectorAll(".tagify-header, .tagify-info").forEach((el) => {
-        el.remove();
-      });
+      document
+        .querySelectorAll(".tagify-header, .tagify-info")
+        .forEach((el) => {
+          el.remove();
+        });
 
       // Reset grid styles that were modified
-      document.querySelectorAll('[style*="grid-template-columns"]').forEach((el) => {
-        el.removeAttribute("style");
-      });
+      document
+        .querySelectorAll('[style*="grid-template-columns"]')
+        .forEach((el) => {
+          el.removeAttribute("style");
+        });
+
+      // Clear processed elements cache
+      this.processedElements = new WeakSet();
 
       state.initialized.tracklistEnhancer = false;
     },
@@ -1091,7 +1434,10 @@
         }
 
         // Add listener for song changes
-        Spicetify.Player.addEventListener("songchange", this.updateNowPlayingWidget);
+        Spicetify.Player.addEventListener(
+          "songchange",
+          this.updateNowPlayingWidget
+        );
 
         // Initial update
         setTimeout(this.updateNowPlayingWidget, 1000);
@@ -1134,7 +1480,8 @@
         const trackUri = Spicetify.Player.data?.item?.uri;
         if (
           !trackUri ||
-          (!trackUri.startsWith("spotify:track:") && !trackUri.startsWith("spotify:local:"))
+          (!trackUri.startsWith("spotify:track:") &&
+            !trackUri.startsWith("spotify:local:"))
         ) {
           if (state.nowPlayingWidgetTagInfo) {
             state.nowPlayingWidgetTagInfo.style.display = "none";
@@ -1177,7 +1524,8 @@
             state.taggedTracks[trackUri].tags &&
             state.taggedTracks[trackUri].tags.length > 0
           ) {
-            const tagListTooltip = tracklistEnhancer.createTagListTooltip(trackUri);
+            const tagListTooltip =
+              tracklistEnhancer.createTagListTooltip(trackUri);
             state.nowPlayingWidgetTagInfo.title = tagListTooltip;
           }
 
