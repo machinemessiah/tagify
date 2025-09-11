@@ -32,6 +32,7 @@ import {
   faBullhorn,
   faBolt,
   faFilter,
+  faCoffee,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
@@ -883,6 +884,26 @@ const InfoModal: React.FC<InfoModalProps> = ({ onClose }) => {
                       {
                         "--fa-animation-duration": "3s",
                         "--fa-beat-fade-scale": "1.20",
+                      } as React.CSSProperties & Record<string, string>
+                    }
+                  />
+                </a>
+                <a
+                  href="https://buymeacoffee.com/alexk218"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Give Alex a coffee :)"
+                  className={styles.githubLink}
+                >
+                  <FontAwesomeIcon
+                    icon={faCoffee}
+                    size="lg"
+                    bounce
+                    className="fa-bounce"
+                    style={
+                      {
+                        "--fa-animation-duration": "5s",
+                        "--fa-bounce-height": "-15px",
                       } as React.CSSProperties & Record<string, string>
                     }
                   />
