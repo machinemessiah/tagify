@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import TagSelector from "../../components/TagSelector";
+import TagSelector from "@/components/tagging/TagSelector";
 import { TagCategory, TrackTag } from "@/hooks/data/useTagData";
 import React, { act } from "react";
 
@@ -80,7 +80,6 @@ describe.skip("TagSelector", () => {
   const renderTagSelector = (props = {}) => {
     return render(
       <TagSelector
-        track={mockTrack}
         categories={mockCategories}
         trackTags={mockTrackTags}
         onToggleTag={mockOnToggleTag}
