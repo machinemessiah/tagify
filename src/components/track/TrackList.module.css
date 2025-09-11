@@ -220,12 +220,15 @@
 }
 
 .excludedTagFilter {
-  background: #b91c1c;
+  background-color: #e74c3c !important;
   color: white !important;
+  font-weight: 600 !important;
+  text-decoration: line-through;
 }
 
 .excludedTagFilter:hover {
-  background: #991b1b;
+  background-color: #c0392b !important;
+  opacity: 0.95 !important;
 }
 
 .filterSectionHeader {
@@ -326,11 +329,6 @@
   font-size: 12px;
   color: var(--spice-subtext);
   flex-shrink: 0;
-}
-
-.trackItemRating {
-  display: flex;
-  align-items: center;
 }
 
 /* Filter stars */
@@ -448,18 +446,35 @@
   color: var(--spice-text);
 }
 
+.playAllButton,
+.createPlaylistButton,
+.smartPlaylistButton {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  min-height: 36px;
+  justify-content: center;
+}
+
+.playAllButton,
+.smartPlaylistButton {
+  width: 3em;
+}
+
 .createPlaylistButton {
   background: rgb(0 0 0 / 30%);
   color: white;
-  border: 1px solid rgb(255 255 255 / 20%);
+  border: 1px solid rgb(255 255 255 / 15%);
   backdrop-filter: blur(10px);
   width: 10em;
-}
-
-.createPlaylistButton:hover:not(:disabled) {
-  background: rgb(255 255 255 / 10%);
-  border-color: rgb(255 255 255 / 30%);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
 }
 
 .createPlaylistButton:disabled {
@@ -471,6 +486,12 @@
   box-shadow: none;
 }
 
+.createPlaylistButton:hover:not(:disabled) {
+  background: rgb(255 255 255 / 10%);
+  border-color: rgb(255 255 255 / 30%);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
+}
+
 .smartPlaylistButton {
   background: linear-gradient(
     135deg,
@@ -478,7 +499,7 @@
     rgb(255 152 0 / 15%)
   );
   color: white;
-  border: 1px solid rgb(255 193 7 / 30%);
+  border: 1px solid rgb(255 193 7 / 15%);
   position: relative;
   overflow: hidden;
 }
@@ -499,13 +520,23 @@
   transition: left 0.5s ease;
 }
 
+.smartPlaylistButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgb(255 193 7 / 8%);
+
+  /* border-color: rgb(255 193 7 / 15%); */
+  transform: none;
+  box-shadow: none;
+}
+
 .smartPlaylistButton:hover:not(:disabled) {
   background: linear-gradient(
     135deg,
     rgb(255 193 7 / 25%),
     rgb(255 152 0 / 25%)
   );
-  border-color: rgb(255 193 7 / 50%);
+  /* border-color: rgb(255 193 7 / 50%); */
   box-shadow: 0 4px 12px rgb(255 193 7 / 30%);
 }
 
@@ -537,15 +568,6 @@
     transform: scale(1.1);
     filter: drop-shadow(0 0 8px rgb(255 215 0 / 80%));
   }
-}
-
-.smartPlaylistButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background: rgb(255 193 7 / 8%);
-  border-color: rgb(255 193 7 / 15%);
-  transform: none;
-  box-shadow: none;
 }
 
 .smartPlaylistButton:disabled svg {
@@ -625,18 +647,6 @@
 
 .loadMoreButton:hover {
   background: rgb(255 255 255 / 10%);
-}
-
-.excludedTagFilter {
-  background-color: #e74c3c !important;
-  color: white !important;
-  font-weight: 600 !important;
-  text-decoration: line-through;
-}
-
-.excludedTagFilter:hover {
-  background-color: #c0392b !important;
-  opacity: 0.95 !important;
 }
 
 .incompleteBullet {
@@ -726,38 +736,11 @@
   margin-left: 6px;
 }
 
-.playAllButton,
-.createPlaylistButton,
-.smartPlaylistButton {
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  min-height: 36px;
-  justify-content: center;
-}
-
-.playAllButton,
-.smartPlaylistButton {
-  width: 3em;
-}
-
 .playAllButton {
   background: linear-gradient(135deg, #1e40af, #1d4ed8);
   color: white;
   box-shadow: 0 2px 6px rgb(30 64 175 / 25%);
-}
-
-.playAllButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
-  box-shadow: 0 3px 10px rgb(30 64 175 / 35%);
+  border: 1px solid rgb(255 193 7 / 15%);
 }
 
 .playAllButton:disabled {
@@ -768,6 +751,11 @@
   background: #64748b;
 }
 
+.playAllButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  box-shadow: 0 3px 10px rgb(30 64 175 / 35%);
+}
+
 .playAllButton::before {
   font-family: "Font Awesome 5 Free";
   content: "\f04b";
@@ -776,7 +764,6 @@
 }
 
 /* Sort controls */
-
 .sortOrderButton {
   background: rgb(0 0 0 / 20%);
   color: var(--spice-text);

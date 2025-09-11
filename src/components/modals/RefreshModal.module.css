@@ -137,15 +137,15 @@
   margin-top: auto;
 }
 
-.refreshButton:hover:not(:disabled) {
-  background: rgb(255 255 255 / 10%);
-  transform: translateY(-1px);
-}
-
 .refreshButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+}
+
+.refreshButton:hover:not(:disabled) {
+  background: rgb(255 255 255 / 10%);
+  transform: translateY(-1px);
 }
 
 .quickButton {

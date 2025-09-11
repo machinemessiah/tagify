@@ -37,13 +37,13 @@
   transition: background-color 0.2s ease;
 }
 
-.actionButton:hover:not(:disabled) {
-  background-color: rgb(255 255 255 / 10%);
-}
-
 .actionButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.actionButton:hover:not(:disabled) {
+  background-color: rgb(255 255 255 / 10%);
 }
 
 .lockButton {
