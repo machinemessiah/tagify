@@ -3,8 +3,7 @@
 Tagify is a powerful [Spicetify](https://github.com/spicetify/cli) custom app that brings advanced music tagging and organization capabilities to Spotify.
 
 [![GitHub release](https://img.shields.io/github/release/alexk218/tagify.svg)](https://github.com/alexk218/tagify/releases)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/alexk218/tagify.svg)](https://github.com/alexk218/tagify/stargazers)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/alexk218)
 
 ## Demo
 
@@ -123,3 +122,9 @@ Join the community and influence Tagify's roadmap.
 - **Get Help**: [Ask questions](https://github.com/alexk218/tagify/discussions/categories/q-a)
 - **Report Bugs**: [Bug reports](https://github.com/alexk218/tagify/discussions/categories/bug-report)
 - **Announcements**: [Latest updates](https://github.com/alexk218/tagify/discussions/categories/announcements)
+
+## Support me ☕
+If you enjoy Tagify and want to support its development, consider [buying me a coffee](https://buymeacoffee.com/alexk218)
+:). 
+
+Thank you.
